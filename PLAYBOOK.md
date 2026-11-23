@@ -1,11 +1,11 @@
 # Daily Short playbook
 
-How each day's video for the "Build Your Site" YouTube channel is made. This repo is PUBLIC: it holds only the videos, the demo-site source, and public performance numbers. Never commit names, emails, locations, client or business details, credentials, or anything else about the channel owner.
+How each day's video for the "Build Your Site" YouTube channel is made. This repo is PUBLIC: it holds only the videos, the demo-site source, and the tools. Research notes, the video log and performance numbers are kept elsewhere, never here. Never commit names, emails, locations, client or business details, credentials, or anything else about the channel owner.
 
 ## The format
 A 15 to 20 second vertical video (1080x1920, 30 fps) that films a real, working website built that day for an invented brand. The site is a single `index.html` with no network requests; all visuals are drawn in code (canvas, CSS, SVG).
 
-What the first hit on the channel had in common with the breakout videos in this niche:
+Format checklist:
 - A striking moving visual in the first second (particles, 3D motion), before any site UI appears.
 - A plain-language value hook on screen at 0s, then "Not a video. A website." around 2s.
 - A premium product or brand, and a new scene on every scroll step (scrollytelling).
