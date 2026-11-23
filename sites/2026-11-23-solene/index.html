@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solène N°7 — Eau de Parfum</title>
+<style>
+  :root { --gold: #f0c27a; --ink: #f7efe2; --muted: rgba(247,239,226,.66); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: auto; }
+  body { background: #050302; color: var(--ink); font-family: "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  #track { height: 400vh; }
+  #stage { position: fixed; inset: 0; overflow: hidden; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .serif { font-family: "Liberation Serif", "Times New Roman", serif; }
+  nav { position: absolute; top: 26px; left: 26px; right: 26px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--muted); font-weight: 600; z-index: 4; }
+  nav b { font-family: "Liberation Serif", serif; font-weight: 400; font-size: 21px; letter-spacing: .42em; color: var(--ink); padding-left: .42em; }
+  .panel { position: absolute; left: 0; right: 0; padding: 0 30px; will-change: opacity, transform; opacity: 0; }
+  .eyebrow { font-size: 11px; letter-spacing: .34em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+
+  #p1 { top: 65.5%; text-align: center; }
+  #p1 h1 { font-family: "Liberation Serif", serif; font-weight: 400; font-style: italic; font-size: 72px; line-height: .96; letter-spacing: -.02em; margin-top: 14px; }
+  #p1 p { margin-top: 14px; font-size: 15px; color: var(--muted); letter-spacing: .04em; }
+  #p1 .scroll { margin: 26px auto 0; width: 1px; height: 46px; background: linear-gradient(var(--gold), transparent); }
+
+  #p2 { top: 21%; }
+  #p2 h2, #p3 h2 { font-family: "Liberation Serif", serif; font-weight: 400; font-size: 54px; line-height: 1; letter-spacing: -.02em; margin-top: 12px; }
+  #p2 h2 i, #p3 h2 i, #p4 h3 i { color: var(--gold); }
+  .note { position: absolute; left: 0; top: 0; will-change: transform, opacity; opacity: 0; white-space: nowrap; }
+  .note b { display: block; font-family: "Liberation Serif", serif; font-weight: 400; font-style: italic; font-size: 30px; letter-spacing: -.01em; }
+  .note span { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+  #n1 { text-align: right; }
+
+  #p3 { top: 21%; text-align: center; }
+  #p3stats { position: absolute; left: 22px; right: 22px; top: 60%; display: grid; grid-template-columns: repeat(3,1fr); gap: 0; opacity: 0; }
+  #p3stats div { text-align: center; padding: 6px 4px; border-left: 1px solid rgba(240,194,122,.28); }
+  #p3stats div:first-child { border-left: 0; }
+  #p3stats b { display: block; font-family: "Liberation Serif", serif; font-weight: 400; font-size: 50px; letter-spacing: -.02em; color: var(--ink); }
+  #p3stats span { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+  #p4 { top: 47%; }
+  .card { border-radius: 28px; padding: 26px 24px 24px; background: linear-gradient(160deg, rgba(255,236,204,.14), rgba(255,236,204,.04)); border: 1px solid rgba(240,194,122,.3); backdrop-filter: blur(14px); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+  .card .row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; }
+  .card h3 { font-family: "Liberation Serif", serif; font-weight: 400; font-size: 40px; line-height: 1; letter-spacing: -.02em; }
+  .card .price { font-family: "Liberation Serif", serif; font-size: 40px; line-height: 1; }
+  .card .sub { font-size: 13px; color: var(--muted); margin-top: 8px; letter-spacing: .03em; }
+  .sizes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+  .sizes button { font: inherit; font-size: 14px; font-weight: 600; letter-spacing: .06em; color: var(--ink); background: transparent; border: 1px solid rgba(247,239,226,.3); border-radius: 999px; padding: 13px 0; cursor: pointer; }
+  .sizes button.on { background: var(--ink); color: #0b0705; border-color: var(--ink); }
+  .buy { width: 100%; margin-top: 12px; font: inherit; font-weight: 700; font-size: 16px; letter-spacing: .08em; text-transform: uppercase; color: #140c04; background: linear-gradient(180deg, #f8d79b, #e0a655); border: 0; border-radius: 999px; padding: 19px 0; cursor: pointer; box-shadow: 0 14px 40px rgba(224,166,85,.35); will-change: transform; }
+  .buy.done { background: #f7efe2; }
+  .fine { text-align: center; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); margin-top: 16px; font-weight: 600; }
+
+  #film { position: fixed; inset: 0; z-index: 50; pointer-events: none; display: none; }
+  body.film #film { display: block; }
+  #film .cap { position: absolute; left: 0; right: 0; top: 92px; text-align: center; }
+  #film .cap span { display: inline-block; max-width: 470px; font-family: "Inter Display","Inter",sans-serif; font-weight: 900; font-size: 32px; letter-spacing: -.025em; line-height: 1.08; color: #111; background: #fff; padding: 11px 18px 12px; border-radius: 14px; box-shadow: 0 12px 36px rgba(0,0,0,.55); }
+  #film .cap span u { text-decoration: none; background: #ffd15c; border-radius: 6px; padding: 0 5px; }
+  #film .tap { position: absolute; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: rgba(255,255,255,.4); border: 3px solid #fff; opacity: 0; }
+  body.film nav { top: 34px; }
+</style>
+</head>
+<body>
+<div id="track"></div>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <nav><span>Menu</span><b>SOLÈNE</b><span>Bag (<i id="bag" style="font-style:normal">0</i>)</span></nav>
+
+  <div class="panel" id="p1">
+    <div class="eyebrow">Eau de parfum &middot; N&deg;7</div>
+    <h1>Light, bottled.</h1>
+    <p>Bergamot, amber and cedar. Composed slowly, worn all day.</p>
+    <div class="scroll"></div>
+  </div>
+
+  <div class="panel" id="p2">
+    <div class="eyebrow">The composition</div>
+    <h2 class="serif">Three notes,<br><i>one trail.</i></h2>
+  </div>
+  <div class="note" id="n0"><b>Bergamot</b><span>Top &middot; bright</span></div>
+  <div class="note" id="n1"><b>Amber</b><span>Heart &middot; warm</span></div>
+  <div class="note" id="n2"><b>Cedar</b><span>Base &middot; deep</span></div>
+
+  <div class="panel" id="p3">
+    <div class="eyebrow">The seventh formula</div>
+    <h2 class="serif">Six we threw away.<br><i>One we kept.</i></h2>
+  </div>
+  <div id="p3stats">
+    <div><b data-c="72">0</b><span>Hours on skin</span></div>
+    <div><b data-c="14">0</b><span>Ingredients</span></div>
+    <div><b data-c="500">0</b><span>Per batch</span></div>
+  </div>
+
+  <div class="panel" id="p4">
+    <div class="card">
+      <div class="eyebrow">In stock &middot; ships today</div>
+      <div class="row"><h3>Solène <i>N&deg;7</i></h3><div class="price" id="price">$185</div></div>
+      <div class="sub">Eau de Parfum &middot; refillable glass flacon</div>
+      <div class="sizes"><button id="s50">50 ml</button><button id="s100" class="on">100 ml</button></div>
+      <button class="buy" id="buy">Add to bag</button>
+      <div class="fine">Free shipping &middot; 30-day returns</div>
+    </div>
+  </div>
+</div>
+<div id="film"><div class="cap" id="cap"></div><div class="tap" id="tap"></div></div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  if (FILM) document.body.classList.add('film');
+  var $ = function (id) { return document.getElementById(id); };
+  var cv = $('gl'), cx = cv.getContext('2d'), W, H, DPR;
+  function size() { DPR = window.devicePixelRatio || 1; W = innerWidth; H = innerHeight; cv.width = W * DPR; cv.height = H * DPR; }
+  size(); addEventListener('resize', size);
+
+  var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+  var sm = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  var out = function (x) { x = clamp(x, 0, 1); return 1 - Math.pow(1 - x, 3); };
+  var mix = function (a, b, k) { return a + (b - a) * k; };
+  var seed = 7; function R() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+  function G() { return (R() + R() + R() + R() - 2) * 0.87; }
+  function sgnpow(v, e) { return (v < 0 ? -1 : 1) * Math.pow(Math.abs(v), e); }
+
+  // ---------- particles ----------
+  var N = 11000, P = [];
+  // "N°7" point cloud sampled from real text
+  var tc = document.createElement('canvas'); tc.width = 520; tc.height = 240; var tx = tc.getContext('2d');
+  tx.fillStyle = '#fff'; tx.textAlign = 'center'; tx.textBaseline = 'middle'; tx.font = 'italic 210px "Liberation Serif", serif'; tx.fillText('N°7', 260, 128);
+  var td = tx.getImageData(0, 0, 520, 240).data, pts = [];
+  for (var yy = 0; yy < 240; yy += 2) for (var xx = 0; xx < 520; xx += 2) if (td[(yy * 520 + xx) * 4 + 3] > 120) pts.push([(xx - 260) / 260, -(yy - 120) / 260]);
+
+  function flacon(o) {
+    var r = R(), x, y, z, hot = 0;
+    if (r < .50) { var a = R() * 6.2832; y = mix(-.95, .30, R()); x = .50 * sgnpow(Math.cos(a), .42); z = .25 * sgnpow(Math.sin(a), .42); }
+    else if (r < .60) { var a2 = R() * 6.2832, q = Math.sqrt(R()); y = R() < .5 ? -.95 : .30; x = .50 * q * sgnpow(Math.cos(a2), .42); z = .25 * q * sgnpow(Math.sin(a2), .42); }
+    else if (r < .76) { var a3 = R() * 6.2832, q3 = Math.sqrt(R()) * .86; y = mix(-.9, -.02 + Math.sin(a3 * 2) * .015, R()); x = .50 * q3 * sgnpow(Math.cos(a3), .5); z = .25 * q3 * sgnpow(Math.sin(a3), .5); hot = 1; }
+    else if (r < .80) { var a4 = R() * 6.2832; y = mix(.30, .43, R()); x = .1 * Math.cos(a4); z = .1 * Math.sin(a4); }
+    else if (r < .93) { var a5 = R() * 6.2832, top = R() < .22, q5 = top ? Math.sqrt(R()) : 1; y = top ? .84 : mix(.43, .84, R()); x = .2 * q5 * sgnpow(Math.cos(a5), .4); z = .2 * q5 * sgnpow(Math.sin(a5), .4); }
+    else { var a6 = R() * 6.2832, e = Math.acos(2 * R() - 1), rr = 1.25 + R() * .9; x = rr * Math.sin(e) * Math.cos(a6); y = rr * Math.cos(e) * .9; z = rr * Math.sin(e) * Math.sin(a6); hot = -1; }
+    o.bx = x; o.by = y; o.bz = z; o.hot = hot;
+  }
+  var CL = [[-.5, .1, 0], [.55, -.55, .1], [-.45, -1.2, -.05]];
+  for (var i = 0; i < N; i++) {
+    var o = { a: R() * 6.2832, r: R(), z0: R(), s: R(), n1: G(), n2: G(), n3: G(), d: R() };
+    flacon(o);
+    o.c = i % 3; var ring = R() < .32;
+    if (ring) { var ra = R() * 6.2832, rr2 = .50 + G() * .014; o.lx = rr2 * Math.cos(ra); o.ly = G() * .012; o.lz = rr2 * Math.sin(ra); }
+    else { var m = Math.pow(R(), .6) * .33, a7 = R() * 6.2832, e7 = Math.acos(2 * R() - 1); o.lx = m * Math.sin(e7) * Math.cos(a7); o.ly = m * Math.cos(e7); o.lz = m * Math.sin(e7) * Math.sin(a7); }
+    var tp = pts[(R() * pts.length) | 0]; o.tx = tp[0] * 1.05 + G() * .004; o.ty = tp[1] * 1.05 + G() * .004; o.tz = G() * .05;
+    P.push(o);
+  }
+  var q = [0, 0, 0];
+  // each shape writes world coords into q
+  function sVortex(o, t) { var z = (o.z0 + t * .62) % 1, th = o.a + t * 1.1 + z * 3.4, r = .16 + o.r * o.r * 1.5; q[0] = r * Math.cos(th); q[1] = r * Math.sin(th) * 1.5; q[2] = -2.5 + z * 6.2; }
+  function sFlacon(o, t, sc, oy, spin) { var c = Math.cos(spin), s = Math.sin(spin), bob = Math.sin(t * 1.1) * .02; var x = o.bx, z = o.bz; if (o.hot < 0) { var c2 = Math.cos(-spin * .4), s2 = Math.sin(-spin * .4); q[0] = (x * c2 - z * s2) * sc; q[2] = (x * s2 + z * c2) * sc; } else { q[0] = (x * c - z * s) * sc; q[2] = (x * s + z * c) * sc; } q[1] = (o.by + bob) * sc + oy; }
+  function sNotes(o, t) { var cc = CL[o.c], sp = t * (.9 + o.c * .25) + o.c * 2, c = Math.cos(sp), s = Math.sin(sp), tl = .5 + o.c * .5; var x = o.lx * c - o.lz * s, z = o.lx * s + o.lz * c, y = o.ly * Math.cos(tl) - z * Math.sin(tl); z = o.ly * Math.sin(tl) + z * Math.cos(tl); q[0] = cc[0] + x; q[1] = cc[1] + y + Math.sin(t * 1.3 + o.c * 2) * .03; q[2] = cc[2] + z; }
+  function sText(o, t) { var sw = Math.sin(t * .9) * .22, c = Math.cos(sw), s = Math.sin(sw); q[0] = o.tx * c - o.tz * s; q[2] = o.tx * s + o.tz * c; q[1] = o.ty + .1 + Math.sin(t * 1.7 + o.tx * 3) * .012; }
+  function shape(k, o, t) { if (k === 0) sVortex(o, t); else if (k === 1) sFlacon(o, t, 1.15, .3, t * .55); else if (k === 2) sNotes(o, t); else if (k === 3) sText(o, t); else sFlacon(o, t, .6, .5, t * .7 + 1); }
+
+  var T = 0, size50 = false, added = null;
+  function setSize(s) { size50 = s; $('s50').className = s ? 'on' : ''; $('s100').className = s ? '' : 'on'; $('price').textContent = s ? '$120' : '$185'; }
+  $('s50').onclick = function () { setSize(true); }; $('s100').onclick = function () { setSize(false); };
+  function add() { if (added == null) { added = T; $('bag').textContent = '1'; } }
+  $('buy').onclick = add;
+
+  var spr = document.createElement('canvas'); spr.width = spr.height = 64; (function () { var g = spr.getContext('2d'), rg = g.createRadialGradient(32, 32, 0, 32, 32, 32); rg.addColorStop(0, 'rgba(255,214,150,.9)'); rg.addColorStop(.25, 'rgba(255,170,80,.35)'); rg.addColorStop(1, 'rgba(255,120,30,0)'); g.fillStyle = rg; g.fillRect(0, 0, 64, 64); })();
+  var EMB = [[255, 120, 50], [255, 190, 90], [255, 80, 40], [255, 226, 160], [255, 150, 60]];
+  var PAL = [[255, 214, 150], [240, 180, 96], [255, 236, 200], [214, 140, 62], [255, 196, 110]];
+  var TINT = [[214, 230, 120], [255, 150, 70], [176, 120, 84]];
+  var notePos = [[0, 0], [0, 0], [0, 0]]; function pr0(v) { return v; }
+
+  function render(t, p) {
+    T = t;
+    // intro (time) then scroll (p) -> continuous phase f in [0,4]
+    var intro = sm((t - 1.75) / 1.5);
+    var f = intro < 1 ? intro : 1 + clamp(p, 0, 1) * 3;
+    var k0 = Math.min(3, Math.floor(f)), fr = f - k0, hold = k0 === 0 ? fr : sm((fr - .12) / .76);
+    var unit = W * .43, camZ = 3.3, zoom = 1 + (k0 === 1 ? Math.sin(Math.PI * hold) * .5 : 0) + (k0 === 2 ? Math.sin(Math.PI * hold) * .25 : 0);
+    var cxp = W / 2, cyp = H * .45;
+
+    cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.globalCompositeOperation = 'source-over';
+    var bg = cx.createRadialGradient(cxp, cyp, 0, cxp, cyp, H * .7);
+    bg.addColorStop(0, 'rgb(34,20,9)'); bg.addColorStop(.5, 'rgb(13,8,4)'); bg.addColorStop(1, 'rgb(3,2,1)');
+    cx.fillStyle = bg; cx.fillRect(0, 0, W, H);
+    cx.globalCompositeOperation = 'lighter';
+
+    var burst = Math.sin(Math.PI * hold) * (k0 === 0 ? .2 : .3);
+    var wNotes = k0 === 1 ? hold : k0 === 2 ? 1 - hold : 0;
+    var wV = k0 === 0 ? 1 - hold : 0; if (wV > 0) { var cg0 = cx.createRadialGradient(cxp, cyp, 0, cxp, cyp, W * .6); cg0.addColorStop(0, 'rgba(255,150,60,' + (.5 * wV).toFixed(3) + ')'); cg0.addColorStop(1, 'rgba(255,90,20,0)'); cx.fillStyle = cg0; cx.fillRect(0, 0, W, H); }
+    for (var i = 0; i < N; i++) {
+      var o = P[i], kk = sm((hold - o.d * .35) / .65);
+      shape(k0, o, t); var x = q[0], y = q[1], z = q[2];
+      if (kk > 0) { shape(k0 + 1, o, t); x = mix(x, q[0], kk); y = mix(y, q[1], kk); z = mix(z, q[2], kk); }
+      var b = burst * (.4 + o.s);
+      x += o.n1 * b; y += o.n2 * b; z += o.n3 * b;
+      var dz = z + camZ; if (dz < .12) continue;
+      var pr = unit * 2.7 * zoom / dz, sx = cxp + x * pr / 2.7 * 2.7 / 1, sy;
+      sx = cxp + x * pr; sy = cyp - y * pr;
+      if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
+      var near = clamp((camZ / dz), .3, 6), sz = clamp((.9 + o.s * 1.7) * near, .7, 11);
+      var col = PAL[i % 5], tint = TINT[o.c], al = (o.hot > 0 ? 1 : o.hot < 0 ? .4 : .8) * clamp(1.4 - near * .18, .25, 1) * (.55 + .45 * Math.sin(t * 3 + o.a * 9));
+      var em = EMB[i % 5]; var cr = mix(mix(col[0], tint[0], wNotes * .75), em[0], wV), cg = mix(mix(col[1], tint[1], wNotes * .75), em[1], wV), cb = mix(mix(col[2], tint[2], wNotes * .75), em[2], wV);
+      cx.fillStyle = 'rgba(' + (cr | 0) + ',' + (cg | 0) + ',' + (cb | 0) + ',' + al.toFixed(3) + ')';
+      if (sz > 3.2) { cx.beginPath(); cx.arc(sx, sy, sz / 2, 0, 6.2832); cx.fill(); } else cx.fillRect(sx - sz / 2, sy - sz / 2, sz, sz);
+      if (i % 6 === 0) { var gs = sz * 7; cx.globalAlpha = al * .5; cx.drawImage(spr, sx - gs / 2, sy - gs / 2, gs, gs); cx.globalAlpha = 1; }
+      if (wV > .05 && i % 2 === 0) { sVortex(o, t - .05); var dz2 = q[2] + camZ; if (dz2 > .12) { var pr2 = unit * 2.7 * zoom / dz2; cx.strokeStyle = 'rgba(' + (cr | 0) + ',' + (cg | 0) + ',' + (cb | 0) + ',' + (al * wV * .7).toFixed(3) + ')'; cx.lineWidth = sz * .8; cx.beginPath(); cx.moveTo(sx, sy); cx.lineTo(cxp + q[0] * pr2, cyp - q[1] * pr2); cx.stroke(); } }
+    }
+    for (var c = 0; c < 3; c++) { var pz = unit * 2.7 / (CL[c][2] + camZ); notePos[c][0] = cxp + CL[c][0] * pr0(pz); notePos[c][1] = cyp - CL[c][1] * pz; }
+
+    // ---------- DOM panels driven by the same phase ----------
+    var near1 = function (target, w) { return sm(1 - Math.abs(f - target) / w); };
+    var a1 = near1(1, .34) * sm((t - 2.7) / .7), a2 = near1(2, .36), a3 = near1(3, .36), a4 = sm((f - 3.55) / .4);
+    function show(id, a, dy) { var el = $(id); el.style.opacity = a.toFixed(3); el.style.transform = 'translateY(' + ((1 - a) * (dy || 30)).toFixed(1) + 'px)'; el.style.pointerEvents = a > .6 ? 'auto' : 'none'; }
+    show('p1', a1, 24); show('p2', a2); show('p3', a3); show('p4', a4, 60);
+    var off = [[118, -26], [-232, 4], [118, -26]];
+    for (var n = 0; n < 3; n++) { var el = $('n' + n), an = sm((a2 - .35 - n * .1) / .45); el.style.opacity = an.toFixed(3); el.style.transform = 'translate(' + (notePos[n][0] + off[n][0]).toFixed(1) + 'px,' + (notePos[n][1] + off[n][1]).toFixed(1) + 'px)'; }
+    var st = $('p3stats'); st.style.opacity = a3.toFixed(3); st.style.transform = 'translateY(' + ((1 - a3) * 30).toFixed(1) + 'px)';
+    [].forEach.call(st.querySelectorAll('b'), function (b) { b.textContent = Math.round(+b.dataset.c * out((a3 - .15) / .85)); });
+    var buy = $('buy');
+    if (added != null) { var bk = out((t - added) / .45); buy.textContent = 'Added to bag  ✓'; buy.className = 'buy done'; buy.style.transform = 'scale(' + (1 + Math.sin(bk * Math.PI) * .07).toFixed(3) + ')'; }
+  }
+
+  function prog() { return scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+  if (!FILM) { var t0 = performance.now(); (function loop() { render((performance.now() - t0) / 1000, prog()); requestAnimationFrame(loop); })(); }
+
+  // ---------- filming hooks (recorder only) ----------
+  var CAPS = [[0.1, 2.25, 'Websites that look like <u>$5,000</u>'], [2.4, 4.75, 'Not a video. <u>A website.</u>'], [4.9, 8.3, '<u>Claude</u> built it from one prompt'], [8.45, 11.2, 'Every scroll, a <u>new scene</u>'], [11.35, 14.3, 'No code. <u>Minutes,</u> not weeks.'], [14.45, 17.1, 'Follow for a new <u>AI site</u> daily']];
+  var TAPS = [[12.75, 's50', function () { setSize(true); }, false], [14.0, 'buy', add, false]];
+  window.__frame = function (t, y) {
+    window.scrollTo(0, y);
+    TAPS.forEach(function (tp) { if (!tp[3] && t >= tp[0] + .22) { tp[3] = true; T = tp[0] + .22; tp[2](); } });
+    render(t, prog());
+    var html = '';
+    CAPS.forEach(function (c) { if (t >= c[0] && t < c[1]) { var k = out((t - c[0]) / .2), o2 = clamp((c[1] - t) / .12, 0, 1); html = '<span style="opacity:' + Math.min(k, o2).toFixed(3) + ';transform:scale(' + mix(.8, 1, k).toFixed(3) + ') rotate(' + mix(-4, -1.5, k).toFixed(2) + 'deg)">' + c[2] + '</span>'; } });
+    $('cap').innerHTML = html;
+    var tap = $('tap'); tap.style.opacity = 0;
+    TAPS.forEach(function (tp) {
+      var d = t - tp[0]; if (d < 0 || d > .75) return;
+      var r = $(tp[1]).getBoundingClientRect(), press = d < .22 ? out(d / .22) : 1, rel = clamp((d - .22) / .5, 0, 1);
+      tap.style.left = (r.left + r.width * .5) + 'px'; tap.style.top = (r.top + r.height / 2) + 'px';
+      tap.style.opacity = (1 - rel).toFixed(3); tap.style.transform = 'scale(' + (mix(1.5, .8, press) + rel * 1.3).toFixed(3) + ')';
+    });
+  };
+})();
+</script>
+</body>
+</html>

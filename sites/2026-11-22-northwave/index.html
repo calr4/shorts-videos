@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northwave Surf School</title>
+<style>
+  :root { --accent: rgb(255,122,69); --ink: #f6f3ee; --muted: rgba(246,243,238,.72); --panel: rgba(9,12,28,.9); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: auto; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); background: #070a18; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  canvas#sea { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; display: block; }
+  .scrim { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, rgba(5,6,20,.55) 0%, rgba(5,6,20,.08) 34%, rgba(5,6,20,0) 60%); }
+  main { position: relative; z-index: 2; }
+
+  nav { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 26px 26px 0; z-index: 5; }
+  .logo { font-family: "Inter Display","Inter",sans-serif; font-weight: 800; letter-spacing: .22em; font-size: 15px; display: flex; align-items: center; gap: 9px; }
+  .logo i { width: 22px; height: 22px; border-radius: 50%; display: block; background: var(--accent); position: relative; overflow: hidden; }
+  .logo i::after { content: ""; position: absolute; left: -4px; right: -4px; bottom: -9px; height: 16px; border-radius: 50%; background: #070a18; }
+  .toggle { display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(8,10,26,.45); border: 1px solid rgba(255,255,255,.22); backdrop-filter: blur(8px); cursor: pointer; position: relative; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+  .toggle span { padding: 7px 13px; border-radius: 999px; position: relative; z-index: 1; color: rgba(255,255,255,.75); }
+  .toggle .knob { position: absolute; top: 4px; bottom: 4px; left: 4px; width: 50%; border-radius: 999px; background: var(--accent); z-index: 0; }
+  .toggle span.on { color: #0a0c1c; }
+
+  .hero { height: 100vh; min-height: 720px; padding: 132px 28px 0; position: relative; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-family: "Inter Display","Inter",sans-serif; font-weight: 800; font-size: 66px; line-height: .98; letter-spacing: -.035em; margin-top: 16px; }
+  h1 .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; }
+  h1 .w b { display: inline-block; font-weight: inherit; will-change: transform; }
+  .lede { margin-top: 20px; font-size: 17px; line-height: 1.5; color: var(--muted); max-width: 400px; }
+  .cta-row { display: flex; gap: 12px; margin-top: 28px; }
+  .btn { font: inherit; font-weight: 700; font-size: 15px; border: 0; border-radius: 999px; padding: 16px 26px; cursor: pointer; color: #0a0c1c; background: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,.28); }
+  .btn.ghost { background: rgba(255,255,255,.1); color: var(--ink); border: 1px solid rgba(255,255,255,.3); box-shadow: none; backdrop-filter: blur(6px); }
+  .tide { position: absolute; left: 28px; right: 28px; bottom: 44px; display: flex; justify-content: space-between; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.82); font-weight: 600; }
+  .tide b { display: block; font-size: 22px; letter-spacing: -.01em; margin-top: 4px; color: #fff; font-family: "Inter Display","Inter",sans-serif; font-weight: 700; text-transform: none; }
+
+  section.block { padding: 64px 26px 24px; background: linear-gradient(180deg, rgba(7,10,24,0) 0, var(--panel) 90px, var(--panel) 100%); }
+  section.block.flat { background: var(--panel); padding-top: 40px; }
+  h2 { font-family: "Inter Display","Inter",sans-serif; font-weight: 800; font-size: 40px; line-height: 1.02; letter-spacing: -.03em; margin-top: 12px; }
+  h2 em { font-style: normal; color: var(--accent); }
+
+  .cards { margin-top: 28px; display: grid; gap: 14px; }
+  .card { border-radius: 24px; padding: 22px; background: linear-gradient(140deg, rgba(255,255,255,.13), rgba(255,255,255,.04)); border: 1px solid rgba(255,255,255,.16); display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: end; }
+  .card .tag { grid-column: 1 / -1; font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  .card h3 { font-family: "Inter Display","Inter",sans-serif; font-size: 25px; font-weight: 700; letter-spacing: -.02em; }
+  .card p { grid-column: 1; font-size: 14px; line-height: 1.45; color: var(--muted); }
+  .card .price { grid-row: 2 / 4; grid-column: 2; font-family: "Inter Display","Inter",sans-serif; font-weight: 800; font-size: 34px; letter-spacing: -.03em; }
+  .card .price small { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+
+  .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 8px; }
+  .stat { text-align: center; padding: 20px 6px; border-radius: 20px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); }
+  .stat b { display: block; font-family: "Inter Display","Inter",sans-serif; font-size: 32px; font-weight: 800; letter-spacing: -.03em; color: var(--accent); }
+  .stat span { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+  .boards { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 34px; align-items: end; }
+  .board { text-align: center; }
+  .board .shape { width: 74px; margin: 0 auto; border-radius: 50% 50% 46% 46% / 30% 30% 18% 18%; position: relative; box-shadow: 0 24px 40px rgba(0,0,0,.45), inset -10px 0 18px rgba(0,0,0,.18), inset 8px 0 14px rgba(255,255,255,.28); will-change: transform; }
+  .board .shape::before { content: ""; position: absolute; left: 50%; top: 5%; bottom: 4%; width: 2px; margin-left: -1px; background: rgba(60,35,20,.55); }
+  .board .shape::after { content: ""; position: absolute; left: 0; right: 0; top: 56%; height: 13%; background: rgba(255,255,255,.9); mix-blend-mode: soft-light; }
+  .b1 .shape { height: 300px; background: linear-gradient(180deg,#ffe3b0,#ff9a5a 55%,#e8503a); }
+  .b2 .shape { height: 214px; background: linear-gradient(180deg,#c9f3ff,#49b6d6 55%,#1c6f9c); border-radius: 50% 50% 40% 40% / 34% 34% 14% 14%; width: 82px; }
+  .b3 .shape { height: 262px; background: linear-gradient(180deg,#fff7ea,#f1e2c8 55%,#d9c19a); }
+  .board h4 { margin-top: 18px; font-family: "Inter Display","Inter",sans-serif; font-size: 17px; font-weight: 700; }
+  .board p { font-size: 12px; color: var(--muted); margin-top: 3px; letter-spacing: .04em; }
+
+  .final { padding: 84px 26px 150px; background: linear-gradient(180deg, var(--panel) 0, rgba(7,10,24,.25) 100%); text-align: center; }
+  .final h2 { font-size: 52px; }
+  .final p { margin: 16px auto 0; max-width: 360px; color: var(--muted); font-size: 16px; line-height: 1.5; }
+  .final .btn { margin-top: 30px; font-size: 17px; padding: 20px 38px; }
+  .final .btn.done { background: #fff; }
+  .final .note { font-size: 12px; margin-top: 16px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.7); font-weight: 600; }
+
+  [data-r] { will-change: transform, opacity; }
+
+  /* Filming overlay: only shown when the page is opened with ?film=1 */
+  #film { position: fixed; inset: 0; z-index: 50; pointer-events: none; display: none; }
+  #film .cap { position: absolute; left: 0; right: 0; top: 96px; text-align: center; }
+  #film .cap span { display: inline-block; font-family: "Inter Display","Inter",sans-serif; font-weight: 900; font-size: 31px; letter-spacing: -.02em; line-height: 1.1; color: #fff; background: rgba(6,7,18,.86); padding: 12px 20px 13px; border-radius: 16px; box-shadow: 0 10px 34px rgba(0,0,0,.4); }
+  #film .cap span u { text-decoration: none; color: #ffd15c; }
+  #film .tap { position: absolute; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: rgba(255,255,255,.42); border: 3px solid #fff; box-shadow: 0 0 0 0 rgba(255,255,255,.5); opacity: 0; }
+  body.film #film { display: block; }
+  body.film .hero { padding-top: 196px; }
+  body.film nav { padding-top: 28px; }
+</style>
+</head>
+<body>
+<canvas id="sea"></canvas>
+<div class="scrim"></div>
+
+<main>
+  <nav>
+    <div class="logo"><i></i>NORTHWAVE</div>
+    <div class="toggle" id="toggle" role="button" aria-label="Switch between sunset and night">
+      <div class="knob" id="knob"></div><span id="tDay" class="on">Sunset</span><span id="tNight">Night</span>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow" data-intro="0">Surf school &middot; Pacific coast</div>
+    <h1 id="h1">Catch your first wave.</h1>
+    <p class="lede" data-intro="5">Small-group lessons at sunrise and sunset. Board and wetsuit included, no experience needed.</p>
+    <div class="cta-row" data-intro="6">
+      <button class="btn">Book a lesson</button>
+      <button class="btn ghost">See the boards</button>
+    </div>
+    <div class="tide" data-intro="7">
+      <div>Swell<b>3&ndash;4 ft</b></div>
+      <div>Water<b>66&deg;F</b></div>
+      <div>Next lesson<b>6:10 am</b></div>
+    </div>
+  </header>
+
+  <section class="block" id="lessons">
+    <div class="eyebrow" data-r>Lessons</div>
+    <h2 data-r>Three ways <em>in.</em></h2>
+    <div class="cards">
+      <div class="card" data-r><div class="tag">Most popular</div><h3>First Wave</h3><div class="price">$79<small> /2 hr</small></div><p>Stand up on day one. Six students max per coach.</p></div>
+      <div class="card" data-r><div class="tag">Level up</div><h3>Green Room</h3><div class="price">$119<small> /2 hr</small></div><p>Read the lineup, turn, and trim down the line.</p></div>
+      <div class="card" data-r><div class="tag">One on one</div><h3>Private Coach</h3><div class="price">$189<small> /90 min</small></div><p>Your pace, your break, video review after.</p></div>
+    </div>
+  </section>
+
+  <section class="block flat">
+    <div class="stats">
+      <div class="stat" data-r><b data-count="4.9" data-dec="1">0</b><span>Avg rating</span></div>
+      <div class="stat" data-r><b data-count="12400" data-suffix="+">0</b><span>Waves caught</span></div>
+      <div class="stat" data-r><b data-count="6">0</b><span>Max group</span></div>
+    </div>
+  </section>
+
+  <section class="block flat" id="boards">
+    <div class="eyebrow" data-r>The quiver</div>
+    <h2 data-r>Shaped by hand, <em>ready to ride.</em></h2>
+    <div class="boards">
+      <div class="board b1" data-b="-1"><div class="shape"></div><h4>The Log</h4><p>9'2" &middot; cruisy</p></div>
+      <div class="board b2" data-b="0"><div class="shape"></div><h4>Twin Fish</h4><p>5'8" &middot; playful</p></div>
+      <div class="board b3" data-b="1"><div class="shape"></div><h4>Mini-Mal</h4><p>7'6" &middot; forgiving</p></div>
+    </div>
+  </section>
+
+  <section class="final" id="final">
+    <div class="eyebrow" data-r>Dawn patrol</div>
+    <h2 data-r>The ocean's <em>open.</em></h2>
+    <p data-r>Pick a morning. We'll bring the board, the wetsuit and the coffee.</p>
+    <button class="btn" id="book" data-r>Book a lesson</button>
+    <div class="note" data-r id="note">Free cancellation up to 24 hours</div>
+  </section>
+</main>
+
+<div id="film"><div class="cap" id="cap"></div><div class="tap" id="tap"></div></div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  if (FILM) document.body.classList.add('film');
+  var cv = document.getElementById('sea'), cx = cv.getContext('2d');
+  var W = 0, H = 0, DPR = 1;
+  function size() { DPR = window.devicePixelRatio || 1; W = innerWidth; H = innerHeight; cv.width = W * DPR; cv.height = H * DPR; }
+  size(); addEventListener('resize', size);
+
+  var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+  var ease = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  var out = function (x) { x = clamp(x, 0, 1); return 1 - Math.pow(1 - x, 3); };
+  var mix = function (a, b, k) { return a + (b - a) * k; };
+  function rgb(a, b, k, al) { var s = 'rgb'; var c = [Math.round(mix(a[0], b[0], k)), Math.round(mix(a[1], b[1], k)), Math.round(mix(a[2], b[2], k))]; return al == null ? s + '(' + c + ')' : 'rgba(' + c + ',' + al + ')'; }
+  function rnd(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+
+  // headline words
+  var h1 = document.getElementById('h1');
+  h1.innerHTML = h1.textContent.split(' ').map(function (w) { return '<span class="w"><b>' + w + '</b></span>'; }).join(' ');
+  var words = [].slice.call(h1.querySelectorAll('b'));
+  var intro = [].slice.call(document.querySelectorAll('[data-intro]'));
+  var reveals = [].slice.call(document.querySelectorAll('[data-r]'));
+  var counts = [].slice.call(document.querySelectorAll('[data-count]'));
+  var boards = [].slice.call(document.querySelectorAll('.board'));
+
+  var T = 0, nightAt = null, nightDir = 1, nightFrom = 0, booked = null;
+  function nightAmt() { if (nightAt == null) return nightFrom; var k = ease((T - nightAt) / 1.5); return nightDir > 0 ? mix(nightFrom, 1, k) : mix(nightFrom, 0, k); }
+  function toggleNight() { var n = nightAmt(); nightFrom = n; nightDir = n > .5 ? -1 : 1; nightAt = T; }
+  document.getElementById('toggle').addEventListener('click', toggleNight);
+  var bookBtn = document.getElementById('book');
+  function book() { if (booked == null) booked = T; }
+  bookBtn.addEventListener('click', book);
+
+  function drawSea(n) {
+    cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var hz = H * 0.60;
+    var g = cx.createLinearGradient(0, 0, 0, hz);
+    g.addColorStop(0, rgb([44, 22, 92], [4, 6, 22], n));
+    g.addColorStop(.42, rgb([146, 48, 116], [10, 18, 52], n));
+    g.addColorStop(.78, rgb([255, 112, 67], [24, 40, 92], n));
+    g.addColorStop(1, rgb([255, 198, 112], [58, 84, 140], n));
+    cx.fillStyle = g; cx.fillRect(0, 0, W, hz + 2);
+
+    // stars
+    if (n > .02) for (var i = 0; i < 110; i++) {
+      var sx = rnd(i) * W, sy = rnd(i + 500) * hz * .86, tw = .55 + .45 * Math.sin(T * (1.2 + rnd(i + 9) * 2.4) + i);
+      cx.fillStyle = 'rgba(255,255,255,' + (n * tw * (.35 + rnd(i + 77) * .65)).toFixed(3) + ')';
+      var r = .6 + rnd(i + 31) * 1.3; cx.beginPath(); cx.arc(sx, sy, r, 0, 7); cx.fill();
+    }
+    // soft clouds
+    for (var c = 0; c < 4; c++) {
+      var cxp = ((rnd(c + 3) * W * 1.4 + T * (5 + c * 2.2)) % (W * 1.5)) - W * .25, cyp = hz * (.34 + c * .1);
+      var cg = cx.createRadialGradient(cxp, cyp, 0, cxp, cyp, 150 + c * 30);
+      cg.addColorStop(0, rgb([255, 170, 140], [120, 140, 200], n, .22 - n * .12)); cg.addColorStop(1, 'rgba(255,255,255,0)');
+      cx.fillStyle = cg; cx.save(); cx.translate(0, cyp); cx.scale(1, .26); cx.translate(0, -cyp); cx.fillRect(cxp - 220, cyp - 220, 440, 440); cx.restore();
+    }
+    // sun -> moon
+    var bx = mix(W * .68, W * .81, ease(n)), by = mix(hz - 34, H * .35, ease(n)), br = mix(74, 34, n);
+    var glow = cx.createRadialGradient(bx, by, br * .4, bx, by, br * 5.2);
+    glow.addColorStop(0, rgb([255, 226, 150], [190, 210, 255], n, mix(.75, .34, n))); glow.addColorStop(1, 'rgba(255,255,255,0)');
+    cx.fillStyle = glow; cx.fillRect(0, 0, W, hz + 2);
+    cx.save(); cx.beginPath(); cx.rect(0, 0, W, hz); cx.clip();
+    var bg = cx.createLinearGradient(0, by - br, 0, by + br);
+    bg.addColorStop(0, rgb([255, 244, 196], [246, 248, 255], n)); bg.addColorStop(1, rgb([255, 150, 84], [198, 210, 240], n));
+    cx.fillStyle = bg; cx.beginPath(); cx.arc(bx, by, br, 0, 7); cx.fill();
+    if (n > .3) { cx.fillStyle = 'rgba(150,165,205,' + ((n - .3) * .5).toFixed(3) + ')'; [[-.3, -.2, .2], [.25, .15, .14], [-.05, .4, .1]].forEach(function (m) { cx.beginPath(); cx.arc(bx + m[0] * br, by + m[1] * br, m[2] * br, 0, 7); cx.fill(); }); }
+    cx.restore();
+
+    // water base
+    var wg = cx.createLinearGradient(0, hz, 0, H);
+    wg.addColorStop(0, rgb([214, 104, 86], [30, 48, 100], n)); wg.addColorStop(.3, rgb([92, 44, 110], [12, 22, 58], n)); wg.addColorStop(1, rgb([20, 14, 56], [3, 6, 20], n));
+    cx.fillStyle = wg; cx.fillRect(0, hz, W, H - hz);
+    // reflection
+    for (var k = 0; k < 46; k++) {
+      var p = k / 46, ry = hz + 3 + Math.pow(p, 1.6) * (H - hz) * .9, rw = (10 + p * 150) * (.55 + .45 * Math.sin(T * 2.3 + k * 1.9)) , rx = bx + Math.sin(T * 1.2 + k * .8) * (4 + p * 26);
+      cx.fillStyle = rgb([255, 214, 140], [200, 216, 255], n, ((1 - p) * mix(.6, .42, n)).toFixed(3));
+      cx.fillRect(rx - rw / 2, ry, rw, 1.5 + p * 4.5);
+    }
+    // wave layers
+    for (var L = 0; L < 6; L++) {
+      var q = L / 5, y0 = hz + 14 + Math.pow(q, 1.5) * (H - hz) * .92, amp = 3 + q * 20, len = 150 + q * 260, sp = .5 + q * .9;
+      cx.beginPath(); cx.moveTo(0, H);
+      for (var x = 0; x <= W + 8; x += 8) {
+        var y = y0 + Math.sin(x / len * 6.283 + T * sp + L * 1.7) * amp + Math.sin(x / (len * .43) * 6.283 - T * sp * 1.4 + L) * amp * .35;
+        cx.lineTo(x, y);
+      }
+      cx.lineTo(W, H); cx.closePath();
+      cx.fillStyle = rgb([mix(150, 16, q), mix(66, 12, q), mix(120, 52, q)], [mix(26, 3, q), mix(42, 6, q), mix(92, 22, q)], n, .5);
+      cx.fill();
+      cx.lineWidth = 1 + q * 1.6; cx.strokeStyle = rgb([255, 196, 150], [170, 196, 255], n, (.3 - q * .14).toFixed(3));
+      cx.beginPath();
+      for (var x2 = 0; x2 <= W + 8; x2 += 8) {
+        var y2 = y0 + Math.sin(x2 / len * 6.283 + T * sp + L * 1.7) * amp + Math.sin(x2 / (len * .43) * 6.283 - T * sp * 1.4 + L) * amp * .35;
+        x2 ? cx.lineTo(x2, y2) : cx.moveTo(x2, y2);
+      }
+      cx.stroke();
+    }
+  }
+
+  function render(t) {
+    T = t;
+    var n = nightAmt(), root = document.documentElement.style;
+    root.setProperty('--accent', rgb([255, 122, 69], [126, 170, 255], n));
+    document.getElementById('knob').style.transform = 'translateX(' + (n * 96).toFixed(1) + '%)';
+    document.getElementById('tDay').className = n < .5 ? 'on' : '';
+    document.getElementById('tNight').className = n >= .5 ? 'on' : '';
+    drawSea(n);
+
+    words.forEach(function (w, i) { var k = out((t - .25 - i * .13) / .7); w.style.transform = 'translateY(' + ((1 - k) * 110).toFixed(1) + '%)'; });
+    intro.forEach(function (el) { var d = +el.dataset.intro, k = out((t - .15 - d * .13) / .7); el.style.opacity = k.toFixed(3); el.style.transform = 'translateY(' + ((1 - k) * 22).toFixed(1) + 'px)'; });
+
+    var vh = innerHeight;
+    reveals.forEach(function (el, i) {
+      el.style.transform = 'none';
+      var top = el.getBoundingClientRect().top, k = out((vh * .9 - top) / 190);
+      el.style.opacity = k.toFixed(3); el.style.transform = 'translateY(' + ((1 - k) * 46).toFixed(1) + 'px) scale(' + mix(.96, 1, k).toFixed(3) + ')';
+      el._k = k;
+    });
+    counts.forEach(function (el) {
+      var k = ease(((el.parentNode._k || 0) - .2) / .8), v = +el.dataset.count * k, dec = +(el.dataset.dec || 0);
+      el.textContent = (dec ? v.toFixed(dec) : Math.round(v).toLocaleString('en-US')) + (k >= 1 ? (el.dataset.suffix || '') : '');
+    });
+    boards.forEach(function (el) {
+      var sh = el.firstElementChild, top = el.getBoundingClientRect().top, k = out((vh * .92 - top) / 300), d = +el.dataset.b;
+      el.style.opacity = k.toFixed(3);
+      sh.style.transform = 'translateY(' + ((1 - k) * 90).toFixed(1) + 'px) rotate(' + (d * 7 + (1 - k) * d * 22 + Math.sin(t * 1.3 + d) * 1.6).toFixed(2) + 'deg)';
+    });
+    if (booked != null) {
+      var bk = out((t - booked) / .45);
+      bookBtn.textContent = '✓  You’re in. See you at sunrise.'; bookBtn.classList.add('done');
+      bookBtn.style.transform = 'scale(' + (1 + Math.sin(bk * Math.PI) * .08).toFixed(3) + ')'; bookBtn.style.opacity = 1;
+      document.getElementById('note').textContent = 'Confirmation sent · 6:10 am';
+    }
+  }
+
+  if (!FILM) { var t0 = performance.now(); (function loop() { render((performance.now() - t0) / 1000); requestAnimationFrame(loop); })(); addEventListener('scroll', function () {}, { passive: true }); }
+
+  // ---- filming hooks (used only by the recorder) ----
+  var cap = document.getElementById('cap'), tap = document.getElementById('tap');
+  var CAPS = [[0.15, 2.75, 'This is <u>NOT</u> a video.'], [2.95, 5.5, 'It’s a real <u>website.</u>'], [5.7, 12.6, '<u>AI</u> built all of it.'], [12.9, 16.1, 'No code. No designer.']];
+  var TAPS = [[2.55, 'toggle', toggleNight, false], [13.15, 'book', book, false]];
+  window.__frame = function (t, y) {
+    window.scrollTo(0, y);
+    TAPS.forEach(function (tp) { if (!tp[3] && t >= tp[0] + .22) { tp[3] = true; T = tp[0] + .22; tp[2](); } });
+    render(t);
+    var html = '';
+    CAPS.forEach(function (c) { if (t >= c[0] && t < c[1]) { var k = out((t - c[0]) / .22), o = clamp((c[1] - t) / .15, 0, 1); html = '<span style="opacity:' + (Math.min(k, o)).toFixed(3) + ';transform:scale(' + mix(.82, 1, k).toFixed(3) + ') rotate(' + mix(-3, -1.2, k).toFixed(2) + 'deg)">' + c[2] + '</span>'; } });
+    cap.innerHTML = html;
+    tap.style.opacity = 0;
+    TAPS.forEach(function (tp) {
+      var d = t - tp[0]; if (d < 0 || d > .75) return;
+      var r = document.getElementById(tp[1]).getBoundingClientRect(), press = d < .22 ? out(d / .22) : 1, rel = clamp((d - .22) / .5, 0, 1);
+      tap.style.left = (r.left + r.width * (tp[1] === 'toggle' ? .74 : .5)) + 'px'; tap.style.top = (r.top + r.height / 2) + 'px';
+      tap.style.opacity = (1 - rel).toFixed(3); tap.style.transform = 'scale(' + (mix(1.5, .8, press) + rel * 1.3).toFixed(3) + ')';
+    });
+  };
+})();
+</script>
+</body>
+</html>
