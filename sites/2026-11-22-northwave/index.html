@@ -291,6 +291,7 @@
   var cap = document.getElementById('cap'), tap = document.getElementById('tap');
   var CAPS = [[0.15, 2.75, 'This is <u>NOT</u> a video.'], [2.95, 5.5, 'It’s a real <u>website.</u>'], [5.7, 12.6, '<u>AI</u> built all of it.'], [12.9, 16.1, 'No code. No designer.']];
   var TAPS = [[2.55, 'toggle', toggleNight, false], [13.15, 'book', book, false]];
+  window.__film = { duration: 16, keys: [[0, 0], [5.3, 0], [7.3, .447], [7.9, .447], [10.0, .762], [10.6, .762], [12.5, 1], [16, 1]] };
   window.__frame = function (t, y) {
     window.scrollTo(0, y);
     TAPS.forEach(function (tp) { if (!tp[3] && t >= tp[0] + .22) { tp[3] = true; T = tp[0] + .22; tp[2](); } });

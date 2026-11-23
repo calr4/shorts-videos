@@ -226,6 +226,7 @@
   // ---------- filming hooks (recorder only) ----------
   var CAPS = [[0.1, 2.25, 'Websites that look like <u>$5,000</u>'], [2.4, 4.75, 'Not a video. <u>A website.</u>'], [4.9, 8.3, '<u>Claude</u> built it from one prompt'], [8.45, 11.2, 'Every scroll, a <u>new scene</u>'], [11.35, 14.3, 'No code. <u>Minutes,</u> not weeks.'], [14.45, 17.1, 'Follow for a new <u>AI site</u> daily']];
   var TAPS = [[12.75, 's50', function () { setSize(true); }, false], [14.0, 'buy', add, false]];
+  window.__film = { duration: 17, keys: [[0, 0], [4.9, 0], [6.9, 1 / 3], [8.4, 1 / 3], [9.9, 2 / 3], [11.3, 2 / 3], [12.5, 1], [17, 1]] };
   window.__frame = function (t, y) {
     window.scrollTo(0, y);
     TAPS.forEach(function (tp) { if (!tp[3] && t >= tp[0] + .22) { tp[3] = true; T = tp[0] + .22; tp[2](); } });
