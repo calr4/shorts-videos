@@ -36,3 +36,6 @@ Formats to rotate: single tool ("this AI does X"), task-to-tool list ("5 free AI
    `ffmpeg -i /tmp/scene.mp4 -i audio.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 192k -shortest -movflags +faststart aitooldrop/videos/<date>-<slug>.mp4`.
    Keep the file under 40 MB.
 4. Pull 4 frames from the finished file and look at them once more before publishing.
+
+## Music rule (no exceptions)
+Every music bed is generated from scratch in code during the run (synthesised tones and drums, as in `tools/audio_examples/`). Never use an existing song, a sample, a library loop, a cover, a melody copied from or closely following a known song, a platform's trending sound, or music from a generator service. If original music cannot be made, publish the video silent. Do not add music inside TikTok or Instagram.

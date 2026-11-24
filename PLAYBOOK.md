@@ -28,3 +28,6 @@ Each video must be clearly different from the last seven in at least three of: i
 ## Honesty rules
 - Only say what is true: an AI (Claude) built the site from a prompt, no hand-written code. Do not name any other website builder as the tool, and do not make income or price claims beyond the "looks like $X" style hook.
 - Invented brands only. No real companies, people, logos, characters, or copyrighted music.
+
+## Music rule (no exceptions)
+Every music bed is generated from scratch in code during the run (synthesised tones and drums, as in `tools/audio_examples/`). Never use an existing song, a sample, a library loop, a cover, a melody copied from or closely following a known song, a platform's trending sound, or music from a generator service. If original music cannot be made, publish the video silent. Do not add music inside TikTok or Instagram.
