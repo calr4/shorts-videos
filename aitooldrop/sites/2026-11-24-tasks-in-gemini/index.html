@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Tool Drop: Tasks in Gemini</title>
+<style>
+  :root { --blue: #1640ff; --deep: #071a8c; --ink: #ffffff; --sun: #ffd84a; --navy: #06103f; --muted: rgba(255,255,255,.8); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: var(--blue); color: var(--ink); font-family: "Inter Display", "Inter", system-ui, sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  #stage { position: fixed; inset: 0; overflow: hidden; }
+  #bg { position: absolute; inset: 0; }
+  #rays { position: absolute; left: 50%; top: 46%; width: 1700px; height: 1700px; margin: -850px 0 0 -850px; background: repeating-conic-gradient(rgba(255,255,255,.055) 0 9deg, transparent 9deg 18deg); will-change: transform; }
+  .tag { position: absolute; left: 30px; top: 64px; font-weight: 900; font-size: 12px; letter-spacing: .22em; color: var(--navy); background: #fff; padding: 7px 12px 6px; border-radius: 6px; z-index: 9; }
+  .scene { position: absolute; inset: 0; will-change: opacity, transform; opacity: 0; }
+  .sun { background: var(--sun); color: var(--navy); padding: 0 12px; display: inline-block; border-radius: 8px; transform: rotate(-2deg); }
+  .pop { display: inline-block; will-change: transform, opacity; }
+
+  /* A hook */
+  #a h1 { position: absolute; left: 30px; width: 440px; top: 118px; font-weight: 900; font-size: 64px; line-height: 1.05; letter-spacing: -.04em; }
+  #a h1 .big { font-size: 84px; line-height: 1.08; }
+  #star { position: absolute; left: 30px; top: 462px; font-family: "Inter", sans-serif; font-weight: 700; font-size: 19px; color: var(--navy); background: #fff; border-radius: 999px; padding: 9px 16px; will-change: opacity, transform; }
+  .todo { position: absolute; left: 30px; width: 400px; height: 62px; border-radius: 16px; background: #fff; color: var(--navy); display: flex; align-items: center; gap: 14px; padding: 0 16px; font-weight: 800; font-size: 25px; letter-spacing: -.02em; box-shadow: 0 14px 0 rgba(6,16,63,.28); will-change: transform, opacity; }
+  .todo .box { flex: none; width: 34px; height: 34px; border-radius: 9px; border: 3px solid var(--navy); position: relative; }
+  .todo .box svg { position: absolute; inset: -3px; width: 34px; height: 34px; }
+  .todo span.tx { position: relative; }
+  .todo span.tx i { position: absolute; left: 0; top: 52%; height: 4px; background: var(--blue); border-radius: 2px; }
+
+  /* B name */
+  #b .small { position: absolute; left: 30px; top: 150px; font-weight: 800; font-size: 36px; letter-spacing: -.02em; }
+  #nm { position: absolute; left: 30px; top: 206px; font-weight: 900; font-size: 92px; line-height: 1; letter-spacing: -.045em; will-change: transform, opacity; }
+  #nm .sun { margin-top: 8px; }
+  #bdesc { position: absolute; left: 30px; width: 440px; top: 452px; font-weight: 800; font-size: 37px; line-height: 1.12; letter-spacing: -.025em; }
+  #bsrc { position: absolute; left: 30px; top: 652px; font-family: "Inter", sans-serif; font-weight: 600; font-size: 17px; color: var(--muted); }
+
+  /* C items */
+  #prog { position: absolute; left: 30px; width: 440px; top: 122px; display: flex; gap: 8px; }
+  #prog b { flex: 1; height: 10px; border-radius: 5px; background: rgba(255,255,255,.28); overflow: hidden; }
+  #prog b i { display: block; height: 100%; background: var(--sun); width: 0; }
+  #clabel { position: absolute; left: 30px; top: 150px; font-weight: 900; font-size: 17px; letter-spacing: .16em; color: var(--muted); }
+  .item { position: absolute; inset: 0; opacity: 0; will-change: transform, opacity; }
+  .item .num { position: absolute; left: 30px; top: 200px; font-weight: 900; font-size: 150px; line-height: 1; letter-spacing: -.06em; color: var(--sun); }
+  .item .ico { position: absolute; left: 290px; top: 196px; width: 168px; height: 168px; border-radius: 40px; background: #fff; box-shadow: 0 16px 0 rgba(6,16,63,.3); display: grid; place-items: center; will-change: transform; }
+  .item .ico svg { width: 104px; height: 104px; }
+  .item .txt { position: absolute; left: 30px; width: 440px; top: 400px; }
+  .item h2 { font-weight: 900; font-size: 66px; line-height: 1.02; letter-spacing: -.04em; }
+  .item p { margin-top: 20px; font-weight: 800; font-size: 31px; line-height: 1.14; letter-spacing: -.02em; }
+  .item .cond { display: inline-block; margin-top: 24px; font-family: "Inter", sans-serif; font-weight: 700; font-size: 19px; color: var(--navy); background: var(--sun); border-radius: 999px; padding: 9px 16px; will-change: opacity, transform; }
+
+  /* D how */
+  #d h2 { position: absolute; left: 30px; width: 440px; top: 128px; font-weight: 900; font-size: 58px; line-height: 1.05; letter-spacing: -.04em; }
+  .how { position: absolute; left: 30px; width: 440px; height: 112px; border-radius: 24px; background: #fff; color: var(--navy); display: flex; align-items: center; gap: 16px; padding: 0 20px; box-shadow: 0 14px 0 rgba(6,16,63,.28); will-change: transform, opacity; }
+  .how em { font-style: normal; flex: none; width: 52px; height: 52px; border-radius: 14px; background: var(--blue); color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 30px; }
+  .how p { font-weight: 900; font-size: 30px; line-height: 1.08; letter-spacing: -.03em; }
+  #tog { margin-left: auto; flex: none; width: 150px; height: 50px; border-radius: 25px; background: #dfe5ff; position: relative; font-weight: 800; font-size: 17px; }
+  #tog span { position: absolute; top: 0; width: 75px; height: 50px; display: grid; place-items: center; z-index: 2; }
+  #tog span:nth-child(2) { left: 0; } #tog span:nth-child(3) { left: 75px; }
+  #knob { position: absolute; left: 4px; top: 4px; width: 71px; height: 42px; border-radius: 21px; background: var(--sun); will-change: transform; }
+
+  /* E end */
+  #e .small { position: absolute; left: 30px; top: 132px; font-weight: 800; font-size: 30px; letter-spacing: -.02em; }
+  #enm { position: absolute; left: 30px; top: 176px; font-weight: 900; font-size: 74px; line-height: 1; letter-spacing: -.045em; }
+  #efree { position: absolute; left: 30px; top: 356px; font-weight: 900; font-size: 34px; letter-spacing: -.03em; }
+  #chips { position: absolute; left: 30px; width: 440px; top: 410px; display: flex; flex-wrap: wrap; gap: 10px; }
+  #chips span { font-weight: 800; font-size: 25px; letter-spacing: -.02em; background: #fff; color: var(--navy); padding: 9px 16px; border-radius: 12px; will-change: transform, opacity; }
+  #enote { position: absolute; left: 30px; width: 440px; top: 540px; font-family: "Inter", sans-serif; font-weight: 600; font-size: 17px; line-height: 1.3; color: var(--muted); }
+  #follow { position: absolute; left: 30px; top: 622px; font-weight: 900; font-size: 30px; letter-spacing: -.02em; color: var(--navy); background: var(--sun); padding: 18px 24px; border-radius: 18px; box-shadow: 0 12px 0 rgba(6,16,63,.3); will-change: transform, opacity; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div><div id="rays"></div>
+  <div class="tag">AI TOOL DROP</div>
+
+  <section class="scene" id="a">
+    <h1><span class="pop">Google's AI</span><br><span class="pop">now runs your</span><br><span class="pop big">errands</span><br><span class="pop">for</span> <span class="pop big sun">FREE</span></h1>
+    <div id="star">Rolling out now in 6 countries</div>
+    <div class="todo" style="top:536px"><div class="box"><svg viewBox="0 0 34 34"><path d="M8 18l6 6 13-15" fill="none" stroke="#1640ff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1"/></svg></div><span class="tx">Call the garage<i></i></span></div>
+    <div class="todo" style="top:618px"><div class="box"><svg viewBox="0 0 34 34"><path d="M8 18l6 6 13-15" fill="none" stroke="#1640ff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1"/></svg></div><span class="tx">Sort out the bills<i></i></span></div>
+  </section>
+
+  <section class="scene" id="b">
+    <div class="small">It's called</div>
+    <div id="nm">Tasks in<br><span class="sun">Gemini</span></div>
+    <div id="bdesc"><span class="pop">It works in the</span> <span class="pop">background on</span> <span class="pop">multi-step jobs,</span> <span class="pop">on your behalf.</span></div>
+    <div id="bsrc">Source: Google, 17 Nov 2026</div>
+  </section>
+
+  <section class="scene" id="c">
+    <div id="prog"><b><i></i></b><b><i></i></b><b><i></i></b><b><i></i></b></div>
+    <div id="clabel">4 THINGS IT CAN DO</div>
+    <div class="item">
+      <div class="num">1</div>
+      <div class="ico"><svg viewBox="0 0 104 104"><path d="M30 14c-6 2-12 8-12 16 0 30 26 56 56 56 8 0 14-6 16-12l-18-12-8 8c-10-4-20-14-24-24l8-8z" fill="#1640ff"/><path d="M62 22c10 2 18 10 20 20M60 38c4 1 6 3 7 7" fill="none" stroke="#ffb400" stroke-width="7" stroke-linecap="round"/></svg></div>
+      <div class="txt"><h2>Makes phone calls for you</h2>
+      <p>You approve the call plan before it dials.</p>
+      <div class="cond">US businesses · not in every state</div></div>
+    </div>
+    <div class="item">
+      <div class="num">2</div>
+      <div class="ico"><svg viewBox="0 0 104 104"><path d="M24 12h56v80l-9-7-9 7-10-7-10 7-9-7-9 7z" fill="#1640ff"/><path d="M36 32h32M36 48h32M36 64h18" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg></div>
+      <div class="txt"><h2>Helps pay the bills</h2>
+      <p>Google's own line: it can "pay the bills".</p>
+      <div class="cond">Working in the background</div></div>
+    </div>
+    <div class="item">
+      <div class="num">3</div>
+      <div class="ico"><svg viewBox="0 0 104 104"><rect x="14" y="22" width="76" height="68" rx="12" fill="#1640ff"/><rect x="14" y="22" width="76" height="20" rx="10" fill="#ffb400"/><path d="M34 12v18M70 12v18" stroke="#06103f" stroke-width="8" stroke-linecap="round"/><path d="M36 64l10 10 22-22" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="txt"><h2>Books appointments</h2>
+      <p>It can find a time in your Google Calendar.</p>
+      <div class="cond">Example from Google's post</div></div>
+    </div>
+    <div class="item">
+      <div class="num">4</div>
+      <div class="ico"><svg viewBox="0 0 104 104"><path d="M18 36h68l-6 54H24z" fill="#1640ff"/><path d="M36 44V30a16 16 0 0132 0v14" fill="none" stroke="#06103f" stroke-width="8" stroke-linecap="round"/><circle cx="52" cy="66" r="9" fill="#ffb400"/></svg></div>
+      <div class="txt"><h2>Shops for you</h2>
+      <p>Nothing is bought without your go-ahead.</p>
+      <div class="cond">Google Pay checkout · US · 18+</div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="d">
+    <h2>Turn it on in <span class="sun">3 steps</span></h2>
+    <div class="how" style="top:292px"><em>1</em><p>Open Gemini</p></div>
+    <div class="how" style="top:426px"><em>2</em><p>Flip to Task</p><div id="tog"><div id="knob"></div><span>Chat</span><span>Task</span></div></div>
+    <div class="how" style="top:560px"><em>3</em><p>Say what you need done</p></div>
+  </section>
+
+  <section class="scene" id="e">
+    <div class="small">Remember the name</div>
+    <div id="enm">Tasks in<br><span class="sun">Gemini</span></div>
+    <div id="efree">Rolling out free in:</div>
+    <div id="chips"><span>US</span><span>Canada</span><span>Australia</span><span>India</span><span>Japan</span><span>Korea</span></div>
+    <div id="enote">Some features are US-only. Details checked Nov 2026 and may change.</div>
+    <div id="follow">Follow for one AI tool a day</div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  var $ = function (id) { return document.getElementById(id); };
+  var all = function (q) { return [].slice.call(document.querySelectorAll(q)); };
+  var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+  var sm = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  var out = function (x) { x = clamp(x, 0, 1); return 1 - Math.pow(1 - x, 3); };
+  var back = function (x) { x = clamp(x, 0, 1); var c = 2.0; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  var mix = function (a, b, k) { return a + (b - a) * k; };
+
+  var SC = [['a', 0, 2.8], ['b', 2.8, 5.2], ['c', 5.2, 14.8], ['d', 14.8, 17.6], ['e', 17.6, 99]];
+  var IT0 = 5.2, ITD = 2.4, DUR = 20.4;
+  var todos = all('.todo'), items = all('.item'), hows = all('.how'), chips = all('#chips span'), segs = all('#prog b i');
+
+  function render(t) {
+    $('rays').style.transform = 'rotate(' + (t * 5).toFixed(2) + 'deg)';
+    $('bg').style.background = 'radial-gradient(90% 60% at 50% ' + (40 + 6 * Math.sin(t * .6)).toFixed(1) + '%, #2f5cff, #1640ff 55%, #0a23b8)';
+    SC.forEach(function (s) {
+      var first = s[1] === 0, last = s[2] > 90;
+      var i = first ? 1 : sm((t - s[1]) / .18), o = last ? 1 : sm((s[2] - t) / .16);
+      var el = $(s[0]); el.style.opacity = (i * o).toFixed(3);
+      el.style.transform = 'translateY(' + ((1 - i) * 46 - (1 - o) * 46).toFixed(1) + 'px)';
+    });
+
+    // A: text is on screen from frame 0, it only settles
+    all('#a .pop').forEach(function (el, i) { var k = back((t + .16 - i * .05) / .3); el.style.transform = 'scale(' + mix(.86, 1, k).toFixed(3) + ')' + (el.classList.contains('sun') ? ' rotate(' + (-2 + 1.5 * Math.sin(t * 5)).toFixed(2) + 'deg)' : ''); });
+    $('star').style.opacity = clamp((t - .35) / .12, 0, 1); $('star').style.transform = 'translateX(' + ((1 - out((t - .35) / .3)) * -30).toFixed(1) + 'px)';
+    todos.forEach(function (el, i) {
+      var t0 = .5 + i * .22, k = back((t - t0) / .32), tick = sm((t - 1.25 - i * .55) / .22);
+      el.style.opacity = clamp((t - t0) / .1, 0, 1); el.style.transform = 'translateX(' + ((1 - k) * 120).toFixed(1) + 'px) rotate(' + (i ? 1.2 : -1.2) + 'deg)';
+      el.querySelector('path').style.strokeDashoffset = (1 - tick).toFixed(3);
+      el.querySelector('.tx i').style.width = (tick * 100).toFixed(1) + '%';
+      el.querySelector('.tx').style.opacity = mix(1, .55, tick).toFixed(2);
+    });
+
+    // B
+    var tb = t - 2.8, nk = back((tb - .1) / .36);
+    $('nm').style.transform = 'scale(' + mix(.7, 1, nk).toFixed(3) + ')'; $('nm').style.transformOrigin = 'left top';
+    all('#bdesc .pop').forEach(function (el, i) { var d = tb - .6 - i * .22; el.style.opacity = clamp(d / .1, 0, 1); el.style.transform = 'translateY(' + ((1 - out(d / .28)) * 20).toFixed(1) + 'px)'; });
+    $('bsrc').style.opacity = sm((tb - 1.4) / .3).toFixed(3);
+
+    // C
+    items.forEach(function (el, i) {
+      var ti = t - IT0 - i * ITD, last = i === items.length - 1;
+      var a = sm(ti / .14) * (last ? 1 : sm((ITD - ti) / .12));
+      el.style.opacity = a.toFixed(3);
+      el.style.transform = 'translateX(' + ((1 - out(ti / .26)) * 90 - (last ? 0 : (1 - sm((ITD - ti) / .12)) * 90)).toFixed(1) + 'px)';
+      var ik = back((ti - .05) / .36);
+      el.querySelector('.ico').style.transform = 'scale(' + mix(.4, 1, ik).toFixed(3) + ') rotate(' + (mix(-18, 5, ik) + 2 * Math.sin(ti * 4)).toFixed(2) + 'deg)';
+      var nk2 = back((ti - .0) / .3); el.querySelector('.num').style.transform = 'scale(' + mix(.5, 1, nk2).toFixed(3) + ')'; el.querySelector('.num').style.transformOrigin = 'left bottom';
+      var p = el.querySelector('p'); p.style.opacity = clamp((ti - .45) / .12, 0, 1); p.style.transform = 'translateY(' + ((1 - out((ti - .45) / .25)) * 16).toFixed(1) + 'px)';
+      var c = el.querySelector('.cond'), ck = back((ti - .85) / .3); c.style.opacity = clamp((ti - .85) / .1, 0, 1); c.style.transform = 'scale(' + mix(.7, 1, ck).toFixed(3) + ')'; c.style.transformOrigin = 'left center';
+      segs[i].style.width = (clamp(ti / ITD, 0, 1) * 100).toFixed(1) + '%';
+    });
+
+    // D
+    var td = t - 14.8;
+    hows.forEach(function (el, i) { var d = td - .25 - i * .55, k = back(d / .34); el.style.opacity = clamp(d / .1, 0, 1); el.style.transform = 'translateY(' + ((1 - k) * 40).toFixed(1) + 'px) scale(' + mix(.9, 1, k).toFixed(3) + ')'; });
+    $('knob').style.transform = 'translateX(' + (sm((td - 1.25) / .25) * 71).toFixed(1) + 'px)';
+
+    // E
+    var te = t - 17.6;
+    $('enm').style.transform = 'scale(' + mix(.8, 1, back((te - .05) / .3)).toFixed(3) + ')'; $('enm').style.transformOrigin = 'left top';
+    $('efree').style.opacity = clamp((te - .4) / .12, 0, 1);
+    chips.forEach(function (el, i) { var d = te - .55 - i * .1, k = back(d / .26); el.style.opacity = clamp(d / .08, 0, 1); el.style.transform = 'scale(' + mix(.5, 1, k).toFixed(3) + ')'; });
+    $('enote').style.opacity = sm((te - 1.25) / .3).toFixed(3);
+    var fk = back((te - 1.45) / .36); $('follow').style.opacity = clamp((te - 1.45) / .1, 0, 1);
+    $('follow').style.transform = 'scale(' + (mix(.6, 1, fk) * (1 + .025 * Math.sin(te * 6))).toFixed(3) + ') rotate(-1.5deg)'; $('follow').style.transformOrigin = 'left center';
+  }
+
+  if (!FILM) { var t0 = performance.now(); (function loop() { render(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); })(); }
+  window.__film = { duration: DUR, keys: [[0, 0], [DUR, 0]] };
+  window.__frame = function (t) { render(t); };
+})();
+</script>
+</body>
+</html>
