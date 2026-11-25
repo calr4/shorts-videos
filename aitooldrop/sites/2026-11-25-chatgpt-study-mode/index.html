@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Tool Drop: Study mode in ChatGPT</title>
+<style>
+  :root { --paper: #f6f0e1; --ink: #0f3d2e; --soft: #4d6e60; --hl: #ff8a1f; --card: #fffdf6; --line: rgba(15,61,46,.10); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: var(--paper); color: var(--ink); font-family: "Inter Display", "Inter", system-ui, sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  #stage { position: fixed; inset: 0; overflow: hidden; }
+  #rules { position: absolute; left: 0; right: 0; top: -44px; bottom: -44px; background: repeating-linear-gradient(to bottom, transparent 0 42px, var(--line) 42px 44px); will-change: transform; }
+  #margin { position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: rgba(255,138,31,.35); }
+  .doodle { position: absolute; will-change: transform; opacity: .5; }
+  .tag { position: absolute; left: 34px; top: 66px; font-weight: 900; font-size: 12px; letter-spacing: .22em; color: var(--paper); background: var(--ink); padding: 7px 12px 6px; border-radius: 6px; z-index: 9; }
+  .scene { position: absolute; inset: 0; will-change: opacity, transform; opacity: 0; }
+  .pop { display: inline-block; will-change: transform, opacity; transform-origin: left center; }
+  /* highlighter stroke: grows left to right behind the word */
+  .mark { position: relative; display: inline-block; z-index: 0; }
+  .mark i { position: absolute; left: -8px; right: -8px; top: 12%; bottom: 4%; background: var(--hl); border-radius: 10px 16px 12px 18px; transform-origin: left center; transform: scaleX(0) rotate(-1.2deg); z-index: -1; opacity: .92; }
+  .small { font-family: "Inter", sans-serif; font-weight: 600; font-size: 17px; color: var(--soft); }
+
+  /* A hook */
+  #a h1 { position: absolute; left: 34px; width: 440px; top: 116px; font-weight: 900; font-size: 68px; line-height: 1.07; letter-spacing: -.04em; }
+  #a h1 .big { font-size: 100px; line-height: 1.1; }
+  #ask { position: absolute; left: 34px; top: 482px; max-width: 420px; background: var(--card); border: 3px solid var(--ink); border-radius: 26px 26px 26px 6px; padding: 16px 22px; font-weight: 800; font-size: 29px; letter-spacing: -.02em; box-shadow: 0 10px 0 rgba(15,61,46,.16); will-change: transform, opacity; transform-origin: left bottom; }
+  #ask span { position: relative; }
+  #ask span i { position: absolute; left: -4px; top: 50%; height: 6px; margin-top: -2px; background: var(--hl); border-radius: 3px; width: 0; }
+  #instead { position: absolute; left: 34px; top: 606px; font-weight: 900; font-size: 44px; letter-spacing: -.035em; will-change: transform, opacity; transform-origin: left center; }
+
+  /* B turn it on */
+  #b .pre { position: absolute; left: 34px; top: 122px; font-weight: 800; font-size: 44px; letter-spacing: -.03em; }
+  #bname { position: absolute; left: 34px; top: 172px; font-weight: 900; font-size: 112px; line-height: .98; letter-spacing: -.05em; will-change: transform; transform-origin: left top; }
+  #sw { position: absolute; left: 34px; top: 424px; width: 196px; height: 100px; border-radius: 50px; border: 4px solid var(--ink); background: #e4dcc8; box-shadow: 0 10px 0 rgba(15,61,46,.16); }
+  #swk { position: absolute; left: 6px; top: 6px; width: 80px; height: 80px; border-radius: 40px; background: var(--ink); will-change: transform; }
+  #swl { position: absolute; left: 252px; top: 446px; font-weight: 900; font-size: 50px; letter-spacing: -.03em; will-change: opacity, transform; }
+  #bfree { position: absolute; left: 34px; top: 564px; font-weight: 900; font-size: 46px; line-height: 1.12; letter-spacing: -.035em; }
+  #bsrc { position: absolute; left: 34px; top: 682px; }
+
+  /* C contrast */
+  #c h2 { position: absolute; left: 34px; width: 440px; top: 118px; font-weight: 900; font-size: 52px; line-height: 1.07; letter-spacing: -.04em; }
+  .lab { position: absolute; left: 34px; font-weight: 900; font-size: 15px; letter-spacing: .18em; color: var(--soft); }
+  .bub { position: absolute; left: 34px; max-width: 430px; background: var(--card); border: 3px solid var(--ink); border-radius: 24px 24px 24px 6px; padding: 14px 20px; font-weight: 800; font-size: 28px; line-height: 1.15; letter-spacing: -.02em; box-shadow: 0 8px 0 rgba(15,61,46,.14); will-change: transform, opacity; transform-origin: left bottom; }
+  .bub.study { background: var(--ink); color: var(--paper); }
+  #cnote { position: absolute; left: 34px; top: 690px; }
+
+  /* D quiz */
+  #d h2 { position: absolute; left: 34px; width: 440px; top: 118px; font-weight: 900; font-size: 70px; line-height: 1.04; letter-spacing: -.045em; }
+  #quiz { position: absolute; left: 34px; top: 300px; width: 436px; background: var(--card); border: 3px solid var(--ink); border-radius: 26px; padding: 18px 18px 20px; box-shadow: 0 12px 0 rgba(15,61,46,.16); will-change: transform, opacity; transform-origin: left top; }
+  #quiz .q { font-weight: 900; font-size: 15px; letter-spacing: .18em; color: var(--soft); margin-bottom: 12px; }
+  .opt { position: relative; height: 64px; border-radius: 16px; border: 3px solid rgba(15,61,46,.25); margin-top: 10px; display: flex; align-items: center; gap: 14px; padding: 0 14px; font-weight: 800; font-size: 26px; letter-spacing: -.02em; overflow: hidden; will-change: transform, opacity; }
+  .opt em { font-style: normal; flex: none; width: 36px; height: 36px; border-radius: 10px; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-weight: 900; font-size: 20px; position: relative; z-index: 2; }
+  .opt .bar { display: block; height: 14px; border-radius: 7px; background: rgba(15,61,46,.22); position: relative; z-index: 2; }
+  .opt .fill { position: absolute; inset: 0; background: var(--hl); transform-origin: left center; transform: scaleX(0); z-index: 1; }
+  .opt svg { margin-left: auto; width: 38px; height: 38px; position: relative; z-index: 2; }
+  #dfb { position: absolute; left: 34px; top: 630px; font-weight: 900; font-size: 30px; letter-spacing: -.03em; will-change: transform, opacity; transform-origin: left center; }
+  #dsrc { position: absolute; left: 34px; top: 688px; }
+
+  /* E name */
+  #e .pre { position: absolute; left: 34px; top: 122px; font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
+  #ename { position: absolute; left: 34px; top: 168px; font-weight: 900; font-size: 96px; line-height: .98; letter-spacing: -.05em; will-change: transform; transform-origin: left top; }
+  #ein { position: absolute; left: 34px; top: 366px; font-weight: 900; font-size: 48px; letter-spacing: -.035em; }
+  #chips { position: absolute; left: 34px; width: 440px; top: 446px; display: flex; flex-wrap: wrap; gap: 10px; }
+  #chips span { font-weight: 800; font-size: 25px; letter-spacing: -.02em; background: var(--card); border: 3px solid var(--ink); padding: 8px 15px; border-radius: 14px; will-change: transform, opacity; }
+  #enote { position: absolute; left: 34px; width: 430px; top: 566px; line-height: 1.3; }
+  #follow { position: absolute; left: 34px; top: 634px; font-weight: 900; font-size: 28px; letter-spacing: -.02em; color: var(--paper); background: var(--ink); padding: 17px 22px; border-radius: 18px; box-shadow: 0 10px 0 rgba(255,138,31,.9); will-change: transform, opacity; transform-origin: left center; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="rules"></div><div id="margin"></div>
+  <svg class="doodle" id="d1" style="left:404px;top:44px" width="110" height="110" viewBox="0 0 110 110"><path d="M55 12l10 30 32 2-25 20 9 31-26-18-26 18 9-31-25-20 32-2z" fill="none" stroke="#ff8a1f" stroke-width="5" stroke-linejoin="round"/></svg>
+  <svg class="doodle" id="d2" style="left:392px;top:800px" width="130" height="130" viewBox="0 0 130 130"><path d="M20 70c0-30 22-50 48-50s44 20 44 44-18 44-42 44-36-14-36-30 12-28 28-28 24 10 24 20" fill="none" stroke="#0f3d2e" stroke-width="5" stroke-linecap="round"/></svg>
+  <div class="tag">AI TOOL DROP</div>
+
+  <section class="scene" id="a">
+    <h1><span class="pop">Stop asking</span><br><span class="pop">ChatGPT</span><br><span class="pop">for the</span><br><span class="pop big mark">answer<i></i></span></h1>
+    <div id="ask"><span>just tell me the answer<i></i></span></div>
+    <div id="instead">Do this instead ↓</div>
+  </section>
+
+  <section class="scene" id="b">
+    <div class="pre">Turn on</div>
+    <div id="bname">Study<br>mode</div>
+    <div id="sw"><div id="swk"></div></div>
+    <div id="swl">ON</div>
+    <div id="bfree"><span class="pop">It's on the</span><br><span class="pop mark">FREE<i></i></span> <span class="pop" style="margin-left:14px">plan</span></div>
+    <div id="bsrc" class="small">Usage limits apply · Source: ChatGPT Free plan page</div>
+  </section>
+
+  <section class="scene" id="c">
+    <h2><span class="pop">It asks you</span><br><span class="pop mark">questions<i></i></span><br><span class="pop">and gives</span> <span class="pop mark" style="margin-left:10px">hints<i></i></span></h2>
+    <div class="lab" id="l1" style="top:316px">NORMAL CHAT</div>
+    <div class="bub" id="b1" style="top:342px">Here's the answer.</div>
+    <div class="lab" id="l2" style="top:432px">STUDY MODE</div>
+    <div class="bub study" id="b2" style="top:458px">What would you try first?</div>
+    <div class="bub study" id="b3" style="top:536px">Hint: start with what you already know.</div>
+    <div id="cnote" class="small">Illustration, not a real reply</div>
+  </section>
+
+  <section class="scene" id="d">
+    <h2><span class="pop">Then it</span><br><span class="pop mark">quizzes<i></i></span> <span class="pop" style="margin-left:12px">you</span></h2>
+    <div id="quiz">
+      <div class="q">QUICK CHECK</div>
+      <div class="opt"><div class="fill"></div><em>A</em><span class="bar" style="width:190px"></span></div>
+      <div class="opt"><div class="fill"></div><em>B</em><span class="bar" style="width:236px"></span><svg viewBox="0 0 38 38"><path d="M8 20l8 8 15-18" fill="none" stroke="#0f3d2e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
+      <div class="opt"><div class="fill"></div><em>C</em><span class="bar" style="width:150px"></span></div>
+    </div>
+    <div id="dfb">…with feedback on your answer</div>
+    <div id="dsrc" class="small">Source: OpenAI</div>
+  </section>
+
+  <section class="scene" id="e">
+    <div class="pre">Next homework? Use</div>
+    <div id="ename">Study<br><span class="mark">mode<i></i></span></div>
+    <div id="ein">in ChatGPT</div>
+    <div id="chips"><span>On the Free plan</span><span>Hints first</span><span>Then quizzes</span></div>
+    <div id="enote" class="small">Limits apply. It can still make mistakes. Details checked Nov 2026.</div>
+    <div id="follow">Follow for one AI tool a day</div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  var $ = function (id) { return document.getElementById(id); };
+  var all = function (q) { return [].slice.call(document.querySelectorAll(q)); };
+  var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+  var sm = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  var out = function (x) { x = clamp(x, 0, 1); return 1 - Math.pow(1 - x, 3); };
+  var back = function (x) { x = clamp(x, 0, 1); var c = 1.8; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  var mix = function (a, b, k) { return a + (b - a) * k; };
+  var hl = function (el, k) { el.querySelector('i').style.transform = 'scaleX(' + out(k).toFixed(3) + ') rotate(-1.2deg)'; };
+  var pop = function (el, d, dur) { el.style.opacity = clamp(d / .08, 0, 1); el.style.transform = 'scale(' + mix(.7, 1, back(d / (dur || .3))).toFixed(3) + ')'; };
+
+  // 80 bpm: one bar = 3 s. Scene cuts sit on bar lines (C runs a bar and a half).
+  var DUR = 16.5, LOOP = 16.15;
+  var SC = [['a', 0, 3], ['b', 3, 6], ['c', 6, 10.5], ['d', 10.5, 13.5], ['e', 13.5, LOOP]];
+  var opts = all('.opt'), chips = all('#chips span');
+
+  function sceneA(t) {
+    all('#a .pop').forEach(function (el, i) { el.style.transform = 'scale(' + mix(.9, 1, back((t + .18 - i * .05) / .3)).toFixed(3) + ')'; });
+    hl($('a').querySelector('.mark'), 1);
+    pop($('ask'), t - .4, .32);
+    $('ask').querySelector('i').style.width = (sm((t - 1.2) / .3) * 104).toFixed(1) + '%';
+    $('ask').querySelector('span').style.opacity = mix(1, .5, sm((t - 1.2) / .3)).toFixed(2);
+    var d = t - 1.75; $('instead').style.opacity = clamp(d / .08, 0, 1);
+    $('instead').style.transform = 'scale(' + mix(.7, 1, back(d / .3)).toFixed(3) + ') translateY(' + (d > .3 ? 5 * Math.sin((d - .3) * 9) : 0).toFixed(1) + 'px)';
+  }
+
+  function render(t) {
+    $('rules').style.transform = 'translateY(' + ((t * 6) % 44).toFixed(2) + 'px)';
+    $('d1').style.transform = 'rotate(' + (8 * Math.sin(t * 1.3)).toFixed(2) + 'deg)';
+    $('d2').style.transform = 'rotate(' + (t * 9).toFixed(2) + 'deg)';
+    SC.forEach(function (s) {
+      var first = s[1] === 0;
+      var i = first ? 1 : sm((t - s[1]) / .18), o = sm((s[2] - t) / .16);
+      var el = $(s[0]); el.style.opacity = (i * o).toFixed(3);
+      el.style.transform = 'translateX(' + ((1 - i) * 50 - (1 - o) * 50).toFixed(1) + 'px)';
+    });
+    // loop: the last moments return to the exact first frame
+    if (t >= LOOP - .16) {
+      var k = sm((t - (LOOP - .1)) / .25);
+      $('a').style.opacity = k.toFixed(3); $('a').style.transform = 'translateX(' + ((1 - k) * 50).toFixed(1) + 'px)';
+      sceneA(0);
+    } else sceneA(t);
+
+    // B
+    var tb = t - 3;
+    $('bname').style.transform = 'scale(' + mix(.75, 1, back((tb - .05) / .34)).toFixed(3) + ')';
+    var on = sm((tb - .75) / .22);
+    $('swk').style.transform = 'translateX(' + (on * 96).toFixed(1) + 'px)';
+    $('swk').style.background = on > .5 ? '#fffdf6' : '#0f3d2e';
+    $('sw').style.background = on > .5 ? '#ff8a1f' : '#e4dcc8';
+    pop($('swl'), tb - .9, .28); $('swl').style.transformOrigin = 'left center';
+    all('#bfree .pop').forEach(function (el, i) { pop(el, tb - 1.35 - i * .14, .28); });
+    hl($('bfree').querySelector('.mark'), (tb - 1.7) / .3);
+    $('bsrc').style.opacity = sm((tb - 2.0) / .25).toFixed(3);
+
+    // C
+    var tc = t - 6;
+    all('#c h2 .pop').forEach(function (el, i) { pop(el, tc - .05 - i * .1, .26); });
+    var cm = all('#c h2 .mark'); hl(cm[0], (tc - .45) / .3); hl(cm[1], (tc - .7) / .3);
+    $('l1').style.opacity = clamp((tc - .95) / .1, 0, 1); pop($('b1'), tc - 1.0, .3);
+    var dim = sm((tc - 1.9) / .25);
+    $('b1').style.opacity = clamp((tc - 1.0) / .08, 0, 1) * mix(1, .38, dim); $('l1').style.opacity = clamp((tc - .95) / .1, 0, 1) * mix(1, .5, dim);
+    $('l2').style.opacity = clamp((tc - 1.85) / .1, 0, 1); pop($('b2'), tc - 1.9, .32); pop($('b3'), tc - 2.85, .32);
+    $('cnote').style.opacity = sm((tc - 1.1) / .3).toFixed(3);
+
+    // D
+    var td = t - 10.5;
+    all('#d h2 .pop').forEach(function (el, i) { pop(el, td - .03 - i * .1, .26); });
+    hl($('d').querySelector('.mark'), (td - .4) / .3);
+    pop($('quiz'), td - .5, .34);
+    opts.forEach(function (el, i) { var d = td - .75 - i * .14; el.style.opacity = clamp(d / .08, 0, 1); el.style.transform = 'translateX(' + ((1 - out(d / .26)) * 40).toFixed(1) + 'px)'; });
+    var pick = sm((td - 1.5) / .25);
+    opts[1].querySelector('.fill').style.transform = 'scaleX(' + pick.toFixed(3) + ')';
+    opts[1].style.borderColor = pick > .1 ? '#0f3d2e' : 'rgba(15,61,46,.25)';
+    opts[1].querySelector('path').style.strokeDashoffset = (1 - sm((td - 1.7) / .2)).toFixed(3);
+    pop($('dfb'), td - 2.05, .3);
+    $('dsrc').style.opacity = sm((td - 2.2) / .25).toFixed(3);
+
+    // E
+    var te = t - 13.5;
+    $('ename').style.transform = 'scale(' + mix(.78, 1, back((te - .04) / .32)).toFixed(3) + ')';
+    hl($('ename').querySelector('.mark'), (te - .35) / .3);
+    $('ein').style.opacity = clamp((te - .45) / .1, 0, 1);
+    chips.forEach(function (el, i) { pop(el, te - .65 - i * .13, .26); });
+    $('enote').style.opacity = sm((te - 1.1) / .25).toFixed(3);
+    var d = te - 1.3; $('follow').style.opacity = clamp(d / .08, 0, 1);
+    $('follow').style.transform = 'scale(' + (mix(.6, 1, back(d / .34)) * (1 + .02 * Math.sin(te * 6))).toFixed(3) + ') rotate(-1.5deg)';
+  }
+
+  if (!FILM) { var t0 = performance.now(); (function loop() { render(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); })(); }
+  window.__film = { duration: DUR, keys: [[0, 0], [DUR, 0]] };
+  window.__frame = function (t) { render(t); };
+})();
+</script>
+</body>
+</html>
