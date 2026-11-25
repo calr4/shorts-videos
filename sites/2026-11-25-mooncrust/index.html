@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mooncrust Pizza | Wood-fired pizza in Starling Bay</title>
+<style>
+  :root { --night:#141a3a; --night2:#232c5c; --cream:#fff6e6; --tomato:#e8452c; --cheese:#ffc94a; --basil:#2f9e5b; --ink:#1b1d2e; --muted:#6b6f85; }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: auto; }
+  body { font-family: "DM Sans", "Fira Sans", system-ui, sans-serif; color: var(--ink); background: var(--cream); overflow-x: hidden; }
+  h1, h2, .logo, .price, .deal b { font-family: "Archivo Black", "Fira Sans", system-ui, sans-serif; font-weight: 900; }
+  body.film { background: #0c1026; padding-top: 62px; }
+  body.film::-webkit-scrollbar { display: none; }
+
+  /* film-only browser bar, caption, scrollbar, finger */
+  #bar, #cap, #sb, #dot, #end { display: none; }
+  body.film #bar { display: flex; position: fixed; z-index: 50; top: 0; left: 0; right: 0; height: 62px; background: #e9ebf2; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid #c9ccd8; }
+  #bar .nav { display: flex; gap: 12px; color: #7d8196; font-size: 26px; line-height: 1; }
+  #bar .url { flex: 1; height: 40px; border-radius: 20px; background: #fff; display: flex; align-items: center; gap: 9px; padding: 0 16px; font-size: 19px; color: #2a2d40; font-weight: 500; box-shadow: inset 0 0 0 1px #d5d8e3; }
+  #bar .lock { width: 13px; height: 11px; background: #5a5f78; border-radius: 3px; position: relative; margin-top: 5px; }
+  #bar .lock::before { content: ""; position: absolute; left: 2px; top: -8px; width: 9px; height: 10px; border: 2.5px solid #5a5f78; border-bottom: 0; border-radius: 6px 6px 0 0; box-sizing: border-box; }
+  #bar .dots { color: #7d8196; font-size: 26px; letter-spacing: 1px; }
+  body.film #cap { display: block; position: fixed; z-index: 60; left: 0; right: 0; top: 118px; text-align: center; pointer-events: none; }
+  #cap span { display: inline-block; max-width: 440px; background: rgba(12,16,38,.94); color: #fff; font-family: "Archivo Black", sans-serif; font-size: 27px; line-height: 1.18; padding: 13px 22px 14px; border-radius: 18px; box-shadow: 0 8px 26px rgba(0,0,0,.35); border: 2px solid rgba(255,255,255,.14); }
+  #cap em { font-style: normal; color: var(--cheese); }
+  body.film #sb { display: block; position: fixed; z-index: 55; right: 5px; top: 70px; width: 7px; height: 600px; border-radius: 4px; background: rgba(20,26,58,.12); }
+  #sb i { position: absolute; left: 0; width: 7px; border-radius: 4px; background: rgba(20,26,58,.55); }
+  body.film #dot { display: block; position: fixed; z-index: 70; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; background: rgba(255,255,255,.55); border: 3px solid #fff; box-shadow: 0 0 0 3px rgba(20,26,58,.5), 0 6px 18px rgba(0,0,0,.35); opacity: 0; pointer-events: none; }
+  body.film #end { position: fixed; z-index: 40; left: 214px; top: 250px; width: 250px; color: #fff; opacity: 0; display: block; }
+  #end .big { font-family: "Archivo Black", sans-serif; font-size: 36px; line-height: 1.1; }
+  #end .big em { font-style: normal; color: var(--cheese); }
+  #end .sub { margin-top: 18px; font-size: 21px; line-height: 1.3; color: #c9cdf0; font-weight: 600; }
+  #end .cta { display: inline-block; margin-top: 24px; background: var(--tomato); color: #fff; font-family: "Archivo Black", sans-serif; font-size: 20px; padding: 12px 18px; border-radius: 14px; line-height: 1.2; }
+
+  /* the site */
+  #page { max-width: 540px; margin: 0 auto; background: var(--cream); transform-origin: 0 0; position: relative; }
+  body.film #page { box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .top { position: sticky; top: 0; z-index: 20; height: 50px; background: var(--night); color: #fff; display: flex; align-items: center; padding: 0 18px; gap: 16px; }
+  body.film .top { top: 62px; }
+  .logo { font-size: 21px; display: flex; align-items: center; gap: 8px; margin-right: auto; }
+  .logo i { width: 22px; height: 22px; border-radius: 50%; background: var(--cheese); box-shadow: inset -6px -3px 0 #e9a521; display: block; }
+  .top a { color: #dfe2ff; text-decoration: none; font-size: 15.5px; font-weight: 600; }
+  .cart { background: var(--tomato); color: #fff !important; padding: 7px 13px; border-radius: 16px; font-weight: 700 !important; }
+
+  .hero { background: radial-gradient(circle at 70% 18%, var(--night2), var(--night) 62%); color: #fff; padding: 122px 26px 42px; position: relative; overflow: hidden; }
+  .star { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #fff; }
+  .hero h1 { font-size: 45px; line-height: 1.03; letter-spacing: -.5px; }
+  .hero h1 em { font-style: normal; color: var(--cheese); }
+  .hero p { margin-top: 14px; font-size: 19px; line-height: 1.4; color: #cfd3f5; max-width: 390px; }
+  .btns { display: flex; gap: 12px; margin-top: 22px; }
+  .btn { display: inline-block; font-weight: 800; font-size: 18px; padding: 14px 22px; border-radius: 14px; text-decoration: none; border: 0; cursor: pointer; font-family: inherit; }
+  .btn.red { background: var(--tomato); color: #fff; }
+  .btn.ghost { color: #fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.55); }
+  .pie { display: block; width: 350px; height: 350px; margin: 34px auto 0; }
+
+  section { padding: 44px 22px 10px; }
+  .kicker { color: var(--tomato); font-weight: 800; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+  h2 { font-size: 33px; line-height: 1.08; margin-top: 6px; letter-spacing: -.3px; }
+  .lead { color: var(--muted); font-size: 17px; margin-top: 8px; line-height: 1.4; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; }
+  .card { background: #fff; border-radius: 20px; padding: 14px 14px 16px; box-shadow: 0 6px 20px rgba(27,29,46,.09); }
+  .card svg { display: block; width: 100%; height: auto; }
+  .card h3 { font-size: 19px; margin-top: 8px; font-weight: 800; }
+  .card p { color: var(--muted); font-size: 14.5px; line-height: 1.35; margin-top: 3px; min-height: 39px; }
+  .row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .price { font-size: 22px; }
+  .add { background: var(--night); color: #fff; font-weight: 800; font-size: 15.5px; padding: 9px 16px; border-radius: 12px; border: 0; cursor: pointer; font-family: inherit; }
+  .add.on { background: var(--basil); }
+  .deal { margin: 34px 22px 0; background: var(--tomato); color: #fff; border-radius: 22px; padding: 22px 22px 24px; display: flex; align-items: center; gap: 16px; }
+  .deal b { font-size: 46px; line-height: 1; color: var(--cheese); white-space: nowrap; }
+  .deal span { font-size: 18px; font-weight: 700; line-height: 1.3; }
+  .rev { background: #fff; border-radius: 18px; padding: 16px 18px; margin-top: 14px; box-shadow: 0 6px 20px rgba(27,29,46,.08); }
+  .stars { color: #f5a623; font-size: 20px; letter-spacing: 3px; }
+  .rev p { font-size: 17px; line-height: 1.4; margin-top: 4px; }
+  .rev small { display: block; margin-top: 6px; color: var(--muted); font-size: 14px; font-weight: 700; }
+  .map { margin-top: 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 6px 20px rgba(27,29,46,.1); }
+  .map svg { display: block; width: 100%; height: auto; }
+  .info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .info div { background: #fff; border-radius: 16px; padding: 14px 16px; font-size: 15.5px; line-height: 1.45; }
+  .info b { display: block; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tomato); margin-bottom: 3px; }
+  footer { margin-top: 40px; background: var(--night); color: #aeb3dc; padding: 30px 22px 36px; font-size: 14.5px; line-height: 1.6; }
+  footer .logo { color: #fff; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div id="bar"><div class="nav"><span>&#8249;</span><span>&#8250;</span></div><div class="url"><i class="lock"></i>mooncrustpizza.example</div><div class="dots">&#8943;</div></div>
+<div id="cap"><span></span></div>
+<div id="sb"><i></i></div>
+<div id="dot"></div>
+<div id="end"><div class="big">AI built this<br><em>whole website.</em></div><div class="sub">Menu, cart, reviews, map.<br>No code typed by hand.</div><div class="cta">Follow for a new<br>AI-built site daily</div></div>
+
+<div id="page">
+  <nav class="top">
+    <div class="logo"><i></i>Mooncrust</div>
+    <a href="#menu">Menu</a><a href="#find">Find us</a><a href="#menu" class="cart" id="cart">Cart 0</a>
+  </nav>
+
+  <header class="hero" id="hero">
+    <h1>Wood-fired pizza, <em>out of this world.</em></h1>
+    <p>Slow dough, hot oven, ready in 12 minutes. Pick up or delivery across Starling Bay.</p>
+    <div class="btns"><a class="btn red" href="#menu">Order now</a><a class="btn ghost" href="#find">Find us</a></div>
+    <svg class="pie" id="pie" viewBox="-110 -110 220 220" aria-label="A pizza">
+      <circle r="104" fill="#d99a4e"/><circle r="92" fill="#e8452c"/><circle r="86" fill="#ffd166"/>
+      <g fill="#c23b22"><circle cx="-42" cy="-38" r="15"/><circle cx="34" cy="-50" r="15"/><circle cx="58" cy="12" r="15"/><circle cx="-8" cy="6" r="15"/><circle cx="-56" cy="28" r="15"/><circle cx="18" cy="56" r="15"/></g>
+      <g fill="#2f9e5b"><ellipse cx="-12" cy="-58" rx="11" ry="5.5" transform="rotate(30 -12 -58)"/><ellipse cx="40" cy="-8" rx="11" ry="5.5" transform="rotate(-40 40 -8)"/><ellipse cx="-30" cy="58" rx="11" ry="5.5" transform="rotate(70 -30 58)"/><ellipse cx="-70" cy="-8" rx="11" ry="5.5" transform="rotate(10 -70 -8)"/></g>
+      <g stroke="#c98a3c" stroke-width="2.5" opacity=".55"><line x1="0" y1="-86" x2="0" y2="86"/><line x1="-86" y1="0" x2="86" y2="0"/><line x1="-61" y1="-61" x2="61" y2="61"/><line x1="-61" y1="61" x2="61" y2="-61"/></g>
+    </svg>
+  </header>
+
+  <section id="menu">
+    <div class="kicker rv">The menu</div>
+    <h2 class="rv">Tonight's pizzas</h2>
+    <p class="lead rv">Baked to order in a 450&deg; wood oven.</p>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <div class="deal rv"><b>2 for $22</b><span>Every Tuesday.<br>Any two classic pizzas.</span></div>
+
+  <section id="reviews">
+    <div class="kicker rv">Reviews</div>
+    <h2 class="rv">Locals love it</h2>
+    <div class="rev rv"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>Best crust in the bay. We order every Friday.</p><small>Jun, Starling Bay</small></div>
+    <div class="rev rv"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>Hot at the door in twenty minutes. Unreal.</p><small>Marisol, Comet Row</small></div>
+  </section>
+
+  <section id="find">
+    <div class="kicker rv">Find us</div>
+    <h2 class="rv">14 Comet Row</h2>
+    <div class="map rv">
+      <svg viewBox="0 0 496 250"><rect width="496" height="250" fill="#dfeadb"/>
+        <path d="M0 190 Q160 150 300 200 T496 170 V250 H0Z" fill="#a9d6e8"/>
+        <g stroke="#fff" stroke-width="16" fill="none"><path d="M-10 70 H506"/><path d="M130 -10 V180"/><path d="M340 -10 V190"/><path d="M130 130 H340"/></g>
+        <g fill="#c8dcc2"><rect x="20" y="88" width="92" height="74" rx="8"/><rect x="150" y="12" width="170" height="44" rx="8"/><rect x="360" y="88" width="116" height="60" rx="8"/></g>
+        <g transform="translate(236 104)"><path d="M0 0 C-30 -34 -22 -66 0 -66 C22 -66 30 -34 0 0Z" fill="#e8452c"/><circle cy="-44" r="10" fill="#ffd166"/></g>
+        <text x="236" y="126" text-anchor="middle" font-family="DM Sans, sans-serif" font-weight="800" font-size="17" fill="#141a3a">Mooncrust Pizza</text>
+      </svg>
+    </div>
+    <div class="info rv"><div><b>Open</b>Every day<br>11 am to 11 pm</div><div><b>Call</b>555 0142<br>Starling Bay</div></div>
+  </section>
+
+  <footer><div class="logo"><i></i>Mooncrust</div>Mooncrust Pizza is a made-up shop.<br>This demo site was built by AI.</footer>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  if (FILM) document.body.className = 'film';
+  var $ = function (s) { return document.querySelector(s); };
+  var clamp = function (x) { return Math.max(0, Math.min(1, x)); };
+  var ease = function (x) { x = clamp(x); return x * x * (3 - 2 * x); };
+
+  // menu cards
+  var pizzas = [
+    ['Classic Moon', 'Tomato, mozzarella, basil', 12, '#ffd166', ['#2f9e5b', '#2f9e5b', '#2f9e5b']],
+    ['Pepperoni Orbit', 'Double pepperoni, hot honey', 14, '#ffc94a', ['#c23b22', '#c23b22', '#c23b22', '#c23b22']],
+    ['Garden Comet', 'Peppers, olives, red onion', 13, '#ffd98a', ['#2f9e5b', '#3b2a4a', '#e8452c', '#3b2a4a']],
+    ['Four Cheese Nova', 'Mozzarella, gouda, feta, blue', 15, '#ffe9a8', ['#fff3c9', '#f4b942', '#fff3c9']]
+  ];
+  var grid = $('#grid'), added = {};
+  pizzas.forEach(function (p, i) {
+    var tops = p[4].map(function (c, k) { var a = k / p[4].length * 6.283 + i; return '<circle cx="' + (Math.cos(a) * 26).toFixed(1) + '" cy="' + (Math.sin(a) * 26).toFixed(1) + '" r="10" fill="' + c + '"/>'; }).join('');
+    var d = document.createElement('div'); d.className = 'card rv';
+    d.innerHTML = '<svg viewBox="-70 -52 140 104"><circle r="50" fill="#d99a4e"/><circle r="43" fill="#e8452c"/><circle r="40" fill="' + p[3] + '"/>' + tops + '</svg><h3>' + p[0] + '</h3><p>' + p[1] + '</p><div class="row"><span class="price">$' + p[2] + '</span><button class="add" data-i="' + i + '">Add</button></div>';
+    grid.appendChild(d);
+  });
+  var adds = [].slice.call(document.querySelectorAll('.add'));
+  function paintCart() {
+    var n = 0; adds.forEach(function (b, i) { var on = !!added[i]; if (on) n++; b.className = 'add' + (on ? ' on' : ''); b.textContent = on ? 'Added ✓' : 'Add'; });
+    $('#cart').textContent = 'Cart ' + n;
+  }
+  adds.forEach(function (b, i) { b.addEventListener('click', function () { added[i] = !added[i]; paintCart(); }); });
+
+  // stars in the hero (fixed pattern)
+  var hero = $('#hero');
+  for (var s = 0; s < 34; s++) { var st = document.createElement('i'); st.className = 'star'; st.style.left = ((s * 137.5) % 100) + '%'; st.style.top = ((s * 61.8) % 78) + '%'; st.style.opacity = (0.35 + (s % 5) * 0.13).toFixed(2); hero.insertBefore(st, hero.firstChild); }
+
+  var page = $('#page'), pie = $('#pie'), rv = [].slice.call(document.querySelectorAll('.rv')), tops = [];
+  function measure() { tops = rv.map(function (el) { var y = 0, e = el; while (e && e !== document.body) { y += e.offsetTop; e = e.offsetParent; } return y; }); }
+  // Everything visible is a pure function of scroll position (and, when filming, time).
+  function render(y) {
+    var vh = innerHeight;
+    pie.style.transform = 'rotate(' + (y * 0.12).toFixed(2) + 'deg) scale(' + (1 + clamp(y / 500) * 0.06).toFixed(3) + ')';
+    for (var i = 0; i < rv.length; i++) { var k = ease((y + vh * 0.86 - tops[i]) / 150); rv[i].style.opacity = k.toFixed(3); rv[i].style.transform = 'translateY(' + ((1 - k) * 34).toFixed(1) + 'px)'; }
+  }
+  measure(); addEventListener('resize', measure);
+  if (!FILM) { paintCart(); (function loop() { render(scrollY); requestAnimationFrame(loop); })(); return; }
+
+  // ---------- filming ----------
+  var CAPS = [
+    [0.0, 3.0, '<em>AI</em> built this website for a <em>pizza shop</em>'],
+    [3.0, 5.6, 'It’s a real page. <em>Watch it scroll.</em>'],
+    [5.6, 8.3, 'Here’s the <em>menu</em>, with prices'],
+    [8.3, 10.6, 'The buttons <em>really work</em>'],
+    [10.6, 13.0, 'Reviews, a map, opening hours'],
+    [13.0, 15.2, 'Built by <em>AI</em>. No code typed by hand.']
+  ];
+  var TAP = 9.0, Z0 = 15.2, Z1 = 16.0, DUR = 17.4;
+  var cap = $('#cap span'), sb = $('#sb i'), dot = $('#dot'), end = $('#end'), H = page.offsetHeight, MAX = H + 62 - innerHeight;
+  window.__film = { duration: DUR, keys: [[0, 0], [1.3, 0], [8.2, 0.44], [9.5, 0.44], [15.2, 1], [DUR, 1]] };
+  window.__frame = function (t, y) {
+    var z = ease((t - Z0) / (Z1 - Z0));                 // zoom out to show the whole page at the end
+    var S = 1 - (1 - 580 / H) * z, ys = y * (1 - z);
+    page.style.transform = z > 0 ? 'translate(' + (z * (58 - (540 - 540 * S) / 2 + (540 - 540 * S) / 2)).toFixed(1) + 'px,' + (z * 118).toFixed(1) + 'px) scale(' + S.toFixed(4) + ')' : 'none';
+    window.scrollTo(0, ys);
+    render(z > 0 ? 1e6 : ys);
+    // caption
+    var txt = ''; for (var i = 0; i < CAPS.length; i++) if (t >= CAPS[i][0] && t < CAPS[i][1]) { txt = CAPS[i][2]; var a = Math.min(clamp((t - CAPS[i][0]) / 0.18), i === CAPS.length - 1 ? clamp((CAPS[i][1] - t) / 0.2) : 1); cap.style.opacity = a.toFixed(2); cap.style.transform = 'translateY(' + ((1 - a) * 10).toFixed(1) + 'px)'; }
+    if (cap.innerHTML !== txt) cap.innerHTML = txt; cap.parentNode.style.visibility = txt ? 'visible' : 'hidden';
+    // scrollbar thumb
+    var th = 600 * innerHeight / (H + 62); sb.style.height = th.toFixed(1) + 'px'; sb.style.top = ((600 - th) * clamp(ys / MAX)).toFixed(1) + 'px'; sb.parentNode.style.opacity = (1 - z).toFixed(2);
+    // tap on the second pizza's Add button
+    added = {}; if (t >= TAP) added[1] = true; paintCart();
+    var r = adds[1].getBoundingClientRect(), d = t - (TAP - 0.75), vis = clamp(d / 0.25) * clamp((1.5 - d) / 0.3), press = 1 - 0.28 * clamp(1 - Math.abs(t - TAP) / 0.16);
+    dot.style.left = (r.left + r.width / 2 + (1 - ease(d / 0.6)) * 70).toFixed(1) + 'px'; dot.style.top = (r.top + r.height / 2 + 6 + (1 - ease(d / 0.6)) * 110).toFixed(1) + 'px';
+    dot.style.opacity = (d > 0 && d < 1.5 ? vis : 0).toFixed(2); dot.style.transform = 'scale(' + press.toFixed(3) + ')';
+    // end card
+    end.style.opacity = ease((t - Z1 + 0.25) / 0.45).toFixed(2); end.style.transform = 'translateX(' + ((1 - ease((t - Z1 + 0.25) / 0.45)) * 24).toFixed(1) + 'px)';
+  };
+})();
+</script>
+</body>
+</html>
