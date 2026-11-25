@@ -5,8 +5,13 @@ How each day's video for the "AI Tool Drop" YouTube channel is made. This repo i
 ## The format
 A 9 to 20 second vertical video (1080x1920, 30 fps) about one AI tool, one comparison, or one short list of tools. It is a single-file animated page (`index.html`, no network requests) filmed with `../tools/film.js`. Everything on screen is drawn in code and is a pure function of time `t`: no CSS transitions, no timers.
 
+The owner's standing rule (given 2026-11-25 after watching the videos; it outranks the brief and the experiment): a stranger must understand the video in the first second.
+
 Format checklist:
-- The hook is fully readable within the first second, as big on-screen text.
+- The first screen names the tool AND what it does for the viewer, in plain everyday words, fully readable within the first second: "ChatGPT has a free Study mode. It quizzes you instead of giving the answer." Do not open with a teaser that hides the tool or the point until later.
+- One idea per screen, in short sentences a 12-year-old would follow. No jargon, no series numbers, nothing that needs an earlier video.
+- Show the tool doing the thing with a simple drawn example or before-and-after (your own shapes and text, never an imitation of the real product's screen), not text alone.
+- Cold-viewer check (required before publishing): look at the frames at 0.5 s and 3 s as a stranger. Which tool is this? What does it do for me? If either answer is not obvious, revise.
 - High density: a new piece of information every 1 to 3 seconds. Viewers should want to pause or rewatch.
 - No voiceover. A beat that starts at 0 seconds.
 - Keep text between 6% and 75% of the height and away from the right 12% (the Shorts UI covers the bottom and the right edge).
