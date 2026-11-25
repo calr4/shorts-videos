@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thimble &amp; Owl Books · The pop-up bookshop</title>
+<style>
+  :root { --cream: #FBF3E1; --ink: #2B2A33; --teal: #1F8A8A; --deep: #14595C; --mustard: #EDB53C; --coral: #F0705A; --blush: #F8C3B0; --sage: #7DB58A; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #FBE6CB; }
+  body { font-family: Poppins, "DM Sans", system-ui, sans-serif; color: var(--ink); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  #track { height: 560vh; }
+  #view { position: fixed; inset: 0; overflow: hidden; background: radial-gradient(120% 80% at 50% 38%, #FFF6E2 0%, #FBE3C4 55%, #F4C9A8 100%); }
+  #beams { position: absolute; left: 50%; top: 46%; width: 1800px; height: 1800px; margin: -900px 0 0 -900px; border-radius: 50%; opacity: .5;
+    background: repeating-conic-gradient(from 0deg, rgba(255,255,255,.55) 0deg 9deg, rgba(255,255,255,0) 9deg 20deg); -webkit-mask-image: radial-gradient(circle, #000 10%, transparent 62%); mask-image: radial-gradient(circle, #000 10%, transparent 62%); }
+  #stage { position: absolute; left: 50%; top: 50%; width: 540px; height: 960px; margin: -480px 0 0 -270px; }
+  nav { position: absolute; left: 22px; right: 22px; top: 24px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+  nav .logo { display: flex; align-items: center; gap: 9px; font-family: Bitter, Georgia, serif; font-weight: 800; font-size: 19px; letter-spacing: -.01em; color: var(--deep); }
+  nav .logo i { width: 30px; height: 30px; border-radius: 50%; background: var(--deep); display: grid; place-items: center; }
+  nav .menu { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--cream); background: var(--coral); border-radius: 999px; padding: 8px 15px; }
+  #dots { position: absolute; left: 18px; top: 420px; display: grid; gap: 9px; z-index: 5; }
+  #dots b { width: 9px; height: 9px; border-radius: 50%; background: rgba(20,89,92,.25); display: block; }
+  #dots b.on { background: var(--coral); }
+  #hint { position: absolute; left: 0; right: 0; top: 792px; text-align: center; font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--deep); z-index: 5; }
+
+  #scene { position: absolute; inset: 0; perspective: 1500px; perspective-origin: 50% 47%; }
+  #book, .page, #cover { transform-style: preserve-3d; }
+  #book { position: absolute; left: 266px; top: 560px; width: 0; height: 0; }
+  #tshadow { position: absolute; left: -290px; top: -60px; width: 580px; height: 470px; border-radius: 50%; background: radial-gradient(closest-side, rgba(120,70,30,.42), rgba(120,70,30,0)); transform: translateZ(-14px); }
+  .board { position: absolute; left: -225px; width: 450px; height: 340px; background: var(--deep); border-radius: 10px; backface-visibility: hidden; }
+  #board0 { top: 0; transform: translateZ(-7px); border-radius: 4px 4px 12px 12px; }
+  #edge { position: absolute; left: -215px; top: 330px; width: 430px; height: 7px; transform-origin: 50% 0; transform: rotateX(-90deg); background: repeating-linear-gradient(180deg, #fffaf0 0 1.4px, #d9c9a6 1.4px 2.4px); }
+  #cover { position: absolute; left: -225px; top: -340px; width: 450px; height: 340px; transform-origin: 50% 100%; }
+  #cover .in { inset: 0; left: 0; top: 0; border-radius: 12px 12px 4px 4px; }
+  #cover .out { position: absolute; inset: 0; border-radius: 12px 12px 4px 4px; background: var(--deep); backface-visibility: hidden; transform: rotateX(180deg); overflow: hidden; }
+  .page { position: absolute; left: -215px; width: 430px; height: 330px; }
+  .page.floor { top: 0; transform-origin: 50% 0; }
+  .page.wall { top: -330px; transform-origin: 50% 100%; }
+  .print { position: absolute; inset: 0; backface-visibility: hidden; overflow: hidden; }
+  .wall .print { border-radius: 8px 8px 0 0; }
+  .floor .print { border-radius: 0 0 8px 8px; }
+  .print::after { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .55;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .45 0 0 0 0 .3 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .wall .print::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 70px; background: linear-gradient(0deg, rgba(60,35,10,.22), rgba(60,35,10,0)); z-index: 3; pointer-events: none; }
+  .floor .print::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 46px; background: linear-gradient(180deg, rgba(60,35,10,.2), rgba(60,35,10,0)); z-index: 3; pointer-events: none; }
+  .print svg.art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .copy { position: absolute; left: 26px; top: 24px; width: 290px; z-index: 2; }
+  .copy small { display: block; font-size: 11.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+  .copy h2 { font-family: Bitter, Georgia, serif; font-weight: 800; font-size: 37px; line-height: 1.0; letter-spacing: -.02em; margin-top: 7px; }
+  .copy p { font-size: 13.5px; font-weight: 500; line-height: 1.3; margin-top: 9px; }
+  .copy p b { font-weight: 700; }
+  .ftxt { position: absolute; left: 0; right: 0; text-align: center; font-family: Bitter, Georgia, serif; font-weight: 800; font-size: 27px; letter-spacing: -.01em; z-index: 2; }
+  .shadow { position: absolute; transform-origin: 50% 0; background: linear-gradient(180deg, rgba(70,40,15,.42), rgba(70,40,15,0)); filter: blur(5px); z-index: 1; border-radius: 0 0 40% 40%; }
+  .piece, .fl { position: absolute; backface-visibility: hidden; }
+  .piece { transform-origin: 50% 100%; }
+  .piece svg, .fl svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  #ticket { cursor: pointer; }
+  .out .ttl { position: absolute; left: 0; right: 0; top: 150px; text-align: center; color: var(--cream); font-family: Bitter, Georgia, serif; font-weight: 800; font-size: 44px; line-height: 1; letter-spacing: -.02em; }
+  .out .sub { position: absolute; left: 0; right: 0; top: 252px; text-align: center; color: var(--mustard); font-size: 15px; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; }
+  .out .frame { position: absolute; inset: 16px; border: 3px solid var(--mustard); border-radius: 8px; }
+  .out svg { position: absolute; left: 50%; top: 40px; width: 96px; height: 96px; margin-left: -48px; }
+
+  #film { position: absolute; inset: 0; z-index: 50; pointer-events: none; display: none; }
+  body.film #film { display: block; }
+  body.film #hint { display: none; }
+  #film .cap { position: absolute; left: 0; right: 0; top: 86px; text-align: center; }
+  #film .cap span { display: inline-block; max-width: 480px; font-family: "Inter Display", Inter, sans-serif; font-weight: 900; font-size: 33px; letter-spacing: -.025em; line-height: 1.1; color: #FFF9EC; background: #24232B; padding: 11px 18px 13px; border-radius: 16px; box-shadow: 0 10px 28px rgba(90,50,20,.35); }
+  #film .cap span em { display: block; font-style: normal; font-weight: 700; font-size: 20.5px; letter-spacing: -.01em; color: #FFE7B0; margin-bottom: 3px; }
+  #film .cap span u { text-decoration: none; background: #EDB53C; color: #24232B; border-radius: 7px; padding: 0 6px; }
+  #film .tap { position: absolute; width: 66px; height: 66px; margin: -33px 0 0 -33px; border-radius: 50%; background: rgba(36,35,43,.3); border: 3px solid #24232B; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="track"></div>
+<div id="view">
+  <div id="beams"></div>
+  <div id="stage">
+    <nav><div class="logo"><i><svg width="20" height="20" viewBox="0 0 20 20"><ellipse cx="10" cy="11" rx="7" ry="7.5" fill="#EDB53C"/><circle cx="7" cy="9" r="3" fill="#FBF3E1"/><circle cx="13" cy="9" r="3" fill="#FBF3E1"/><circle cx="7" cy="9" r="1.3" fill="#2B2A33"/><circle cx="13" cy="9" r="1.3" fill="#2B2A33"/><path d="M8.6 11.5h2.8L10 14z" fill="#F0705A"/></svg></i>Thimble &amp; Owl</div><div class="menu">Menu</div></nav>
+    <div id="dots"><b></b><b></b><b></b><b></b></div>
+    <div id="scene"><div id="book">
+      <div id="tshadow"></div>
+      <div class="board" id="board0"></div>
+      <div id="edge"></div>
+      <div id="cover"><div class="board in"></div><div class="out"><div class="frame"></div>
+        <svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="46" fill="#EDB53C"/><ellipse cx="48" cy="54" rx="26" ry="29" fill="#9A6A48"/><ellipse cx="48" cy="62" rx="15" ry="17" fill="#FBF3E1"/><circle cx="37" cy="42" r="12" fill="#FBF3E1"/><circle cx="59" cy="42" r="12" fill="#FBF3E1"/><circle cx="37" cy="42" r="5" fill="#2B2A33"/><circle cx="59" cy="42" r="5" fill="#2B2A33"/><path d="M43 50h10l-5 9z" fill="#F0705A"/><path d="M24 30l8-12 8 10zM72 30l-8-12-8 10z" fill="#9A6A48"/></svg>
+        <div class="ttl">Thimble &amp; Owl</div><div class="sub">The pop-up bookshop</div></div></div>
+    </div></div>
+    <div id="hint">Scroll to turn the page</div>
+    <div id="film"><div class="cap" id="cap"></div><div class="tap" id="tap"></div></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  if (FILM) document.body.classList.add('film');
+  var $ = function (id) { return document.getElementById(id); };
+  var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+  var ease = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  var outC = function (x) { x = clamp(x, 0, 1); return 1 - Math.pow(1 - x, 3); };
+  var back = function (x) { x = clamp(x, 0, 1); var c = 2.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  var C = { cream: '#FBF3E1', ink: '#2B2A33', teal: '#1F8A8A', deep: '#14595C', mustard: '#EDB53C', coral: '#F0705A', blush: '#F8C3B0', sage: '#7DB58A', wood: '#C98B4E', bark: '#9A6A48', sky: '#CFEAE3' };
+  var S = ' stroke="#FFF9EC" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
+  var s2 = ' stroke="#FFF9EC" stroke-width="1.6" stroke-linejoin="round"';
+  function svg(w, h, body) { return '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' + body + '</svg>'; }
+  function rnd(seed) { return function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }; }
+  function owl(x, y, k) { return '<g transform="translate(' + x + ' ' + y + ') scale(' + k + ')"><path d="M-22 -26l7-13 9 9zM22 -26l-7-13-9 9z" fill="' + C.bark + '"' + s2 + '/><ellipse cx="0" cy="0" rx="27" ry="31" fill="' + C.bark + '"' + S + '/><ellipse cx="0" cy="9" rx="15" ry="18" fill="' + C.cream + '"/><circle cx="-11" cy="-11" r="11.5" fill="' + C.cream + '"/><circle cx="11" cy="-11" r="11.5" fill="' + C.cream + '"/><circle cx="-10" cy="-10" r="4.6" fill="' + C.ink + '"/><circle cx="10" cy="-10" r="4.6" fill="' + C.ink + '"/><path d="M-5 -3h10l-5 9z" fill="' + C.coral + '"/></g>'; }
+  function books(x, y, w, h, seed, cols) { // a row of spines standing on baseline y
+    var r = rnd(seed), o = '', cx = x; cols = cols || [C.coral, C.teal, C.mustard, C.cream, C.deep, C.sage, C.blush];
+    while (cx < x + w - 8) { var bw = 9 + Math.floor(r() * 9), bh = h * (.68 + r() * .32), c = cols[Math.floor(r() * cols.length)]; if (cx + bw > x + w) bw = x + w - cx;
+      o += '<rect x="' + cx + '" y="' + (y - bh).toFixed(1) + '" width="' + bw + '" height="' + bh.toFixed(1) + '" rx="1.5" fill="' + c + '"' + s2 + '/>' + (bw > 12 ? '<rect x="' + (cx + 3) + '" y="' + (y - bh + 7).toFixed(1) + '" width="' + (bw - 6) + '" height="3" fill="rgba(43,42,51,.35)"/>' : ''); cx += bw + 1; }
+    return o; }
+  function tree(w, h, c1, c2) { var m = w / 2; return svg(w, h, '<rect x="' + (m - 6) + '" y="' + (h * .5) + '" width="12" height="' + (h * .5) + '" rx="3" fill="' + C.bark + '"' + S + '/><circle cx="' + m + '" cy="' + (h * .3) + '" r="' + (w * .36) + '" fill="' + c1 + '"' + S + '/><circle cx="' + (m - w * .2) + '" cy="' + (h * .46) + '" r="' + (w * .27) + '" fill="' + c2 + '"' + S + '/><circle cx="' + (m + w * .22) + '" cy="' + (h * .44) + '" r="' + (w * .25) + '" fill="' + c1 + '"' + S + '/>'); }
+
+  // ---------- the four spreads: wall art, floating wall layers, floor art, standing pieces ----------
+  var scallops = ''; for (var i = 0; i < 8; i++) scallops += '<path d="M' + (14 + i * 34) + ' 108h34v14a17 12 0 0 1-34 0z" fill="' + (i % 2 ? C.cream : C.mustard) + '"' + s2 + '/>';
+  var facade = svg(300, 222,
+    '<path d="M4 80L150 6l146 74z" fill="' + C.deep + '"' + S + '/><circle cx="150" cy="50" r="19" fill="' + C.sky + '"' + S + '/>' + owl(150, 54, .42) +
+    '<rect x="14" y="78" width="272" height="144" fill="' + C.coral + '"' + S + '/><rect x="5" y="72" width="290" height="36" rx="7" fill="' + C.cream + '"' + S + '/>' +
+    '<text x="150" y="98" text-anchor="middle" font-family="Bitter,Georgia,serif" font-weight="800" font-size="21" letter-spacing="1.6" fill="' + C.deep + '">THIMBLE &amp; OWL</text>' + scallops +
+    '<rect x="28" y="142" width="82" height="60" rx="7" fill="' + C.sky + '"' + S + '/>' + books(34, 200, 70, 40, 7) +
+    '<rect x="190" y="142" width="82" height="60" rx="7" fill="' + C.sky + '"' + S + '/>' + books(196, 200, 70, 40, 19) +
+    '<path d="M124 222v-58a26 26 0 0 1 52 0v58z" fill="' + C.mustard + '"' + S + '/><circle cx="150" cy="166" r="11" fill="' + C.sky + '"' + s2 + '/><circle cx="166" cy="194" r="3.5" fill="' + C.deep + '"/>');
+  var lamp = svg(40, 130, '<rect x="17" y="34" width="6" height="96" rx="3" fill="' + C.deep + '"' + S + '/><path d="M8 8h24l4 26H4z" fill="' + C.mustard + '"' + S + '/><rect x="6" y="2" width="28" height="8" rx="3" fill="' + C.deep + '"' + s2 + '/>');
+  var board = svg(84, 92, '<path d="M10 92L18 6h48l8 86z" fill="' + C.deep + '"' + S + '/><rect x="20" y="14" width="44" height="56" rx="4" fill="' + C.cream + '"/><text x="42" y="36" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="700" font-size="11" fill="' + C.coral + '">STORY</text><text x="42" y="50" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="700" font-size="11" fill="' + C.coral + '">TIME</text><text x="42" y="64" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="600" font-size="9" fill="' + C.deep + '">Sat 10am</text>');
+  var tub = svg(70, 66, '<circle cx="18" cy="20" r="11" fill="' + C.coral + '"' + S + '/><circle cx="36" cy="13" r="11" fill="' + C.mustard + '"' + S + '/><circle cx="53" cy="21" r="11" fill="' + C.blush + '"' + S + '/><path d="M8 30h54l-6 36H14z" fill="' + C.teal + '"' + S + '/>');
+  var cloud = function (w, h) { return svg(w, h, '<path d="M' + (w * .12) + ' ' + (h * .9) + 'a' + (h * .28) + ' ' + (h * .28) + ' 0 0 1 ' + (w * .1) + ' ' + (-h * .5) + 'a' + (h * .4) + ' ' + (h * .4) + ' 0 0 1 ' + (w * .36) + ' ' + (-h * .2) + 'a' + (h * .32) + ' ' + (h * .32) + ' 0 0 1 ' + (w * .32) + ' ' + (h * .26) + 'a' + (h * .22) + ' ' + (h * .22) + ' 0 0 1 0 ' + (h * .44) + 'z" fill="#FFFDF6"' + s2 + '/>'); };
+  var sun = svg(90, 90, '<circle cx="45" cy="45" r="42" fill="' + C.mustard + '"' + S + '/><circle cx="45" cy="45" r="30" fill="#F6CB62"/>');
+
+  function shelf(w, h, rows, seed) { var o = '<rect x="2" y="2" width="' + (w - 4) + '" height="' + (h - 2) + '" rx="6" fill="' + C.wood + '"' + S + '/>', rh = (h - 14) / rows;
+    for (var r = 0; r < rows; r++) { var y0 = 10 + r * rh; o += '<rect x="12" y="' + y0 + '" width="' + (w - 24) + '" height="' + (rh - 8) + '" fill="#8A5A34"/>' + books(15, y0 + rh - 8, w - 30, rh - 14, seed + r * 13); }
+    return svg(w, h, o); }
+  function cover(x, c, icon, label) { return '<g transform="translate(' + x + ' 0)"><rect x="0" y="4" width="50" height="66" rx="4" fill="' + c + '"' + S + '/>' + icon + '<rect x="3" y="78" width="44" height="17" rx="8.5" fill="' + C.cream + '"/><text x="25" y="90.5" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="700" font-size="10" fill="' + C.deep + '">' + label + '</text></g>'; }
+  var table = svg(220, 128, cover(14, C.deep, '<circle cx="25" cy="34" r="14" fill="' + C.mustard + '"/><circle cx="31" cy="29" r="12" fill="' + C.deep + '"/><circle cx="12" cy="18" r="2" fill="' + C.cream + '"/><circle cx="38" cy="54" r="2" fill="' + C.cream + '"/>', 'Ages 0–3') +
+    cover(85, C.mustard, '<path d="M10 52l15-34 15 34z" fill="' + C.coral + '"/><path d="M10 52l15-12 15 12z" fill="' + C.cream + '"/><circle cx="20" cy="38" r="2" fill="' + C.ink + '"/><circle cx="30" cy="38" r="2" fill="' + C.ink + '"/>', 'Ages 4–7') +
+    cover(156, C.coral, '<ellipse cx="24" cy="40" rx="17" ry="11" fill="' + C.deep + '"/><path d="M38 38l9-9v16z" fill="' + C.deep + '"/><circle cx="15" cy="37" r="2" fill="' + C.cream + '"/><path d="M22 24q3-10 8-2" stroke="' + C.cream + '" stroke-width="2.5" fill="none" stroke-linecap="round"/>', 'Ages 8+') +
+    '<rect x="2" y="98" width="216" height="30" rx="5" fill="' + C.wood + '"' + S + '/>');
+  var plant = svg(60, 100, '<path d="M30 60C8 50 6 22 14 8c14 8 20 30 16 52zM30 60c22-10 24-38 16-52-14 8-20 30-16 52z" fill="' + C.sage + '"' + S + '/><path d="M12 58h36l-5 42H17z" fill="' + C.coral + '"' + S + '/>');
+  var bunt = ''; var bc = [C.coral, C.mustard, C.teal, C.cream, C.sage]; for (i = 0; i < 9; i++) { var bx = 8 + i * 46, by = 6 + Math.sin(i / 8 * Math.PI) * 20; bunt += '<path d="M' + bx + ' ' + by + 'h36l-18 34z" fill="' + bc[i % 5] + '"' + s2 + '/>'; }
+  var bunting = svg(430, 70, '<path d="M0 4Q215 50 430 4" stroke="' + C.deep + '" stroke-width="2.5" fill="none"/>' + bunt);
+
+  var chair = svg(170, 160, '<path d="M30 150V54a55 50 0 0 1 110 0v96z" fill="' + C.coral + '"' + S + '/><path d="M44 150V64a41 38 0 0 1 82 0v86z" fill="#F58E78"/><rect x="6" y="84" width="38" height="70" rx="17" fill="' + C.coral + '"' + S + '/><rect x="126" y="84" width="38" height="70" rx="17" fill="' + C.coral + '"' + S + '/><rect x="40" y="108" width="90" height="32" rx="12" fill="' + C.blush + '"' + S + '/><rect x="24" y="148" width="14" height="12" fill="' + C.bark + '"/><rect x="132" y="148" width="14" height="12" fill="' + C.bark + '"/>');
+  var flamp = svg(90, 200, '<rect x="42" y="70" width="6" height="122" fill="' + C.deep + '"' + S + '/><ellipse cx="45" cy="194" rx="26" ry="6" fill="' + C.deep + '"' + S + '/><circle cx="45" cy="52" r="44" fill="rgba(255,236,170,.3)"/><path d="M22 14h46l14 60H8z" fill="' + C.mustard + '"' + S + '/>');
+  var cush = function (c, c2) { return svg(92, 56, '<rect x="4" y="6" width="84" height="48" rx="20" fill="' + c + '"' + S + '/><path d="M26 8v44M46 7v46M66 8v44" stroke="' + c2 + '" stroke-width="5"/>'); };
+  var stack = svg(80, 70, '<rect x="6" y="50" width="68" height="18" rx="3" fill="' + C.teal + '"' + S + '/><rect x="12" y="32" width="58" height="18" rx="3" fill="' + C.mustard + '"' + S + '/><rect x="4" y="14" width="62" height="18" rx="3" fill="' + C.cream + '"' + S + '/>');
+  var owlpop = svg(150, 250, '<rect x="100" y="36" width="5" height="120" fill="' + C.deep + '"/><path d="M104 30h46l-10 15 10 15h-46z" fill="' + C.mustard + '"' + S + '/><text x="122" y="51" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="700" font-size="14" fill="' + C.deep + '">YAY!</text>' + owl(58, 64, 1.5) + '<rect x="30" y="100" width="56" height="150" fill="' + C.bark + '"/>');
+  function ticket(done) { var c = done ? C.teal : C.coral; return svg(230, 84, '<path d="M8 4h214a4 4 0 0 1 4 4v22a12 12 0 0 0 0 24v22a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V54a12 12 0 0 0 0-24V8a4 4 0 0 1 4-4z" fill="' + c + '"' + S + '/><path d="M56 12v60" stroke="' + C.cream + '" stroke-width="2.5" stroke-dasharray="5 6"/><text x="34" y="52" text-anchor="middle" font-size="26" font-family="Bitter,serif" font-weight="800" fill="' + C.cream + '">' + (done ? '✓' : '★') + '</text><text x="138" y="52" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="700" font-size="25" fill="' + C.cream + '">' + (done ? 'Seat saved' : 'Save a seat') + '</text>'); }
+  var moon = svg(80, 120, '<path d="M40 0v40" stroke="' + C.cream + '" stroke-width="2"/><circle cx="40" cy="78" r="38" fill="' + C.mustard + '"' + S + '/><circle cx="56" cy="66" r="31" fill="#2A9D97"/>');
+  var star = function (c, H) { H = H || 110; return svg(50, H, '<path d="M25 0v' + (H - 50) + '" stroke="' + C.cream + '" stroke-width="2"/><path transform="translate(0 ' + (H - 110) + ')" d="M25 56l7 15 16 2-12 11 3 16-14-8-14 8 3-16L2 73l16-2z" fill="' + c + '"' + S + '/>'); };
+
+  function hills(w, h, c, seed, extra) { var r = rnd(seed), d = 'M0 ' + h + 'V' + (h * .5), x = 0; while (x < w) { var nx = Math.min(w, x + 90 + r() * 80); d += 'Q' + ((x + nx) / 2) + ' ' + (h * (r() * .5 - .1)) + ' ' + nx + ' ' + (h * (.35 + r() * .3)); x = nx; } return svg(w, h, '<path d="' + d + 'V' + h + 'z" fill="' + c + '"' + S + '/>' + (extra || '')); }
+  function house(x, y, c, k) { return '<g transform="translate(' + x + ' ' + y + ') scale(' + (k || 1) + ')"><rect x="0" y="14" width="30" height="26" fill="' + C.cream + '"' + s2 + '/><path d="M-4 16L15 0l19 16z" fill="' + c + '"' + s2 + '/><rect x="11" y="24" width="8" height="16" fill="' + c + '"/></g>'; }
+  var post = svg(150, 150, '<rect x="24" y="10" width="9" height="140" rx="3" fill="' + C.bark + '"' + S + '/><path d="M12 22h108l18 17-18 17H12z" fill="' + C.cream + '"' + S + '/><text x="66" y="45" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="700" font-size="15" fill="' + C.deep + '">Bookshop</text><path d="M16 70h84v28H16z" fill="' + C.mustard + '"' + S + '/><text x="58" y="89" text-anchor="middle" font-family="Poppins,sans-serif" font-weight="700" font-size="13" fill="' + C.deep + '">2 min walk</text>');
+  var pin = svg(84, 124, '<path d="M42 120C18 84 6 66 6 44a36 36 0 0 1 72 0c0 22-12 40-36 76z" fill="' + C.coral + '"' + S + '/><circle cx="42" cy="44" r="19" fill="' + C.cream + '"/>' + owl(42, 46, .36));
+  var balloon = svg(100, 150, '<path d="M38 108l6 22h12l6-22" stroke="' + C.deep + '" stroke-width="2" fill="none"/><rect x="40" y="128" width="20" height="16" rx="3" fill="' + C.bark + '"' + s2 + '/><path d="M50 4a44 46 0 0 1 44 46c0 26-22 44-32 58H38C28 94 6 76 6 50A44 46 0 0 1 50 4z" fill="' + C.coral + '"' + S + '/><path d="M50 4c-16 10-22 30-22 48s6 40 12 56h20c6-16 12-38 12-56S66 14 50 4z" fill="' + C.mustard + '"/><path d="M50 4c-5 12-8 30-8 48s2 40 4 56h8c2-16 4-38 4-56S55 16 50 4z" fill="' + C.cream + '"/>');
+
+  var stars = ''; var rr = rnd(5); for (i = 0; i < 26; i++) stars += '<circle cx="' + (rr() * 430).toFixed(0) + '" cy="' + (rr() * 330).toFixed(0) + '" r="' + (2 + rr() * 3).toFixed(1) + '" fill="rgba(255,255,255,.55)"/>';
+  var cobble = ''; rr = rnd(11); for (i = 0; i < 40; i++) cobble += '<ellipse cx="' + (rr() * 430).toFixed(0) + '" cy="' + (rr() * 330).toFixed(0) + '" rx="13" ry="8" fill="rgba(154,106,72,.16)"/>';
+
+  var SPREADS = [
+    { wall: 'linear-gradient(180deg,#BFE3DC,#E4F2E6)', wallArt: '<path d="M0 330V250l40-30 40 30v-50l50-36 50 36v40l46-30 46 30v-60l44-30 44 30v50l30-20v120z" fill="rgba(31,138,138,.22)"/>',
+      copy: '<small style="color:#14595C">Est. once upon a time</small><h2 style="color:#14595C">Stories that stand up.</h2><p style="color:#14595C">A tiny bookshop for big imaginations.</p>',
+      fls: [{ x: 322, y: 16, w: 86, h: 86, z: 26, s: sun }, { x: 286, y: 76, w: 110, h: 50, z: 58, s: cloud(110, 50), drift: 9 }],
+      floor: '#F6E7C8', floorArt: cobble + '<path d="M168 0h94l40 330H128z" fill="#F8C3B0"/><path d="M178 0h74l34 330H144z" fill="none" stroke="#FFF9EC" stroke-width="3" stroke-dasharray="10 9"/>', ftxt: ['Step inside', 262, C.coral],
+      pcs: [{ x: 0, y: 84, w: 300, h: 222, d: 0, s: facade }, { x: -178, y: 126, w: 86, h: 150, d: .12, s: tree(86, 150, C.sage, C.teal) }, { x: 180, y: 132, w: 76, h: 132, d: .16, s: tree(76, 132, C.teal, C.sage) },
+        { x: -128, y: 208, w: 36, h: 118, d: .24, s: lamp }, { x: 122, y: 214, w: 78, h: 86, d: .3, s: board }, { x: -52, y: 236, w: 56, h: 52, d: .36, s: tub }] },
+    { wall: 'linear-gradient(180deg,#F9CDBB,#FBE0CF)', wallArt: stars,
+      copy: '<small style="color:#C4472F">New this week</small><h2 style="color:#7A2E22">Fresh off the shelf.</h2><p style="color:#7A2E22">Hand-picked <b>picture books.</b></p>',
+      fls: [{ x: 0, y: 158, w: 430, h: 70, z: 34, s: bunting }],
+      floor: '#F7E3C3', floorArt: '<ellipse cx="215" cy="205" rx="180" ry="112" fill="#1F8A8A"/><ellipse cx="215" cy="205" rx="160" ry="96" fill="none" stroke="#FFF9EC" stroke-width="3" stroke-dasharray="3 12" stroke-linecap="round"/>', ftxt: null,
+      pcs: [{ x: 0, y: 62, w: 350, h: 196, d: 0, s: shelf(350, 196, 3, 3) }, { x: -150, y: 150, w: 110, h: 124, d: .14, s: shelf(110, 124, 2, 41) }, { x: 158, y: 150, w: 56, h: 96, d: .18, s: plant }, { x: 10, y: 216, w: 220, h: 128, d: .28, s: table }] },
+    { wall: 'linear-gradient(180deg,#2A9D97,#23857F)', wallArt: stars,
+      copy: '<small style="color:#FFE2A0">Every Saturday · 10am</small><h2 style="color:#FBF3E1">Story time,<br>out loud.</h2><p style="color:#FBF3E1">Cushions, cocoa and one very good book.</p>',
+      fls: [{ x: 322, y: 0, w: 76, h: 114, z: 52, s: moon, swing: 5 }, { x: 266, y: 0, w: 40, h: 150, z: 30, s: star(C.cream, 150), swing: -5 }, { x: 392, y: 0, w: 34, h: 76, z: 40, s: star(C.blush), swing: 8 }],
+      floor: '#F6E7C8', floorArt: '<ellipse cx="215" cy="190" rx="186" ry="124" fill="#EDB53C"/><ellipse cx="215" cy="190" rx="150" ry="96" fill="#F6CB62"/><ellipse cx="215" cy="190" rx="110" ry="68" fill="none" stroke="#FFF9EC" stroke-width="4" stroke-dasharray="2 14" stroke-linecap="round"/>', ftxt: null,
+      pcs: [{ x: -78, y: 96, w: 130, h: 232, d: 0, s: owlpop, owl: 1 }, { x: -78, y: 110, w: 170, h: 160, d: 0, s: chair }, { x: 108, y: 104, w: 90, h: 200, d: .12, s: flamp }, { x: -168, y: 176, w: 84, h: 52, d: .2, s: cush(C.teal, C.cream) }, { x: 176, y: 150, w: 70, h: 62, d: .24, s: stack },
+        { x: 0, y: 256, w: 230, h: 84, d: .32, s: ticket(false), id: 'ticket' }] },
+    { wall: 'linear-gradient(180deg,#BFE3DC,#F3ECCB)', wallArt: '<circle cx="215" cy="330" r="120" fill="rgba(237,181,60,.5)"/><circle cx="215" cy="330" r="190" fill="none" stroke="rgba(237,181,60,.35)" stroke-width="18" stroke-dasharray="10 26"/>',
+      copy: '<small style="color:#C4472F">Come say hello</small><h2 style="color:#14595C">Find us on Lantern Lane.</h2><p style="color:#14595C"><b>12 Lantern Lane, Fernhollow</b><br>Open every day, 9 to 6</p>',
+      fls: [{ x: 318, y: 12, w: 92, h: 138, z: 64, s: balloon, bob: 7 }, { x: 318, y: 168, w: 90, h: 40, z: 30, s: cloud(90, 40), drift: -6 }],
+      floor: '#BFE0B4', floorArt: '<path d="M215 0C120 70 330 150 230 330" fill="none" stroke="#FBF3E1" stroke-width="30" stroke-linecap="round"/><path d="M215 0C120 70 330 150 230 330" fill="none" stroke="#EDB53C" stroke-width="4" stroke-dasharray="12 12"/>', ftxt: null,
+      pcs: [{ x: 0, y: 50, w: 430, h: 112, d: 0, s: hills(430, 112, C.sage, 8, house(70, 18, C.coral) + house(300, 22, C.mustard) + house(190, 6, C.teal, .8)) }, { x: 0, y: 118, w: 430, h: 86, d: .12, s: hills(430, 86, C.teal, 21, house(120, 14, C.mustard, .9) + house(350, 20, C.coral, .9)) },
+        { x: -150, y: 170, w: 70, h: 120, d: .2, s: tree(70, 120, C.sage, '#5E9E6E') }, { x: -84, y: 226, w: 150, h: 150, d: .28, s: post }, { x: 110, y: 214, w: 84, h: 124, d: .34, s: pin, bounce: 1 }] }
+  ];
+
+  // ---------- build the DOM once ----------
+  var book = $('book'), N = SPREADS.length;
+  SPREADS.forEach(function (sp, j) {
+    var w = document.createElement('div'); w.className = 'page wall';
+    w.innerHTML = '<div class="print" style="background:' + sp.wall + '"><svg class="art" viewBox="0 0 430 330">' + sp.wallArt + '</svg><div class="copy">' + sp.copy + '</div></div>';
+    sp.fls.forEach(function (f) { var e = document.createElement('div'); e.className = 'fl'; e.style.cssText = 'left:' + f.x + 'px;top:' + f.y + 'px;width:' + f.w + 'px;height:' + f.h + 'px;transform-origin:50% 0'; e.innerHTML = f.s; w.appendChild(e); f.el = e; });
+    var f = document.createElement('div'); f.className = 'page floor';
+    var pr = '<div class="print" style="background:' + sp.floor + '"><svg class="art" viewBox="0 0 430 330">' + sp.floorArt + '</svg>' + (sp.ftxt ? '<div class="ftxt" style="top:' + sp.ftxt[1] + 'px;color:' + sp.ftxt[2] + '">' + sp.ftxt[0] + '</div>' : '');
+    sp.pcs.forEach(function (p, k) { pr += '<div class="shadow" data-k="' + k + '" style="left:' + (215 + p.x - p.w * .42) + 'px;top:' + p.y + 'px;width:' + (p.w * .84) + 'px;height:' + Math.min(90, p.h * .5) + 'px"></div>'; });
+    f.innerHTML = pr + '</div>';
+    sp.pcs.forEach(function (p, k) { var e = document.createElement('div'); e.className = 'piece'; if (p.id) e.id = p.id; e.style.cssText = 'left:' + (215 + p.x - p.w / 2) + 'px;top:' + (p.y - p.h) + 'px;width:' + p.w + 'px;height:' + p.h + 'px'; e.innerHTML = p.s; f.appendChild(e); p.el = e; p.sh = f.querySelector('.shadow[data-k="' + k + '"]'); });
+    book.appendChild(f); book.appendChild(w); sp.w = w; sp.f = f;
+  });
+  var cover = $('cover'), dots = $('dots').children, hint = $('hint'), beams = $('beams'), stage = $('stage'), tk = $('ticket');
+  var savedAt = null, shown = null, NOW = 0;
+  tk.addEventListener('click', function () { savedAt = savedAt == null ? NOW : null; });
+  function fit() { var k = Math.min(innerWidth / 540, innerHeight / 960); stage.style.transform = 'scale(' + k + ')'; }
+  addEventListener('resize', fit); fit();
+
+  // ---------- one pure render: time t (seconds) and scroll progress s (0..1) ----------
+  function render(t, s) {
+    NOW = t;
+    var close = ease((s - .84) / .15), o = (.64 + .36 * outC(t / 1.1)) * (1 - close), W = 180 - 110 * o;
+    var p = [], cur = 0; for (var k = 0; k < N - 1; k++) { p[k] = clamp((s - k * .27 - .02) / .23, 0, 1); if (p[k] > .5) cur = k + 1; }
+    var yaw = 4.2 * Math.sin(t * .62 + .4) - 2 * close, zoom = .91 + .02 * Math.sin(t * .4) - .03 * close;
+    book.style.transform = 'translateY(' + (-34 * close).toFixed(1) + 'px) rotateX(58deg) rotateZ(' + yaw.toFixed(3) + 'deg) scale(' + zoom.toFixed(4) + ')';
+    cover.style.transform = 'rotateX(' + (-W).toFixed(3) + 'deg) translateZ(-3px)';
+    beams.style.transform = 'rotate(' + (t * 4).toFixed(2) + 'deg)';
+    var fold = ease((o - .3) / .5);
+    SPREADS.forEach(function (sp, j) {
+      var pin = j ? p[j - 1] : 1, pout = j < N - 1 ? p[j] : 0, vis = pin > 0 && pout < 1;
+      sp.w.style.display = sp.f.style.display = vis ? '' : 'none'; if (!vis) return;
+      sp.w.style.transform = 'rotateX(' + (-(180 - (180 - W) * pin)).toFixed(3) + 'deg) translateZ(' + (j * .5) + 'px)';
+      sp.f.style.transform = 'rotateX(' + (pout * (180 - W)).toFixed(3) + 'deg) translateZ(' + ((N - j) * .5) + 'px)';
+      var rw = (j ? ease((pin - .55) / .45) : ease((o - .62) / .38)) * fold;
+      sp.fls.forEach(function (f, i) {
+        var tr = 'translateZ(' + (f.z * rw + .6).toFixed(2) + 'px)';
+        if (f.drift) tr += ' translateX(' + (f.drift * Math.sin(t * .9 + i)).toFixed(2) + 'px)';
+        if (f.bob) tr += ' translateY(' + (f.bob * Math.sin(t * 1.6)).toFixed(2) + 'px) rotate(' + (2.5 * Math.sin(t * 1.1)).toFixed(2) + 'deg)';
+        if (f.swing) tr += ' rotate(' + (f.swing * Math.sin(t * 1.7 + i * 1.3)).toFixed(2) + 'deg)';
+        f.el.style.transform = tr; f.el.style.opacity = rw < .02 ? 0 : 1;
+      });
+      sp.pcs.forEach(function (pc) {
+        var rin = j ? back((pin - .5 - pc.d * .55) / .34) : back((o - .5 - pc.d * .5) / .32), r = rin * (1 - ease(pout / .34)) * (j ? fold : 1), extra = '';
+        if (pc.owl) { r *= savedAt == null ? 0 : back((t - savedAt) / .55); }
+        if (pc.id) { var done = savedAt != null; if (shown !== done) { pc.el.innerHTML = ticket(done); shown = done; } if (done) { var b = clamp((t - savedAt) / .4, 0, 1); extra = ' scale(' + (1 + .12 * Math.sin(b * Math.PI)).toFixed(3) + ')'; } else extra = ' scale(' + (1 + .03 * Math.sin(t * 5)).toFixed(3) + ')'; }
+        if (pc.bounce) extra = ' translateY(' + (-9 * Math.abs(Math.sin(t * 3.2))).toFixed(2) + 'px)';
+        var wob = 1.6 * Math.sin(t * 1.9 + pc.d * 20) * r;
+        pc.el.style.transform = 'rotateX(' + (-(90 * r + wob)).toFixed(3) + 'deg)' + extra; pc.el.style.opacity = r < .04 ? 0 : 1;
+        pc.sh.style.transform = 'skewX(-14deg) scaleY(' + Math.max(0, Math.min(1.1, r)).toFixed(3) + ')'; pc.sh.style.opacity = clamp(r * 1.4, 0, 1).toFixed(3);
+      });
+    });
+    for (k = 0; k < N; k++) dots[k].className = k === cur ? 'on' : '';
+    hint.style.opacity = (1 - clamp(s / .05, 0, 1)) * clamp((t - 1.4) / .5, 0, 1);
+  }
+
+  function prog() { return scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+  if (!FILM) { var t0 = performance.now(); (function loop() { render((performance.now() - t0) / 1000, prog()); requestAnimationFrame(loop); })(); }
+
+  // ---------- filming hooks (recorder only) ----------
+  var CAPS = [[-1, 2.3, '<em>Claude builds a new website every day</em>#8 is a <u>pop-up book</u>'], [2.4, 4.6, 'Not a video. <u>A website.</u>'], [4.7, 7.8, 'Every scroll <u>turns a page</u>'], [7.9, 10.4, 'Built by <u>Claude</u>. No hand-written code.'], [10.5, 13.4, 'It\'s real: <u>tap</u> to save a seat'], [13.5, 17.1, '<em>New site tomorrow</em><u>Follow</u> to see #9']];
+  var TAPT = 10.75;
+  window.__film = { duration: 17, keys: [[0, 0], [4.3, 0], [5.6, .27], [7.9, .27], [9.2, .54], [12.5, .54], [13.8, .81], [15.3, .81], [16.85, 1], [17, 1]] };
+  window.__frame = function (t, y) {
+    window.scrollTo(0, y);
+    savedAt = t >= TAPT + .22 ? TAPT + .22 : null;
+    render(t, prog());
+    var html = '';
+    CAPS.forEach(function (c) { if (t >= c[0] && t < c[1]) { var k = outC((t - c[0]) / .2), o2 = clamp((c[1] - t) / .12, 0, 1); html = '<span style="opacity:' + Math.min(k, o2).toFixed(3) + ';transform:scale(' + (.8 + .2 * k).toFixed(3) + ') rotate(' + (-4 + 2.5 * k).toFixed(2) + 'deg)">' + c[2] + '</span>'; } });
+    $('cap').innerHTML = html;
+    var tap = $('tap'), d = t - TAPT; tap.style.opacity = 0;
+    if (d >= 0 && d <= .75) {
+      var r = tk.getBoundingClientRect(), press = d < .22 ? outC(d / .22) : 1, rel = clamp((d - .22) / .5, 0, 1);
+      tap.style.left = (r.left + r.width * .5) + 'px'; tap.style.top = (r.top + r.height / 2) + 'px';
+      tap.style.opacity = (1 - rel).toFixed(3); tap.style.transform = 'scale(' + (1.5 - .7 * press + rel * 1.3).toFixed(3) + ')';
+    }
+  };
+})();
+</script>
+</body>
+</html>
