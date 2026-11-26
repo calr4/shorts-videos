@@ -23,6 +23,18 @@
   body.film #cap { display: block; position: fixed; z-index: 60; left: 0; right: 0; top: 120px; text-align: center; pointer-events: none; }
   #cap span { display: inline-block; max-width: 452px; background: rgba(59,32,21,.96); color: #fff; font-family: "Bitter", Georgia, serif; font-weight: 800; font-size: 28px; line-height: 1.18; padding: 12px 22px 14px; border-radius: 20px; box-shadow: 0 8px 24px rgba(59,32,21,.35); border: 2px solid rgba(255,255,255,.2); }
   #cap em { font-style: normal; color: #ffa9cc; }
+  /* film-only "before" page: an old-style shop site that wipes away to reveal the real one */
+  #old, #wipe { display: none; }
+  body.film #old { display: block; position: fixed; z-index: 45; left: 0; right: 0; top: 62px; bottom: 0; background: #c9c9c9; font-family: "Times New Roman", "DejaVu Serif", serif; color: #000; text-align: center; padding: 138px 18px 0; }
+  #old .in { background: #fff; border: 3px ridge #888; padding: 14px 12px 600px; }
+  #old h1 { font-family: "Comic Relief", "Comic Sans MS", cursive; font-size: 34px; color: #d4007a; text-shadow: 2px 2px 0 #ffe600; margin: 0; font-weight: 700; }
+  #old .mq { background: #ffe600; border: 2px solid #000; font-size: 18px; font-weight: bold; padding: 4px; margin: 12px 0; color: #c00; }
+  #old p { font-size: 20px; margin: 10px 0; }
+  #old a { color: #00e; text-decoration: underline; font-size: 21px; }
+  #old table { margin: 12px auto; border-collapse: collapse; font-size: 19px; }
+  #old td { border: 2px solid #777; padding: 5px 16px; background: #eee; }
+  #old .ctr { display: inline-block; background: #000; color: #0f0; font-family: "DejaVu Sans Mono", monospace; font-size: 18px; padding: 3px 8px; letter-spacing: 3px; }
+  body.film #wipe { display: block; position: fixed; z-index: 46; top: 62px; bottom: 0; width: 8px; margin-left: -4px; background: #fff; box-shadow: 0 0 24px 8px rgba(255,120,180,.9); opacity: 0; }
   body.film #sb { display: block; position: fixed; z-index: 55; right: 5px; top: 70px; width: 7px; height: 600px; border-radius: 4px; background: rgba(74,42,28,.12); }
   #sb i { position: absolute; left: 0; width: 7px; border-radius: 4px; background: rgba(74,42,28,.55); }
   body.film #dot { display: block; position: fixed; z-index: 70; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; background: rgba(255,255,255,.6); border: 3px solid #fff; box-shadow: 0 0 0 3px rgba(74,42,28,.55), 0 6px 18px rgba(0,0,0,.3); opacity: 0; pointer-events: none; }
@@ -113,6 +125,8 @@
 </head>
 <body>
 <div id="bar"><div class="nav"><span>&#8249;</span><span>&#8250;</span></div><div class="url"><i class="lock"></i>pinkpostcreamery.example</div><div class="dots">&#8943;</div></div>
+<div id="old"><div class="in"><h1>PINKPOST ICE CREAM</h1><div class="mq">*** WELCOME TO OUR WEB SITE!!! ***</div><p>We sell ice cream. Please visit us.</p><p><a>Home</a> | <a>Flavors</a> | <a>Contact</a> | <a>Guestbook</a></p><table><tr><td>Strawberry</td><td>$3.50</td></tr><tr><td>Mint Chip</td><td>$3.75</td></tr><tr><td>Vanilla</td><td>$3.50</td></tr></table><p>This page is under construction.</p><p>You are visitor number <span class="ctr">000482</span></p><p style="font-size:16px">Best viewed in 800 x 600</p></div></div>
+<div id="wipe"></div>
 <div id="cap"><span></span></div>
 <div id="sb"><i></i></div>
 <div id="dot"></div>
@@ -304,9 +318,9 @@
 
   // ---------- filming ----------
   var CAPS = [
-    [0.0, 2.9, '<em>AI</em> built this website for an <em>ice cream shop</em>'],
-    [2.9, 5.2, 'This is the <em>real page</em>'],
-    [5.2, 7.5, 'Every <em>flavour</em>, with prices'],
+    [0.0, 1.75, 'Before: an <em>old-style</em> shop website'],
+    [1.75, 4.9, 'After: <em>AI</em> built this for an <em>ice cream shop</em>'],
+    [4.9, 7.5, 'Every <em>flavour</em>, with prices'],
     [7.5, 10.6, 'Tap a flavour. <em>The cone builds.</em>'],
     [10.6, 12.9, 'Reviews, a map, opening hours'],
     [12.9, 15.0, 'Built by <em>AI</em>. No code typed by hand.']
@@ -314,7 +328,7 @@
   var TAPS = [[8.2, 0], [9.05, 1], [9.95, 4]], Z0 = 15.0, Z1 = 15.8, DUR = 17.4;
   var cap = $('#cap span'), sb = $('#sb i'), dot = $('#dot'), end = $('#end'), H = page.offsetHeight, MAX = H + 62 - innerHeight;
   var yFl = topOf($('#flavours')) - 150, yB = topOf($('#build')) - 152;
-  window.__film = { duration: DUR, keys: [[0, 0], [0.35, 0], [5.4, yFl / MAX], [7.7, yB / MAX], [10.45, (yB + 16) / MAX], [14.9, 1], [DUR, 1]] };
+  window.__film = { duration: DUR, keys: [[0, 0], [2.7, 0], [5.9, yFl / MAX], [7.7, yB / MAX], [10.45, (yB + 16) / MAX], [14.9, 1], [DUR, 1]] };
   var first = true;
   window.__frame = function (t, y) {
     if (first) { measure(); first = false; }
@@ -324,6 +338,10 @@
     window.scrollTo(0, ys);
     picks = []; ordered = 0; for (var k = 0; k < TAPS.length; k++) if (t >= TAPS[k][0]) { if (TAPS[k][1] < 4) picks.push({ f: BF[TAPS[k][1]], at: TAPS[k][0] }); else ordered = 1; }
     render(z > 0 ? 1e6 : ys, t);
+    // before/after wipe: the old-style page is cut away from the left between 1.45 s and 2.1 s
+    var wp = ease((t - 1.45) / 0.65), oldEl = $('#old'), wEl = $('#wipe');
+    oldEl.style.clipPath = 'inset(0 0 0 ' + (wp * 100).toFixed(2) + '%)'; oldEl.style.visibility = wp >= 1 ? 'hidden' : 'visible';
+    wEl.style.left = (wp * 540).toFixed(1) + 'px'; wEl.style.opacity = (wp > 0 && wp < 1) ? 1 : 0;
     // caption
     var txt = ''; for (var i = 0; i < CAPS.length; i++) if (t >= CAPS[i][0] && t < CAPS[i][1]) { txt = CAPS[i][2]; var a = Math.min(i === 0 ? 1 : clamp((t - CAPS[i][0]) / 0.16), i === CAPS.length - 1 ? clamp((CAPS[i][1] - t) / 0.2) : 1); cap.style.opacity = a.toFixed(2); cap.style.transform = 'translateY(' + ((1 - a) * 10).toFixed(1) + 'px)'; }
     if (cap.innerHTML !== txt) cap.innerHTML = txt; cap.parentNode.style.visibility = txt ? 'visible' : 'hidden';
