@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Tool Drop: Muse turns a saved recipe Reel into a shopping list</title>
+<style>
+  :root { --bg: #24104f; --bg2: #341a6e; --cream: #fff3df; --coral: #ff6f59; --ink: #1c0b3f; --soft: #c9b8f2; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--cream); font-family: "Inter Display", "Inter", system-ui, sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  #stage { position: fixed; inset: 0; overflow: hidden; background: radial-gradient(120% 70% at 20% 0%, var(--bg2), var(--bg) 70%); }
+  .blob { position: absolute; border-radius: 50%; will-change: transform; }
+  #bl1 { width: 300px; height: 300px; left: 330px; top: -90px; background: rgba(255,111,89,.16); }
+  #bl2 { width: 380px; height: 380px; left: -170px; top: 690px; background: rgba(201,184,242,.10); }
+  .tag { position: absolute; left: 34px; top: 66px; font-weight: 900; font-size: 12px; letter-spacing: .22em; color: var(--ink); background: var(--coral); padding: 7px 12px 6px; border-radius: 6px; z-index: 9; }
+  .scene { position: absolute; inset: 0; will-change: opacity, transform; opacity: 0; }
+  .pop { display: inline-block; will-change: transform, opacity; transform-origin: left center; }
+  .co { color: var(--coral); }
+  .small { font-family: "Inter", sans-serif; font-weight: 600; font-size: 16px; color: var(--soft); }
+
+  /* A: headline + drawn demo */
+  #a h1 { position: absolute; left: 34px; width: 440px; top: 98px; font-weight: 900; font-size: 52px; line-height: 1.06; white-space: nowrap; letter-spacing: -.04em; }
+  #ask { position: absolute; left: 96px; top: 336px; width: 378px; background: var(--coral); color: var(--ink); border-radius: 24px 24px 6px 24px; padding: 13px 18px; font-weight: 800; font-size: 23px; line-height: 1.15; letter-spacing: -.02em; will-change: transform, opacity; transform-origin: right bottom; }
+  #tile { position: absolute; left: 34px; top: 436px; width: 140px; height: 250px; border-radius: 20px; overflow: hidden; background: linear-gradient(160deg, #ff9d6b, #ff6f59 55%, #d9486b); box-shadow: 0 10px 0 rgba(0,0,0,.28); will-change: transform; }
+  #tile svg { position: absolute; inset: 0; }
+  #tlab { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font-weight: 900; font-size: 13px; letter-spacing: .14em; color: var(--cream); }
+  #list { position: absolute; left: 190px; top: 436px; width: 284px; height: 250px; background: var(--cream); color: var(--ink); border-radius: 20px; padding: 14px 16px; box-shadow: 0 10px 0 rgba(0,0,0,.28); will-change: transform, opacity; transform-origin: left top; }
+  #list .hd { font-weight: 900; font-size: 13px; letter-spacing: .16em; color: #6a4fb0; margin-bottom: 6px; }
+  .it { display: flex; align-items: center; gap: 11px; height: 39px; font-weight: 800; font-size: 25px; letter-spacing: -.02em; will-change: transform, opacity; }
+  .it b { flex: none; width: 24px; height: 24px; border-radius: 7px; border: 3px solid var(--ink); position: relative; }
+  .it b svg { position: absolute; left: -3px; top: -3px; width: 24px; height: 24px; }
+  #flow { position: absolute; left: 166px; top: 540px; width: 34px; height: 34px; border-radius: 17px; background: var(--ink); border: 3px solid var(--cream); display: grid; place-items: center; z-index: 3; will-change: transform, opacity; }
+  #anote { position: absolute; left: 34px; top: 698px; }
+
+  /* B: how */
+  #b h2 { position: absolute; left: 34px; top: 116px; font-weight: 900; font-size: 62px; letter-spacing: -.045em; }
+  .step { position: absolute; left: 34px; width: 440px; display: flex; gap: 16px; align-items: flex-start; will-change: transform, opacity; transform-origin: left center; }
+  .step em { font-style: normal; flex: none; width: 54px; height: 54px; border-radius: 16px; background: var(--coral); color: var(--ink); display: grid; place-items: center; font-weight: 900; font-size: 32px; }
+  .step p { font-weight: 900; font-size: 37px; line-height: 1.08; letter-spacing: -.035em; }
+  #plug { position: absolute; left: 34px; top: 386px; width: 440px; height: 70px; }
+  .pill { position: absolute; top: 8px; height: 54px; padding: 0 20px; border-radius: 27px; display: grid; place-items: center; font-weight: 900; font-size: 24px; letter-spacing: -.02em; will-change: transform; }
+  #p1 { left: 0; background: var(--cream); color: var(--ink); }
+  #p2 { right: 0; background: var(--cream); color: var(--ink); }
+  #wire { position: absolute; left: 150px; top: 31px; height: 8px; width: 190px; border-radius: 4px; background: var(--coral); transform-origin: left center; }
+  #bnote { position: absolute; left: 34px; top: 690px; }
+
+  /* C: free + asks first */
+  #c h2 { position: absolute; left: 34px; width: 440px; top: 108px; font-weight: 900; font-size: 56px; line-height: 1.0; letter-spacing: -.045em; white-space: nowrap; }
+  #c h2 .co { font-size: 124px; letter-spacing: -.06em; }
+  #csub { position: absolute; left: 34px; top: 290px; font-weight: 800; font-size: 30px; letter-spacing: -.02em; color: var(--soft); }
+  #okc { position: absolute; left: 34px; top: 372px; width: 440px; background: var(--cream); color: var(--ink); border-radius: 24px; padding: 20px 22px 22px; box-shadow: 0 10px 0 rgba(0,0,0,.28); will-change: transform, opacity; transform-origin: left top; }
+  #okc p { font-weight: 900; font-size: 38px; line-height: 1.08; letter-spacing: -.035em; }
+  #okb { margin-top: 16px; display: flex; gap: 12px; }
+  #okb span { height: 56px; padding: 0 22px; border-radius: 16px; display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 24px; border: 3px solid var(--ink); will-change: transform; }
+  #yes { background: var(--coral); }
+  #cnote { position: absolute; left: 34px; width: 430px; top: 668px; line-height: 1.35; }
+
+  /* D: name + follow */
+  #d .pre { position: absolute; left: 34px; top: 122px; font-weight: 800; font-size: 32px; letter-spacing: -.02em; color: var(--soft); }
+  #dname { position: absolute; left: 34px; top: 160px; font-weight: 900; font-size: 150px; line-height: 1; letter-spacing: -.06em; color: var(--coral); will-change: transform; transform-origin: left top; }
+  #dby { position: absolute; left: 34px; top: 318px; font-weight: 900; font-size: 44px; letter-spacing: -.035em; }
+  #dline { position: absolute; left: 34px; width: 440px; top: 400px; font-weight: 900; font-size: 40px; line-height: 1.1; letter-spacing: -.035em; }
+  #follow { position: absolute; left: 34px; top: 580px; font-weight: 900; font-size: 28px; letter-spacing: -.02em; color: var(--ink); background: var(--cream); padding: 17px 22px; border-radius: 18px; box-shadow: 0 10px 0 var(--coral); will-change: transform, opacity; transform-origin: left center; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="blob" id="bl1"></div><div class="blob" id="bl2"></div>
+  <div class="tag">AI TOOL DROP</div>
+
+  <section class="scene" id="a">
+    <h1>Meta's <span class="co">Muse AI</span><br>turns a saved<br>recipe Reel into<br>a <span class="co">shopping list</span></h1>
+    <div id="ask">Make a shopping list from the pasta Reel I saved</div>
+    <div id="tile">
+      <svg viewBox="0 0 140 250">
+        <!-- drawn bowl of pasta -->
+        <ellipse cx="70" cy="128" rx="50" ry="50" fill="#fff3df"/>
+        <ellipse cx="70" cy="128" rx="38" ry="38" fill="#ffd27a"/>
+        <g fill="none" stroke="#e39a2d" stroke-width="5" stroke-linecap="round">
+          <path d="M44 118c10-14 22 10 32-4s16 6 22-2"/><path d="M42 134c12-10 20 12 32 0s18 4 24-4"/><path d="M52 150c8-8 16 6 24-2s12 2 16-4"/>
+        </g>
+        <circle cx="58" cy="112" r="7" fill="#e5484d"/><circle cx="88" cy="140" r="7" fill="#e5484d"/><circle cx="76" cy="106" r="4" fill="#3d9a50"/><circle cx="60" cy="146" r="4" fill="#3d9a50"/>
+        <!-- saved marker -->
+        <path d="M108 14h20v30l-10-8-10 8z" fill="#fff3df"/>
+        <!-- play -->
+        <circle cx="26" cy="30" r="15" fill="rgba(28,11,63,.55)"/><path d="M21 22l13 8-13 8z" fill="#fff3df"/>
+      </svg>
+      <div id="tlab">SAVED REEL</div>
+    </div>
+    <div id="flow"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h9M8 3l5 5-5 5" fill="none" stroke="#fff3df" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div id="list">
+      <div class="hd">SHOPPING LIST</div>
+      <div class="it"><b></b>Spaghetti</div>
+      <div class="it"><b></b>Tomatoes</div>
+      <div class="it"><b></b>Garlic</div>
+      <div class="it"><b></b>Basil</div>
+      <div class="it"><b></b>Parmesan</div>
+    </div>
+    <div id="anote" class="small">Illustration, not a real reply</div>
+  </section>
+
+  <section class="scene" id="b">
+    <h2>How to <span class="co">do it</span></h2>
+    <div class="step" id="s1" style="top:232px"><em>1</em><p>Connect your Instagram to Muse</p></div>
+    <div id="plug"><div id="wire"></div><div class="pill" id="p1">Instagram</div><div class="pill" id="p2">Muse</div></div>
+    <div class="step" id="s2" style="top:498px"><em>2</em><p>Ask in the Muse app or in WhatsApp</p></div>
+    <div id="bnote" class="small">Source: Meta</div>
+  </section>
+
+  <section class="scene" id="c">
+    <h2><span class="pop co">Free</span><br><span class="pop">for most things</span></h2>
+    <div id="csub">Paid plans add more.</div>
+    <div id="okc"><p>It asks you before it buys anything</p><div id="okb"><span id="yes"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M5 14l6 6 11-13" fill="none" stroke="#1c0b3f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>Approve</span><span>Not now</span></div></div>
+    <div id="cnote" class="small">Adults only. Not in every country yet.<br>Source: Meta. Details checked Nov 2026.</div>
+  </section>
+
+  <section class="scene" id="d">
+    <div class="pre">Try it with your saved recipes</div>
+    <div id="dname">Muse</div>
+    <div id="dby">by Meta</div>
+    <div id="dline">Saved recipe Reel <span class="co">→</span><br>shopping list</div>
+    <div id="follow">Follow for one AI tool a day</div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  var $ = function (id) { return document.getElementById(id); };
+  var all = function (q) { return [].slice.call(document.querySelectorAll(q)); };
+  var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+  var sm = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  var out = function (x) { x = clamp(x, 0, 1); return 1 - Math.pow(1 - x, 3); };
+  var back = function (x) { x = clamp(x, 0, 1); var c = 1.8; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  var mix = function (a, b, k) { return a + (b - a) * k; };
+  var pop = function (el, d, dur) { el.style.opacity = clamp(d / .08, 0, 1); el.style.transform = 'scale(' + mix(.7, 1, back(d / (dur || .3))).toFixed(3) + ')'; };
+  var CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12l5 5 10-12" fill="none" stroke="#ff6f59" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>';
+  all('.it b').forEach(function (b) { b.innerHTML = CHECK; });
+
+  // 104 bpm: beat = 0.577 s, bar = 2.308 s. Scene cuts sit on bar or half-bar lines.
+  var BT = 60 / 104, DUR = 16.5, LOOP = 7 * 4 * BT;          // 16.154
+  var SC = [['a', 0, 12 * BT], ['b', 12 * BT, 18 * BT], ['c', 18 * BT, 24 * BT], ['d', 24 * BT, LOOP]];
+  var items = all('.it');
+
+  function sceneA(t) {
+    // the saved Reel is already sliding in on frame 0
+    var k = out((t + .34) / .8);
+    $('tile').style.transform = 'translateX(' + ((1 - k) * -190).toFixed(1) + 'px) rotate(' + (mix(-9, -3, k) + 1.2 * Math.sin(t * 2.2)).toFixed(2) + 'deg)';
+    pop($('ask'), t - .12, .3);
+    pop($('list'), t - BT, .32);
+    pop($('flow'), t - BT * 1.5, .26);
+    $('flow').style.transform += ' translateX(' + (3 * Math.sin(t * 7)).toFixed(1) + 'px)';
+    items.forEach(function (el, i) {
+      var d = t - BT * (3 + i);
+      el.style.opacity = clamp(d / .07, 0, 1);
+      el.style.transform = 'translateX(' + ((1 - out(d / .24)) * 34).toFixed(1) + 'px)';
+      el.querySelector('path').style.strokeDashoffset = (1 - sm((t - BT * (8 + i * .5)) / .16)).toFixed(3);
+    });
+    $('anote').style.opacity = sm((t - BT * 1.5) / .3).toFixed(3);
+  }
+
+  function render(t) {
+    $('bl1').style.transform = 'translate(' + (18 * Math.sin(t * .9)).toFixed(1) + 'px,' + (14 * Math.cos(t * .7)).toFixed(1) + 'px)';
+    $('bl2').style.transform = 'translate(' + (22 * Math.cos(t * .6)).toFixed(1) + 'px,' + (16 * Math.sin(t * .8)).toFixed(1) + 'px)';
+    SC.forEach(function (s) {
+      var first = s[1] === 0;
+      var i = first ? 1 : sm((t - s[1]) / .18), o = sm((s[2] - t) / .16);
+      var el = $(s[0]); el.style.opacity = (i * o).toFixed(3);
+      el.style.transform = 'translateX(' + ((1 - i) * 50 - (1 - o) * 50).toFixed(1) + 'px)';
+    });
+    // loop: the last moments return to the exact first frame
+    if (t >= LOOP - .16) {
+      var k = sm((t - (LOOP - .1)) / .25);
+      $('a').style.opacity = k.toFixed(3); $('a').style.transform = 'translateX(' + ((1 - k) * 50).toFixed(1) + 'px)';
+      sceneA(0);
+    } else sceneA(t);
+
+    // B
+    var tb = t - 12 * BT;
+    pop($('s1'), tb - .12, .3);
+    var w = sm((tb - .7) / .35);
+    $('p1').style.transform = 'translateX(' + ((1 - out((tb - .45) / .3)) * -60).toFixed(1) + 'px)';
+    $('p2').style.transform = 'translateX(' + ((1 - out((tb - .45) / .3)) * 60).toFixed(1) + 'px) scale(' + (1 + .08 * Math.sin(clamp((tb - 1.05) / .3, 0, 1) * Math.PI)).toFixed(3) + ')';
+    $('p1').style.opacity = $('p2').style.opacity = clamp((tb - .45) / .1, 0, 1);
+    $('wire').style.transform = 'scaleX(' + w.toFixed(3) + ')';
+    pop($('s2'), tb - 3 * BT, .3);
+    $('bnote').style.opacity = sm((tb - 1.0) / .3).toFixed(3);
+
+    // C
+    var tc = t - 18 * BT;
+    all('#c h2 .pop').forEach(function (el, i) { pop(el, tc - .05 - i * .16, .3); });
+    $('csub').style.opacity = sm((tc - .7) / .25).toFixed(3);
+    pop($('okc'), tc - 2 * BT, .34);
+    var press = sm((tc - 3.6 * BT) / .12) * (1 - sm((tc - 3.6 * BT - .16) / .14));
+    $('yes').style.transform = 'scale(' + (1 - .08 * press).toFixed(3) + ')';
+    $('yes').querySelector('path').style.strokeDashoffset = (1 - sm((tc - 3.7 * BT) / .2)).toFixed(3);
+    $('cnote').style.opacity = sm((tc - 1.5) / .3).toFixed(3);
+
+    // D
+    var td = t - 24 * BT;
+    $('dname').style.transform = 'scale(' + mix(.75, 1, back((td - .04) / .32)).toFixed(3) + ')';
+    $('dby').style.opacity = clamp((td - .35) / .1, 0, 1);
+    $('dline').style.opacity = clamp((td - .58) / .1, 0, 1);
+    $('dline').style.transform = 'translateY(' + ((1 - out((td - .58) / .25)) * 18).toFixed(1) + 'px)';
+    var d = td - 2 * BT; $('follow').style.opacity = clamp(d / .08, 0, 1);
+    $('follow').style.transform = 'scale(' + (mix(.6, 1, back(d / .34)) * (1 + .02 * Math.sin(td * 6))).toFixed(3) + ') rotate(-1.5deg)';
+  }
+
+  if (!FILM) { var t0 = performance.now(); (function loop() { render(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); })(); }
+  window.__film = { duration: DUR, keys: [[0, 0], [DUR, 0]] };
+  window.__frame = function (t) { render(t); };
+})();
+</script>
+</body>
+</html>
