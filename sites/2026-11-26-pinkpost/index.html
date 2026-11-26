@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pinkpost Creamery | Small-batch ice cream in Wafflestone</title>
+<style>
+  :root { --pink:#ff8fbd; --pink2:#ffd9e8; --pink3:#fff0f6; --mint:#bdeedb; --mint2:#e2f8ef; --sky:#b9defc; --sky2:#e4f2ff; --lemon:#ffe58a; --choc:#4a2a1c; --choc2:#7a5646; --white:#fff; }
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: "Inter", "Fira Sans", system-ui, sans-serif; color: var(--choc); background: #fff; overflow-x: hidden; }
+  h1, h2, h3, .logo, .price, .total b, .mq, .bigfont { font-family: "Bitter", "Gelasio", Georgia, serif; font-weight: 800; }
+  body.film { background: #3b2015; padding-top: 62px; }
+  body.film::-webkit-scrollbar { display: none; }
+
+  /* film-only: browser bar, caption, scrollbar, finger, end card */
+  #bar, #cap, #sb, #dot, #end { display: none; }
+  body.film #bar { display: flex; position: fixed; z-index: 50; top: 0; left: 0; right: 0; height: 62px; background: #f1edf0; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid #d9d0d6; }
+  #bar .nav { display: flex; gap: 12px; color: #8b7f87; font-size: 26px; line-height: 1; }
+  #bar .url { flex: 1; height: 40px; border-radius: 20px; background: #fff; display: flex; align-items: center; gap: 9px; padding: 0 16px; font-size: 19px; color: #3a2a30; font-weight: 500; box-shadow: inset 0 0 0 1px #e0d6dc; }
+  #bar .lock { width: 13px; height: 11px; background: #6d5f67; border-radius: 3px; position: relative; margin-top: 5px; }
+  #bar .lock::before { content: ""; position: absolute; left: 2px; top: -8px; width: 9px; height: 10px; border: 2.5px solid #6d5f67; border-bottom: 0; border-radius: 6px 6px 0 0; box-sizing: border-box; }
+  #bar .dots { color: #8b7f87; font-size: 26px; letter-spacing: 1px; }
+  body.film #cap { display: block; position: fixed; z-index: 60; left: 0; right: 0; top: 120px; text-align: center; pointer-events: none; }
+  #cap span { display: inline-block; max-width: 452px; background: rgba(59,32,21,.96); color: #fff; font-family: "Bitter", Georgia, serif; font-weight: 800; font-size: 28px; line-height: 1.18; padding: 12px 22px 14px; border-radius: 20px; box-shadow: 0 8px 24px rgba(59,32,21,.35); border: 2px solid rgba(255,255,255,.2); }
+  #cap em { font-style: normal; color: #ffa9cc; }
+  body.film #sb { display: block; position: fixed; z-index: 55; right: 5px; top: 70px; width: 7px; height: 600px; border-radius: 4px; background: rgba(74,42,28,.12); }
+  #sb i { position: absolute; left: 0; width: 7px; border-radius: 4px; background: rgba(74,42,28,.55); }
+  body.film #dot { display: block; position: fixed; z-index: 70; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; background: rgba(255,255,255,.6); border: 3px solid #fff; box-shadow: 0 0 0 3px rgba(74,42,28,.55), 0 6px 18px rgba(0,0,0,.3); opacity: 0; pointer-events: none; }
+  body.film #end { position: fixed; z-index: 40; left: 206px; top: 236px; width: 262px; color: #fff; opacity: 0; display: block; }
+  #end .big { font-family: "Bitter", Georgia, serif; font-weight: 800; font-size: 37px; line-height: 1.1; }
+  #end .big em { font-style: normal; color: #ffa9cc; }
+  #end .sub { margin-top: 18px; font-size: 21px; line-height: 1.32; color: #f3dccf; font-weight: 600; }
+  #end .cta { display: inline-block; margin-top: 24px; background: var(--pink); color: var(--choc); font-family: "Bitter", Georgia, serif; font-weight: 800; font-size: 21px; padding: 13px 18px; border-radius: 16px; line-height: 1.2; }
+
+  /* the site */
+  #page { max-width: 540px; margin: 0 auto; background: #fff; transform-origin: 0 0; position: relative; }
+  body.film #page { box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+  .top { position: sticky; top: 0; z-index: 20; height: 50px; background: #fff; display: flex; align-items: center; padding: 0 16px; gap: 15px; border-bottom: 2px solid var(--pink2); }
+  body.film .top { top: 62px; }
+  .logo { font-size: 21px; display: flex; align-items: center; gap: 7px; margin-right: auto; color: var(--choc); letter-spacing: -.2px; }
+  .logo svg { width: 22px; height: 28px; display: block; }
+  .top a { color: var(--choc2); text-decoration: none; font-size: 14.5px; font-weight: 600; white-space: nowrap; }
+  .top a.order { background: var(--pink); color: var(--choc); padding: 7px 12px; border-radius: 16px; font-weight: 800; }
+
+  .hero { position: relative; overflow: hidden; background: linear-gradient(180deg, #ffe4ef 0%, #ffd3e4 70%, #ffc6dc 100%); padding: 112px 0 0 26px; height: 722px; }
+  .blob { position: absolute; border-radius: 50%; }
+  .spr { position: absolute; left: 0; top: 0; width: 15px; height: 6px; border-radius: 3px; will-change: transform; }
+  .hero .txt { position: relative; z-index: 3; width: 292px; }
+  .open { display: inline-block; background: #fff; color: var(--choc); font-size: 13.5px; font-weight: 700; padding: 6px 12px; border-radius: 14px; box-shadow: 0 3px 10px rgba(255,143,189,.35); position: absolute; top: 22px; left: 26px; z-index: 3; }
+  .open i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #3fbf8a; margin-right: 6px; }
+  .hero h1 { font-size: 44px; line-height: 1.04; letter-spacing: -.8px; }
+  .hero h1 em { font-style: normal; color: #e8468a; }
+  .hero p { margin-top: 14px; font-size: 17.5px; line-height: 1.42; color: var(--choc2); font-weight: 500; }
+  .btn { display: inline-block; font-weight: 800; font-size: 18px; padding: 15px 22px; border-radius: 28px; text-decoration: none; border: 0; cursor: pointer; font-family: inherit; }
+  .btn.choc { background: var(--choc); color: #fff; margin-top: 22px; box-shadow: 0 8px 18px rgba(74,42,28,.28); }
+  .hero .rate { margin-top: 18px; font-size: 14.5px; font-weight: 700; color: var(--choc2); }
+  .hero .rate b { color: #f2a100; letter-spacing: 2px; font-size: 17px; }
+  #heroCone { position: absolute; z-index: 2; left: 270px; top: 118px; width: 256px; height: 585px; overflow: visible; }
+  .drip { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 46px; display: block; z-index: 4; }
+
+  section { padding: 34px 22px 8px; }
+  .kicker { color: #e8468a; font-weight: 800; font-size: 13.5px; letter-spacing: 2.2px; text-transform: uppercase; }
+  h2 { font-size: 34px; line-height: 1.08; margin-top: 5px; letter-spacing: -.5px; }
+  .lead { color: var(--choc2); font-size: 16.5px; margin-top: 8px; line-height: 1.4; }
+
+  .flav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px; margin-top: 22px; }
+  .fl { text-align: center; }
+  .fl svg { display: block; width: 100%; height: auto; }
+  .fl h3 { font-family: "Inter", sans-serif; font-size: 14.5px; font-weight: 800; margin-top: 2px; letter-spacing: -.2px; }
+  .fl .price { display: inline-block; margin-top: 5px; font-size: 15.5px; background: var(--pink3); padding: 3px 11px 4px; border-radius: 12px; color: #c22f6f; }
+
+  .mqwrap { margin-top: 34px; background: var(--choc); color: var(--lemon); overflow: hidden; height: 54px; display: flex; align-items: center; transform: rotate(-1.4deg) scale(1.03); }
+  .mq { white-space: nowrap; font-size: 21px; letter-spacing: .5px; will-change: transform; }
+  .mq i { font-style: normal; color: var(--pink); padding: 0 14px; }
+
+  .builder { margin-top: 20px; background: var(--mint2); border-radius: 28px; padding: 16px 16px 18px 6px; display: grid; grid-template-columns: 206px 1fr; gap: 4px; border: 2px solid var(--mint); }
+  #stage { display: block; width: 206px; height: 356px; overflow: visible; }
+  .pick { font-size: 13px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; color: #2f8f6a; margin: 4px 0 10px; }
+  .fb { display: flex; align-items: center; gap: 10px; width: 100%; height: 50px; margin-bottom: 9px; padding: 0 12px 0 9px; border-radius: 25px; border: 2px solid #cfe9dd; background: #fff; font-family: inherit; font-size: 16.5px; font-weight: 700; color: var(--choc); cursor: pointer; text-align: left; }
+  .fb i { width: 30px; height: 30px; border-radius: 50%; flex: none; box-shadow: inset -5px -5px 0 rgba(0,0,0,.08); }
+  .fb span { flex: 1; white-space: nowrap; }
+  .fb small { font-size: 13.5px; font-weight: 800; color: var(--choc2); }
+  .fb.on { border-color: var(--choc); background: #fffbe9; }
+  .fb.on small { background: var(--choc); color: #fff; padding: 3px 8px; border-radius: 10px; }
+  .total { display: flex; align-items: baseline; justify-content: space-between; margin: 12px 4px 10px; font-size: 15px; font-weight: 700; color: var(--choc2); }
+  .total b { font-size: 31px; color: var(--choc); letter-spacing: -.5px; }
+  .btn.add { width: 100%; background: var(--pink); color: var(--choc); font-size: 17px; padding: 13px 10px; text-align: center; border-radius: 25px; }
+  .btn.add.done { background: #3fbf8a; color: #fff; }
+  .reset { display: block; margin: 9px auto 0; background: none; border: 0; font-family: inherit; font-size: 13.5px; font-weight: 700; color: var(--choc2); text-decoration: underline; cursor: pointer; }
+
+  .rev { position: relative; border-radius: 22px; padding: 16px 18px 16px; margin-top: 14px; }
+  .rev.r1 { background: var(--pink3); margin-right: 34px; }
+  .rev.r2 { background: var(--sky2); margin-left: 34px; }
+  .rev.r3 { background: #fff7d6; margin-right: 34px; }
+  .stars { color: #f2a100; font-size: 19px; letter-spacing: 3px; }
+  .rev p { font-size: 17.5px; line-height: 1.38; margin-top: 3px; font-weight: 600; }
+  .rev small { display: block; margin-top: 6px; color: var(--choc2); font-size: 14px; font-weight: 700; }
+
+  .map { margin-top: 18px; border-radius: 24px; overflow: hidden; border: 2px solid var(--sky); }
+  .map svg { display: block; width: 100%; height: auto; }
+  .hours { margin-top: 14px; background: var(--sky2); border-radius: 22px; padding: 14px 18px 12px; }
+  .hours div { display: flex; justify-content: space-between; font-size: 16.5px; font-weight: 600; padding: 7px 0; border-bottom: 2px dotted #b4d3ee; }
+  .hours div:last-child { border: 0; }
+  .hours b { font-weight: 800; }
+  .contact { display: flex; gap: 10px; margin-top: 12px; }
+  .contact a { flex: 1; text-align: center; text-decoration: none; background: var(--choc); color: #fff; font-weight: 800; font-size: 16px; padding: 13px 6px; border-radius: 24px; }
+  .contact a.alt { background: #fff; color: var(--choc); box-shadow: inset 0 0 0 2px var(--choc); }
+  footer { margin-top: 40px; background: var(--choc); color: #e9cdbf; padding: 0 22px 34px; font-size: 14.5px; line-height: 1.6; }
+  footer svg.fd { display: block; width: calc(100% + 44px); margin: 0 -22px 18px; height: 40px; }
+  footer .logo { color: #fff; margin-bottom: 8px; }
+  footer .links { margin-top: 12px; color: var(--pink); font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="bar"><div class="nav"><span>&#8249;</span><span>&#8250;</span></div><div class="url"><i class="lock"></i>pinkpostcreamery.example</div><div class="dots">&#8943;</div></div>
+<div id="cap"><span></span></div>
+<div id="sb"><i></i></div>
+<div id="dot"></div>
+<div id="end"><div class="big">AI built this<br><em>whole website.</em></div><div class="sub">Flavours, a cone builder, reviews, a map.<br>No code typed by hand.</div><div class="cta">Follow for a new<br>AI-built site every day</div></div>
+
+<div id="page">
+  <nav class="top">
+    <div class="logo"><svg viewBox="0 0 22 28"><path d="M4 12 L11 27 L18 12Z" fill="#e8b06a"/><circle cx="11" cy="8" r="7.5" fill="#ff8fbd"/><circle cx="8.5" cy="5.5" r="2" fill="#fff" opacity=".7"/></svg>Pinkpost</div>
+    <a href="#flavours">Flavours</a><a href="#build">Build a cone</a><a href="#visit">Visit</a><a href="#build" class="order" id="order">Order 0</a>
+  </nav>
+
+  <header class="hero" id="hero">
+    <div class="blob" style="width:300px;height:300px;right:-90px;top:120px;background:#fff;opacity:.55"></div>
+    <div class="blob" style="width:150px;height:150px;left:-50px;top:520px;background:#bdeedb;opacity:.8"></div>
+    <div class="blob" style="width:86px;height:86px;left:236px;top:36px;background:#b9defc;opacity:.85"></div>
+    <div id="sprs"></div>
+    <div class="open"><i></i>Open today until 9 pm</div>
+    <div class="txt">
+      <h1>Small-batch ice cream, <em>scooped daily.</em></h1>
+      <p>Twelve flavours churned every morning, in waffle cones baked in-house.</p>
+      <a class="btn choc" href="#build">Order a cone</a>
+      <div class="rate"><b>&#9733;&#9733;&#9733;&#9733;&#9733;</b> 4.9 from 312 locals</div>
+    </div>
+    <svg id="heroCone" viewBox="0 0 232 530" aria-label="An ice cream cone"></svg>
+    <svg class="drip" viewBox="0 0 540 46" preserveAspectRatio="none"><path d="M0 46 V20 Q20 4 40 20 T80 20 Q100 40 120 20 T160 20 Q185 0 210 20 T260 20 Q280 38 300 20 T340 20 Q365 2 390 20 T440 20 Q460 36 480 20 T520 20 Q530 12 540 20 V46Z" fill="#fff"/></svg>
+  </header>
+
+  <section id="flavours">
+    <div class="kicker rv">Today's menu</div>
+    <h2 class="rv">Pick your flavour</h2>
+    <p class="lead rv">Churned this morning. Priced per scoop.</p>
+    <div class="flav" id="flav"></div>
+  </section>
+
+  <div class="mqwrap"><div class="mq" id="mq"></div></div>
+
+  <section id="build">
+    <div class="kicker rv">Try it</div>
+    <h2 class="rv">Build a cone</h2>
+    <div class="builder rv">
+      <svg id="stage" viewBox="0 0 206 356" aria-label="Your cone"></svg>
+      <div>
+        <div class="pick">Tap a flavour</div>
+        <div id="fbs"></div>
+        <div class="total"><span>Your cone</span><b id="total">$0.00</b></div>
+        <button class="btn add" id="addBtn">Add to order</button>
+        <button class="reset" id="reset">Start over</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="reviews">
+    <div class="kicker rv">Reviews</div>
+    <h2 class="rv">Sweet words</h2>
+    <div class="rev r1 sl"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>The mint chip tastes like actual mint. We walk here every Sunday.</p><small>Tavi, Wafflestone</small></div>
+    <div class="rev r2 sr"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>Warm waffle cone, cold scoop. Nothing else needed.</p><small>Odile, Sprinkle Lane</small></div>
+    <div class="rev r3 sl"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>My kids ask for the blue one by name.</p><small>Bram, Cherry Wharf</small></div>
+  </section>
+
+  <section id="visit">
+    <div class="kicker rv">Visit</div>
+    <h2 class="rv">22 Sprinkle Lane</h2>
+    <div class="map rv">
+      <svg viewBox="0 0 496 240"><rect width="496" height="240" fill="#eef8f1"/>
+        <path d="M0 196 Q130 170 250 204 T496 180 V240 H0Z" fill="#b9defc"/>
+        <g stroke="#fff" stroke-width="17" fill="none" stroke-linecap="round"><path d="M-10 78 H506"/><path d="M118 -10 V176"/><path d="M356 -10 V182"/><path d="M118 138 H356"/></g>
+        <g fill="#d6efdf"><rect x="16" y="96" width="86" height="72" rx="10"/><rect x="138" y="10" width="198" height="50" rx="10"/><rect x="376" y="96" width="104" height="62" rx="10"/></g>
+        <g fill="#ffd9e8"><rect x="138" y="96" width="76" height="28" rx="8"/><rect x="262" y="96" width="76" height="28" rx="8"/><rect x="376" y="12" width="104" height="48" rx="10"/><rect x="16" y="12" width="86" height="48" rx="10"/></g>
+        <text x="60" y="140" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="13" fill="#5aa784">Scoop Park</text>
+        <text x="428" y="222" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="13" fill="#4f8fc4">Cherry Wharf</text>
+        <ellipse cx="238" cy="112" rx="15" ry="5" fill="#4a2a1c" opacity=".18"/>
+        <g id="pin"><path d="M238 112 C204 74 214 38 238 38 C262 38 272 74 238 112Z" fill="#e8468a"/><circle cx="238" cy="64" r="12" fill="#fff"/><path d="M232 66 L238 80 L244 66Z" fill="#e8b06a"/><circle cx="238" cy="62" r="6.5" fill="#ff8fbd"/></g>
+        <rect x="170" y="120" width="136" height="26" rx="13" fill="#4a2a1c"/><text x="238" y="138" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="14" fill="#fff">Pinkpost Creamery</text>
+      </svg>
+    </div>
+    <div class="hours rv"><div><span>Monday to Thursday</span><b>12 to 9 pm</b></div><div><span>Friday and Saturday</span><b>11 am to 10 pm</b></div><div><span>Sunday</span><b>11 am to 8 pm</b></div></div>
+    <div class="contact rv"><a href="tel:5550117">Call 555 0117</a><a class="alt" href="#visit">Get directions</a></div>
+  </section>
+
+  <footer>
+    <svg class="fd" viewBox="0 0 540 40" preserveAspectRatio="none"><rect width="540" height="40" fill="#fff"/><path d="M0 40 V22 Q22 4 45 22 T90 22 T135 22 T180 22 T225 22 T270 22 T315 22 T360 22 T405 22 T450 22 T495 22 T540 22 V40Z" fill="#4a2a1c"/></svg>
+    <div class="logo">Pinkpost Creamery</div>Pinkpost Creamery is a made-up shop.<br>This demo site was built by AI.
+    <div class="links">Flavours &nbsp;·&nbsp; Build a cone &nbsp;·&nbsp; Visit</div>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  if (FILM) document.body.className = 'film';
+  var $ = function (s) { return document.querySelector(s); };
+  var clamp = function (x) { return Math.max(0, Math.min(1, x)); };
+  var ease = function (x) { x = clamp(x); return x * x * (3 - 2 * x); };
+  var back = function (x) { x = clamp(x); var c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+
+  // name, price, colour, shade, speckle colour
+  var F = [
+    ['Strawberry', 3.5, '#ff9ec4', '#f27fae', '#e8468a'],
+    ['Mint Chip', 3.75, '#a6ecd0', '#84d9b8', '#4a2a1c'],
+    ['Sky Vanilla', 3.5, '#b3dcff', '#93c8f5', '#ffffff'],
+    ['Lemon Curd', 3.5, '#ffe680', '#f5d354', '#ffffff'],
+    ['Cocoa Fudge', 4, '#9b6a52', '#7f523d', '#4a2a1c'],
+    ['Peach Melba', 3.75, '#ffc3a1', '#f7a67c', '#e8468a'],
+    ['Lavender', 4, '#d2bcff', '#b9a0f2', '#ffffff'],
+    ['Pistachio', 3.75, '#cbe6a6', '#b0d484', '#7a9a4c']
+  ];
+  var money = function (n) { return '$' + n.toFixed(2); };
+  // one scoop, drawn around (0,0), radius about 40
+  function scoop(f, seed) {
+    var s = '<circle r="40" fill="' + f[2] + '"/>';
+    for (var k = -2; k <= 2; k++) s += '<circle cx="' + (k * 17) + '" cy="' + (31 - Math.abs(k) * 3) + '" r="12" fill="' + f[2] + '"/>';
+    s += '<path d="M-36 12 Q0 44 36 12" fill="none" stroke="' + f[3] + '" stroke-width="5" stroke-linecap="round" opacity=".7"/>';
+    for (var j = 0; j < 6; j++) { var a = (j * 2.4 + seed) % 6.283, r = 12 + ((j * 7 + seed * 3) % 16); s += '<circle cx="' + (Math.cos(a) * r).toFixed(1) + '" cy="' + (Math.sin(a) * r - 6).toFixed(1) + '" r="2.6" fill="' + f[4] + '" opacity=".75"/>'; }
+    s += '<ellipse cx="-15" cy="-20" rx="11" ry="6" fill="#fff" opacity=".6" transform="rotate(-32 -15 -20)"/>';
+    return s;
+  }
+  function cone(cx, y, w, h, id) {
+    var p = 'M' + (cx - w) + ' ' + y + ' L' + cx + ' ' + (y + h) + ' L' + (cx + w) + ' ' + y + 'Z', l = '';
+    for (var i = -8; i <= 8; i++) { l += '<path d="M' + (cx + i * 16 - h) + ' ' + y + ' l' + h + ' ' + h + '"/><path d="M' + (cx + i * 16 + h) + ' ' + y + ' l' + (-h) + ' ' + h + '"/>'; }
+    return '<clipPath id="' + id + '"><path d="' + p + '"/></clipPath><path d="' + p + '" fill="#eab672"/><g clip-path="url(#' + id + ')" stroke="#cf9450" stroke-width="2.4" fill="none">' + l + '</g><rect x="' + (cx - w - 7) + '" y="' + (y - 11) + '" width="' + (2 * w + 14) + '" height="20" rx="10" fill="#f3c98e"/><rect x="' + (cx - w - 7) + '" y="' + (y + 1) + '" width="' + (2 * w + 14) + '" height="6" rx="3" fill="#cf9450" opacity=".5"/>';
+  }
+  // falling scoop: d = seconds since it was dropped. Falls, lands, squashes, settles.
+  function dropT(cx, restY, sc, d, fallH) {
+    if (d < 0) return null;
+    var p = clamp(d / 0.38), yo = -fallH * (1 - p * p), s = d - 0.38, sq = s > 0 ? 0.2 * Math.exp(-s * 8) * Math.cos(s * 21) : 0;
+    var sy = 1 - sq, sx = 1 + sq * 0.7, b = 43 * sc;
+    return { o: clamp(d / 0.1), tr: 'translate(' + cx + ' ' + (restY + yo + b).toFixed(1) + ') scale(' + sx.toFixed(3) + ' ' + sy.toFixed(3) + ') translate(0 ' + (-b) + ') scale(' + sc + ')' };
+  }
+
+  // ----- hero cone: scoops keep dropping on a loop -----
+  var hc = $('#heroCone'), HS = [F[0], F[2], F[1]], REST = [286, 212, 138];
+  hc.innerHTML = '<g id="hcg">' + cone(116, 318, 62, 196, 'hcc') + HS.map(function (f, i) { return '<g class="hs">' + scoop(f, i + 1) + '</g>'; }).join('') + '<g class="hs"><path d="M0 -12 q10 -28 30 -30" stroke="#7a2f3f" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle r="15" fill="#e2334f"/><circle cx="-5" cy="-5" r="4" fill="#fff" opacity=".6"/></g></g>';
+  var hs = [].slice.call(hc.querySelectorAll('.hs')), hcg = $('#hcg');
+  var sprs = $('#sprs'), SP = [], SC = ['#ff8fbd', '#7fd8b4', '#7fbff5', '#ffd23f', '#fff', '#c9a8ff'];
+  for (var i = 0; i < 44; i++) { var e = document.createElement('i'); e.className = 'spr'; e.style.background = SC[i % 6]; sprs.appendChild(e); SP.push({ e: e, x: (i * 137.5) % 540, y: (i * 61.8) % 780, v: 26 + (i * 13) % 34, r: (i * 47) % 360, w: (i % 2 ? 1 : -1) * (50 + (i * 29) % 90) }); }
+
+  // ----- flavours grid -----
+  var flav = $('#flav');
+  F.forEach(function (f, i) { var d = document.createElement('div'); d.className = 'fl'; d.innerHTML = '<svg viewBox="-56 -52 112 104"><g class="pp">' + scoop(f, i + 2) + '</g></svg><h3>' + f[0] + '</h3><span class="price">' + money(f[1]) + '</span>'; flav.appendChild(d); });
+  var fls = [].slice.call(document.querySelectorAll('.fl')), pps = fls.map(function (d) { return d.querySelector('.pp'); });
+  var mq = $('#mq'), mqt = ''; for (var m = 0; m < 4; m++) mqt += 'Waffle cones baked in-house<i>&#10022;</i>Twelve flavours daily<i>&#10022;</i>Oat milk on request<i>&#10022;</i>'; mq.innerHTML = mqt;
+
+  // ----- build a cone -----
+  var stage = $('#stage'), BF = [0, 1, 2, 4], picks = [], ordered = 0, fbs = $('#fbs'), BREST = [218, 152, 86];
+  stage.innerHTML = '<ellipse cx="103" cy="344" rx="56" ry="8" fill="#4a2a1c" opacity=".1"/>' + cone(103, 246, 50, 96, 'stc') + '<g id="stk"></g><text id="hint" x="103" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="14" fill="#5d9d84">Your scoops land here</text>';
+  var stk = $('#stk'), hint = $('#hint');
+  BF.forEach(function (fi) { var b = document.createElement('button'); b.className = 'fb'; b.innerHTML = '<i style="background:' + F[fi][2] + '"></i><span>' + F[fi][0] + '</span><small>' + money(F[fi][1]) + '</small>'; b.addEventListener('click', function () { if (picks.length < 3) { picks.push({ f: fi, at: performance.now() / 1000 }); ordered = 0; } }); fbs.appendChild(b); });
+  var fbEls = [].slice.call(fbs.children), addBtn = $('#addBtn');
+  addBtn.addEventListener('click', function () { if (picks.length) ordered = 1; });
+  $('#reset').addEventListener('click', function () { picks = []; ordered = 0; });
+  var lastKey = '';
+  function paintBuilder(now) {
+    var key = picks.map(function (p) { return p.f; }).join(',') + '|' + ordered, tot = 0, cnt = {};
+    picks.forEach(function (p) { tot += F[p.f][1]; cnt[p.f] = (cnt[p.f] || 0) + 1; });
+    if (key !== lastKey) {
+      lastKey = key;
+      stk.innerHTML = picks.map(function (p, i) { return '<g>' + scoop(F[p.f], i + 4) + '</g>'; }).join('');
+      fbEls.forEach(function (b, i) { var c = cnt[BF[i]]; b.className = 'fb' + (c ? ' on' : ''); b.lastChild.textContent = c ? '× ' + c : money(F[BF[i]][1]); });
+      $('#total').textContent = money(tot);
+      addBtn.className = 'btn add' + (ordered ? ' done' : ''); addBtn.textContent = ordered ? 'Added ✓' : 'Add to order';
+      $('#order').textContent = 'Order ' + (ordered ? 1 : 0);
+      hint.style.display = picks.length ? 'none' : '';
+    }
+    for (var i = 0; i < picks.length; i++) { var g = stk.children[i], T = dropT(103, BREST[i], 1.22, now - picks[i].at, 190); if (T) { g.setAttribute('transform', T.tr); g.setAttribute('opacity', T.o.toFixed(2)); } }
+  }
+
+  var page = $('#page'), rv = [].slice.call(document.querySelectorAll('.rv,.sl,.sr')), tops = [], flTop = 0, pin = $('#pin'), pinTop = 0;
+  function topOf(el) { var y = 0; while (el && el !== document.body) { y += el.offsetTop; el = el.offsetParent; } return y; }
+  function measure() { tops = rv.map(topOf); flTop = topOf(flav); pinTop = topOf(document.querySelector('.map')); }
+
+  // Everything visible is a pure function of scroll position and the clock.
+  function render(y, now) {
+    var vh = innerHeight, i;
+    // hero: scoops drop onto the cone on a 7 second loop, sprinkles drift
+    var tc = (now + 0.72) % 7, ST = [0, 0.8, 1.6, 2.35], out = 1 - clamp((tc - 6.3) / 0.5);
+    for (i = 0; i < 4; i++) { var T = dropT(116, i < 3 ? REST[i] : 84, i < 3 ? 1.42 : 1.25, tc - ST[i], 230); if (T) { hs[i].setAttribute('transform', T.tr); hs[i].setAttribute('opacity', (T.o * out).toFixed(2)); } else hs[i].setAttribute('opacity', 0); }
+    hcg.setAttribute('transform', 'translate(0 ' + (y * 0.16).toFixed(1) + ') rotate(' + (Math.sin(now * 2.3) * 2.2).toFixed(2) + ' 116 500)');
+    for (i = 0; i < SP.length; i++) { var s = SP[i], sy = ((s.y + now * s.v) % 780) - 20 + y * 0.12, sx = s.x + Math.sin(now * 1.3 + i) * 9; s.e.style.transform = 'translate(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px) rotate(' + (s.r + now * s.w).toFixed(0) + 'deg)'; }
+    // sections rise in, reviews slide in from the sides
+    for (i = 0; i < rv.length; i++) { var k = ease((y + vh * 0.97 - tops[i]) / 130), c = rv[i].className; rv[i].style.opacity = k.toFixed(3); rv[i].style.transform = c.indexOf('sl') >= 0 ? 'translateX(' + ((k - 1) * 70).toFixed(1) + 'px) rotate(' + ((k - 1) * 4).toFixed(2) + 'deg)' : c.indexOf('sr') >= 0 ? 'translateX(' + ((1 - k) * 70).toFixed(1) + 'px) rotate(' + ((1 - k) * 4).toFixed(2) + 'deg)' : 'translateY(' + ((1 - k) * 30).toFixed(1) + 'px)'; }
+    // flavour scoops pop in one after another
+    for (i = 0; i < fls.length; i++) { var q = (y + vh * 0.9 - flTop - Math.floor(i / 4) * 150) / 130 - (i % 4) * 0.28, kk = back(q); pps[i].setAttribute('transform', 'scale(' + Math.max(0.001, kk).toFixed(3) + ') rotate(' + ((1 - clamp(q)) * -40).toFixed(1) + ')'); fls[i].style.opacity = clamp(q * 2.5).toFixed(2); }
+    mq.style.transform = 'translateX(' + (-(y * 0.42) % 900 - 20).toFixed(1) + 'px)';
+    var pk = clamp((y + vh * 0.74 - pinTop) / 120), pb = pk < 1 ? -(1 - pk * pk) * 90 : 0; pin.setAttribute('transform', 'translate(0 ' + pb.toFixed(1) + ')'); pin.setAttribute('opacity', clamp(pk * 3).toFixed(2));
+    paintBuilder(now);
+  }
+  measure(); addEventListener('resize', measure);
+  if (!FILM) { (function loop() { render(scrollY, performance.now() / 1000); requestAnimationFrame(loop); })(); return; }
+
+  // ---------- filming ----------
+  var CAPS = [
+    [0.0, 2.9, '<em>AI</em> built this website for an <em>ice cream shop</em>'],
+    [2.9, 5.2, 'This is the <em>real page</em>'],
+    [5.2, 7.5, 'Every <em>flavour</em>, with prices'],
+    [7.5, 10.6, 'Tap a flavour. <em>The cone builds.</em>'],
+    [10.6, 12.9, 'Reviews, a map, opening hours'],
+    [12.9, 15.0, 'Built by <em>AI</em>. No code typed by hand.']
+  ];
+  var TAPS = [[8.2, 0], [9.05, 1], [9.95, 4]], Z0 = 15.0, Z1 = 15.8, DUR = 17.4;
+  var cap = $('#cap span'), sb = $('#sb i'), dot = $('#dot'), end = $('#end'), H = page.offsetHeight, MAX = H + 62 - innerHeight;
+  var yFl = topOf($('#flavours')) - 150, yB = topOf($('#build')) - 152;
+  window.__film = { duration: DUR, keys: [[0, 0], [0.35, 0], [5.4, yFl / MAX], [7.7, yB / MAX], [10.45, (yB + 16) / MAX], [14.9, 1], [DUR, 1]] };
+  var first = true;
+  window.__frame = function (t, y) {
+    if (first) { measure(); first = false; }
+    var z = ease((t - Z0) / (Z1 - Z0));                 // zoom out to show the whole page at the end
+    var S = 1 - (1 - 690 / H) * z, ys = y * (1 - z);
+    page.style.transform = z > 0 ? 'translate(' + (z * 40).toFixed(1) + 'px,' + (z * 84).toFixed(1) + 'px) scale(' + S.toFixed(4) + ')' : 'none';
+    window.scrollTo(0, ys);
+    picks = []; ordered = 0; for (var k = 0; k < TAPS.length; k++) if (t >= TAPS[k][0]) { if (TAPS[k][1] < 4) picks.push({ f: BF[TAPS[k][1]], at: TAPS[k][0] }); else ordered = 1; }
+    render(z > 0 ? 1e6 : ys, t);
+    // caption
+    var txt = ''; for (var i = 0; i < CAPS.length; i++) if (t >= CAPS[i][0] && t < CAPS[i][1]) { txt = CAPS[i][2]; var a = Math.min(i === 0 ? 1 : clamp((t - CAPS[i][0]) / 0.16), i === CAPS.length - 1 ? clamp((CAPS[i][1] - t) / 0.2) : 1); cap.style.opacity = a.toFixed(2); cap.style.transform = 'translateY(' + ((1 - a) * 10).toFixed(1) + 'px)'; }
+    if (cap.innerHTML !== txt) cap.innerHTML = txt; cap.parentNode.style.visibility = txt ? 'visible' : 'hidden';
+    // scrollbar thumb
+    var th = 600 * innerHeight / (H + 62); sb.style.height = th.toFixed(1) + 'px'; sb.style.top = ((600 - th) * clamp(ys / MAX)).toFixed(1) + 'px'; sb.parentNode.style.opacity = (1 - z).toFixed(2);
+    // finger taps on two flavour buttons
+    var op = 0;
+    for (k = 0; k < TAPS.length; k++) {
+      var T0 = TAPS[k][0], d = t - (T0 - 0.5); if (d <= 0 || d >= 0.85) continue;
+      var r = (TAPS[k][1] < 4 ? fbEls[TAPS[k][1]] : addBtn).getBoundingClientRect(), m = 1 - ease(d / 0.42), press = 1 - 0.28 * clamp(1 - Math.abs(t - T0) / 0.14);
+      dot.style.left = (r.left + r.width * 0.62 + m * 50).toFixed(1) + 'px'; dot.style.top = (r.top + r.height / 2 + 4 + m * 90).toFixed(1) + 'px';
+      dot.style.transform = 'scale(' + press.toFixed(3) + ')'; op = clamp(d / 0.2) * clamp((0.85 - d) / 0.2);
+    }
+    dot.style.opacity = op.toFixed(2);
+    // end card
+    var ek = ease((t - Z1 + 0.25) / 0.45); end.style.opacity = ek.toFixed(2); end.style.transform = 'translateX(' + ((1 - ek) * 24).toFixed(1) + 'px)';
+  };
+})();
+</script>
+</body>
+</html>
