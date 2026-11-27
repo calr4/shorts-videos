@@ -3,21 +3,26 @@
 How each day's video for the "AI Tool Drop" YouTube channel is made. This repo is PUBLIC: it holds only videos, the animated page source, and tools. Never commit names, emails, locations, business details, credentials, research notes, the video log, or performance numbers.
 
 ## The format
-A 9 to 20 second vertical video (1080x1920, 30 fps) about one AI tool, one comparison, or one short list of tools. It is a single-file animated page (`index.html`, no network requests) filmed with `../tools/film.js`. Everything on screen is drawn in code and is a pure function of time `t`: no CSS transitions, no timers.
+A 14 to 18 second vertical video (1080x1920, 30 fps) in the series **"Free AI website you should know (Part N)"**. It is a single-file animated page (`index.html`, no network requests) filmed with `../tools/film.js`. Everything on screen is drawn in code and is a pure function of time `t`: no CSS transitions, no timers.
 
-The owner's standing rule (given 2026-11-25 after watching the videos; it outranks the brief and the experiment): a stranger must understand the video in the first second.
+Why this format (owner's instruction, 2026-11-27: study the channels that are winning and use what works): a faceless channel has reached Part 207 of a "Powerful website you should know" series with 14-second Shorts that get around 90,000 views; a silent "type this, get that" Short reached 377,000. Both show the result first, then where to go, then what to do, then the result again. Borrow the structure only. Never copy another creator's footage, wording, tool picks in the same order, or series name.
 
-Format checklist:
-- The first screen names the tool AND what it does for the viewer, in plain everyday words, fully readable within the first second: "ChatGPT has a free Study mode. It quizzes you instead of giving the answer." Do not open with a teaser that hides the tool or the point until later.
-- One idea per screen, in short sentences a 12-year-old would follow. No jargon, no series numbers, nothing that needs an earlier video.
-- Show the tool doing the thing with a simple drawn example or before-and-after (your own shapes and text, never an imitation of the real product's screen), not text alone.
-- Cold-viewer check (required before publishing): look at the frames at 0.5 s and 3 s as a stranger. Which tool is this? What does it do for me? If either answer is not obvious, revise.
-- High density: a new piece of information every 1 to 3 seconds. Viewers should want to pause or rewatch.
-- No voiceover. A beat that starts at 0 seconds.
-- Keep text between 6% and 75% of the height and away from the right 12% (the Shorts UI covers the bottom and the right edge).
-- End on the tool's name or a clear takeaway, then "Follow for one AI tool a day".
+The five beats (keep this order):
+1. **Result first, 0 to 2.3 s.** Headline "Free AI website you should know" with a "PART N" tag, and the tool's result already happening on screen (the before turning into the after).
+2. **Where, 2.3 to 5 s.** "1. Go to <address>" with the address typed into a plain browser bar.
+3. **Do, 5 to 8.6 s.** "2. <the one thing you do>", shown being done with the finger dot.
+4. **What the AI does, 8.6 to 12.6 s.** "3. <what it does>", then the result again, bigger.
+5. **Proof and follow, 12.6 s to end.** Three or four short facts taken from the maker's page (free, nothing to download, which devices, who made it), then "Follow for Part N+1" and the tool's name large.
 
-Formats to rotate: single tool ("this AI does X"), task-to-tool list ("5 free AI tools for X"), free vs paid, before and after, myth vs fact, "what changed this week".
+Rules:
+- Pick tools that are free to use, run in a browser, and give a result you can SEE in two seconds (drawing, images, sound, a visible transformation). Skip tools whose result is a wall of text.
+- The Part number goes up by one each day; the Video log has the last number. Part 1 was AutoDraw (2026-11-27), in `aitooldrop/sites/2026-11-27-autodraw/`, which is the reference for the layout and timing.
+- A stranger must know in the first second what the tool does: the result is on screen in the first frame.
+- One idea per screen, in short everyday words. Keep text between 6% and 75% of the height and away from the right 12%.
+- The interface is your own drawing, labelled "Illustration. Not the real screen." Never imitate a real product's screen, logo or mascot.
+- No voiceover unless the owner turns one on. A beat that starts at 0 seconds.
+- Never use fake urgency ("deleting this in 2 hours"), invented stories, or "comment for the link": nothing sends a link.
+- Cold-viewer check (required before publishing): look at the frames at 0.5 s and 3 s as a stranger. Which tool is this? What does it do for me? Would I stop scrolling? If any answer is no, revise.
 
 ## Accuracy rules (the channel's reputation depends on these)
 - Every claim about a tool (what it does, its name, whether it is free, limits, price) must be checked the same day on the tool maker's own website or help pages, by opening the page. A search snippet or a blog is not enough.
