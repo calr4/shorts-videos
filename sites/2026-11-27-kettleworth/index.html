@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kettleworth Barbers | Sharp cuts, no waiting</title>
+<style>
+  :root { --navy:#14213d; --navy2:#1f3260; --paper:#f6f1e7; --card:#fffdf8; --red:#d7263d; --brass:#e0a82e; --blue:#2f6fd0; --ink:#17203a; --muted:#6a708a; --ok:#1f9d6b; }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: auto; }
+  body { font-family: "Inter", "DM Sans", system-ui, sans-serif; color: var(--ink); background: var(--paper); overflow-x: hidden; }
+  h1, h2, .logo, .price, .anton { font-family: "Anton", "Archivo Black", Impact, sans-serif; font-weight: 400; letter-spacing: .5px; }
+  body.film { background: #0a0e1a; padding-top: 62px; }
+  body.film::-webkit-scrollbar { display: none; }
+
+  /* film-only browser bar, caption, scrollbar, finger, end card */
+  #bar, #cap, #sb, #dot, #end { display: none; }
+  body.film #bar { display: flex; position: fixed; z-index: 50; top: 0; left: 0; right: 0; height: 62px; background: #e9ebf2; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid #c9ccd8; }
+  #bar .nav { display: flex; gap: 12px; color: #7d8196; font-size: 26px; line-height: 1; }
+  #bar .url { flex: 1; height: 40px; border-radius: 20px; background: #fff; display: flex; align-items: center; gap: 9px; padding: 0 16px; font-size: 19px; color: #2a2d40; font-weight: 500; box-shadow: inset 0 0 0 1px #d5d8e3; }
+  #bar .lock { width: 13px; height: 11px; background: #5a5f78; border-radius: 3px; position: relative; margin-top: 5px; }
+  #bar .lock::before { content: ""; position: absolute; left: 2px; top: -8px; width: 9px; height: 10px; border: 2.5px solid #5a5f78; border-bottom: 0; border-radius: 6px 6px 0 0; box-sizing: border-box; }
+  #bar .dots { color: #7d8196; font-size: 26px; letter-spacing: 1px; }
+  body.film #cap { display: block; position: fixed; z-index: 60; left: 0; right: 0; top: 120px; text-align: center; pointer-events: none; }
+  #cap span { display: inline-block; max-width: 452px; background: #fff; color: #10182e; font-family: "Inter", sans-serif; font-weight: 900; font-size: 27px; line-height: 1.18; letter-spacing: -.3px; padding: 12px 22px 13px; border-radius: 16px; box-shadow: 0 8px 26px rgba(0,0,0,.4), 0 0 0 3px #10182e; }
+  #cap em { font-style: normal; color: var(--red); }
+  body.film #sb { display: block; position: fixed; z-index: 55; right: 5px; top: 70px; width: 8px; height: 600px; border-radius: 4px; background: rgba(140,146,170,.28); }
+  #sb i { position: absolute; left: 0; width: 8px; border-radius: 4px; background: #8a90aa; box-shadow: 0 0 0 1px rgba(255,255,255,.7); }
+  body.film #dot { display: block; position: fixed; z-index: 70; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; background: rgba(255,255,255,.55); border: 3px solid #fff; box-shadow: 0 0 0 3px rgba(20,33,61,.6), 0 6px 18px rgba(0,0,0,.35); opacity: 0; pointer-events: none; }
+  body.film #end { position: fixed; z-index: 40; left: 196px; top: 236px; width: 300px; color: #fff; opacity: 0; display: block; }
+  #end .big { font-family: "Anton", sans-serif; font-size: 46px; line-height: 1.08; letter-spacing: .5px; }
+  #end .big em { font-style: normal; color: var(--brass); }
+  #end .sub { margin-top: 18px; font-size: 21px; line-height: 1.32; color: #cdd3ea; font-weight: 600; }
+  #end .cta { display: inline-block; margin-top: 24px; background: var(--red); color: #fff; font-weight: 900; font-size: 21px; padding: 13px 18px; border-radius: 14px; line-height: 1.2; }
+
+  /* ---------- the site ---------- */
+  #page { max-width: 540px; margin: 0 auto; background: var(--paper); transform-origin: 0 0; position: relative; }
+  body.film #page { box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .top { position: sticky; top: 0; z-index: 20; height: 52px; background: var(--navy); color: #fff; display: flex; align-items: center; padding: 0 16px; gap: 17px; border-bottom: 3px solid var(--brass); overflow: hidden; }
+  body.film .top { top: 62px; }
+  .logo { font-size: 23px; display: flex; align-items: center; gap: 9px; margin-right: auto; text-transform: uppercase; }
+  .logo i { width: 12px; height: 28px; border-radius: 5px; display: block; background: repeating-linear-gradient(-45deg, #fff 0 5px, var(--red) 5px 10px, #fff 10px 15px, var(--blue) 15px 20px); box-shadow: 0 0 0 2px var(--brass); }
+  .top a { color: #dfe5fb; text-decoration: none; font-size: 15.5px; font-weight: 600; }
+  .top a.go { background: var(--red); color: #fff; padding: 7px 14px; border-radius: 9px; font-weight: 800; }
+
+  .hero { background: radial-gradient(circle at 78% 8%, var(--navy2), var(--navy) 60%); color: #fff; padding: 124px 26px 0; position: relative; overflow: hidden; }
+  .hero > * { position: relative; z-index: 3; }
+  .hero h1 { font-size: 66px; line-height: 1.02; text-transform: uppercase; transform-origin: 0 50%; }
+  .hero h1 em { font-style: normal; color: var(--brass); }
+  .hero p { margin-top: 14px; font-size: 19px; line-height: 1.42; color: #cfd6ee; max-width: 420px; }
+  .btns { display: flex; gap: 12px; margin-top: 20px; transform-origin: 0 50%; }
+  .btn { display: inline-block; font-weight: 800; font-size: 18px; padding: 14px 22px; border-radius: 11px; text-decoration: none; border: 0; cursor: pointer; font-family: inherit; }
+  .btn.red { background: var(--red); color: #fff; box-shadow: 0 5px 0 #9c1628; }
+  .btn.ghost { color: #fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.55); }
+  .shop { display: block; width: 488px; height: auto; margin: 26px 0 0; }
+  #cover { position: absolute; z-index: 1; inset: 0; background: #eceef4; }
+  .sk { position: absolute; z-index: 2; border-radius: 10px; background: #c9cedb; }
+  .top .sk { z-index: 5; }
+  #navcover { position: absolute; inset: 0; background: #dfe2ea; z-index: 4; }
+
+  .band { height: 40px; background: var(--red); overflow: hidden; position: relative; border-top: 3px solid var(--brass); border-bottom: 3px solid var(--brass); }
+  .band div { position: absolute; top: 0; left: 0; white-space: nowrap; color: #fff; font-family: "Anton", sans-serif; font-size: 19px; line-height: 34px; letter-spacing: 2px; text-transform: uppercase; }
+
+  section { padding: 40px 22px 12px; }
+  .kicker { color: var(--red); font-weight: 800; font-size: 14px; letter-spacing: 2.5px; text-transform: uppercase; }
+  h2 { font-size: 42px; line-height: 1.06; margin-top: 6px; text-transform: uppercase; }
+  .lead { color: var(--muted); font-size: 17px; margin-top: 8px; line-height: 1.4; }
+
+  .svc { margin-top: 20px; background: var(--card); border-radius: 18px; box-shadow: 0 6px 22px rgba(23,32,58,.1); overflow: hidden; }
+  .svc .it { display: flex; align-items: center; gap: 14px; padding: 15px 18px; border-bottom: 2px dashed #e4dccb; }
+  .svc .it:last-child { border-bottom: 0; }
+  .ic { width: 46px; height: 46px; flex: none; border-radius: 12px; background: var(--navy); display: grid; place-items: center; }
+  .ic svg { width: 30px; height: 30px; }
+  .it h3 { font-size: 19.5px; font-weight: 800; }
+  .it small { display: block; color: var(--muted); font-size: 14.5px; margin-top: 2px; }
+  .it .mid { flex: 1; }
+  .price { font-size: 30px; color: var(--navy); }
+  .it .min { display: block; text-align: right; font-size: 12.5px; color: var(--muted); font-weight: 700; font-family: "Inter", sans-serif; letter-spacing: 0; }
+
+  .crew { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
+  .who { background: var(--card); border-radius: 18px; padding: 12px 8px 14px; text-align: center; box-shadow: 0 6px 22px rgba(23,32,58,.1); }
+  .who svg { width: 118px; height: 118px; display: block; margin: 0 auto; }
+  .who b { display: block; font-size: 19px; margin-top: 8px; }
+  .who small { display: block; color: var(--muted); font-size: 13.5px; margin-top: 2px; line-height: 1.3; }
+
+  .book { margin: 36px 16px 0; background: var(--navy); color: #fff; border-radius: 24px; padding: 26px 20px 24px; position: relative; overflow: hidden; box-shadow: 0 14px 34px rgba(20,33,61,.35); }
+  .book::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 9px; background: repeating-linear-gradient(-45deg, #fff 0 12px, var(--red) 12px 24px, #fff 24px 36px, var(--blue) 36px 48px); }
+  .book h2 { font-size: 40px; }
+  .book h2 em { font-style: normal; color: var(--brass); }
+  .step { margin-top: 18px; font-size: 14px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #aab5da; }
+  .chips { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .chip { background: #223463; border: 0; color: #fff; font-family: inherit; font-size: 17.5px; font-weight: 800; padding: 9px 4px 10px; border-radius: 14px; cursor: pointer; box-shadow: inset 0 0 0 2px #3a4f86; }
+  .chip svg { width: 56px; height: 56px; display: block; margin: 0 auto 4px; }
+  .chip.on { background: #fff; color: var(--navy); box-shadow: inset 0 0 0 4px var(--brass); }
+  .slots { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .slot { background: #223463; border: 0; color: #fff; font-family: inherit; font-size: 20px; font-weight: 800; padding: 13px 0; border-radius: 12px; cursor: pointer; box-shadow: inset 0 0 0 2px #3a4f86; }
+  .slot.full { color: #6f7ca6; text-decoration: line-through; background: #192850; box-shadow: none; cursor: default; }
+  .slot.on { background: var(--brass); color: var(--navy); box-shadow: none; }
+  #confirm { display: block; width: 100%; margin-top: 18px; background: var(--red); color: #fff; font-family: inherit; font-weight: 900; font-size: 21px; padding: 16px 0; border: 0; border-radius: 13px; cursor: pointer; box-shadow: 0 5px 0 #9c1628; }
+  #confirm.done { background: var(--ok); box-shadow: 0 5px 0 #14704b; }
+  #note { margin-top: 13px; text-align: center; font-size: 15px; color: #aab5da; font-weight: 600; min-height: 19px; }
+
+  .rev { background: var(--card); border-radius: 18px; padding: 16px 18px; margin-top: 14px; box-shadow: 0 6px 22px rgba(23,32,58,.09); border-left: 6px solid var(--brass); }
+  .stars { color: var(--brass); font-size: 21px; letter-spacing: 3px; }
+  .rev p { font-size: 17.5px; line-height: 1.4; margin-top: 4px; font-weight: 500; }
+  .rev small { display: block; margin-top: 6px; color: var(--muted); font-size: 14px; font-weight: 700; }
+
+  .visit { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 20px; }
+  .map { border-radius: 20px; overflow: hidden; box-shadow: 0 6px 22px rgba(23,32,58,.12); }
+  .map svg { display: block; width: 100%; height: auto; }
+  .hours { background: var(--card); border-radius: 18px; padding: 8px 18px; box-shadow: 0 6px 22px rgba(23,32,58,.09); }
+  .hours div { display: flex; justify-content: space-between; padding: 11px 0; border-bottom: 2px dashed #e4dccb; font-size: 17px; }
+  .hours div:last-child { border-bottom: 0; }
+  .hours b { font-weight: 800; }
+  .hours .now { color: var(--ok); font-weight: 800; }
+  footer { margin-top: 38px; background: var(--navy); color: #aab5da; padding: 28px 22px 34px; font-size: 14.5px; line-height: 1.6; border-top: 4px solid var(--brass); }
+  footer .logo { color: #fff; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div id="bar"><div class="nav"><span>&#8249;</span><span>&#8250;</span></div><div class="url"><i class="lock"></i>kettleworthbarbers.example</div><div class="dots">&#8943;</div></div>
+<div id="cap"><span></span></div>
+<div id="sb"><i></i></div>
+<div id="dot"></div>
+<div id="end"><div class="big">AI built this<br><em>whole website.</em></div><div class="sub">Prices, booking, reviews, map.<br>No code typed by hand.</div><div class="cta">Follow for a new<br>AI-built site every day</div></div>
+
+<div id="page">
+  <nav class="top" id="top">
+    <div class="logo"><i></i>Kettleworth</div>
+    <a href="#services">Services</a><a href="#barbers">Barbers</a><a href="#book" class="go">Book</a>
+    <div id="navcover"></div>
+  </nav>
+
+  <header class="hero" id="hero">
+    <div id="cover"></div>
+    <h1 id="h1">Sharp cuts,<br><em>no waiting.</em></h1>
+    <p id="hp">Walk in or book a chair in ten seconds. Cuts, fades and hot towel shaves on Larkspur Lane.</p>
+    <div class="btns" id="hb"><a class="btn red" href="#book">Book a chair</a><a class="btn ghost" href="#services">See prices</a></div>
+    <svg class="shop" id="shop" viewBox="0 0 488 300" aria-label="The Kettleworth Barbers shop front with a turning barber pole">
+      <defs>
+        <clipPath id="poleclip"><rect x="34" y="62" width="44" height="170" rx="10"/></clipPath>
+        <linearGradient id="shade" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".28"/><stop offset=".35" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient>
+        <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9b0"/><stop offset="1" stop-color="#f7c765"/></linearGradient>
+      </defs>
+      <rect x="0" y="286" width="488" height="14" fill="#0d1730"/>
+      <rect x="104" y="40" width="364" height="246" rx="6" fill="#2a3f74"/>
+      <rect x="104" y="40" width="364" height="42" fill="#0f1a36"/>
+      <text x="286" y="71" text-anchor="middle" font-family="Anton, sans-serif" font-size="29" letter-spacing="5" fill="#e0a82e">KETTLEWORTH BARBERS</text>
+      <!-- awning -->
+      <g id="awn"><path d="M96 82 H476 L488 122 H84Z" fill="#fff"/>
+        <g fill="#d7263d"><path d="M96 82 H134 L126.6 122 H84Z"/><path d="M172 82 H210 L206.8 122 H166.4Z"/><path d="M248 82 H286 L287.2 122 H246.8Z"/><path d="M324 82 H362 L367.6 122 H327.2Z"/><path d="M400 82 H438 L447.8 122 H407.6Z"/></g>
+        <path d="M84 122 H488 V130 Q467.8 142 447.6 130 Q427.4 142 407.2 130 Q387 142 366.8 130 Q346.6 142 326.4 130 Q306.2 142 286 130 Q265.8 142 245.6 130 Q225.4 142 205.2 130 Q185 142 164.8 130 Q144.6 142 124.4 130 Q104.2 142 84 130Z" fill="#f6f1e7"/></g>
+      <!-- window -->
+      <rect x="124" y="150" width="204" height="118" rx="6" fill="url(#glass)" stroke="#0f1a36" stroke-width="6"/>
+      <g fill="#14213d"><!-- chair silhouette -->
+        <rect x="196" y="204" width="56" height="16" rx="6"/><rect x="238" y="170" width="16" height="44" rx="7"/><rect x="232" y="162" width="28" height="14" rx="6"/><rect x="190" y="194" width="44" height="9" rx="4"/><rect x="218" y="220" width="10" height="30"/><rect x="198" y="248" width="50" height="9" rx="4"/><rect x="176" y="212" width="22" height="9" rx="4"/>
+      </g>
+      <g id="glint" opacity=".55"><path d="M150 150 L176 150 L132 268 L124 268 L124 220Z" fill="#fff"/></g>
+      <!-- door -->
+      <rect x="352" y="150" width="92" height="136" rx="6" fill="#d7263d" stroke="#0f1a36" stroke-width="6"/>
+      <rect x="366" y="164" width="64" height="58" rx="4" fill="url(#glass)"/>
+      <g id="sign"><rect x="374" y="176" width="48" height="24" rx="4" fill="#fff"/><text x="398" y="194" text-anchor="middle" font-family="Anton, sans-serif" font-size="16" fill="#1f9d6b">OPEN</text></g>
+      <circle cx="430" cy="236" r="5" fill="#e0a82e"/>
+      <!-- barber pole -->
+      <rect x="74" y="140" width="34" height="8" fill="#e0a82e"/>
+      <g clip-path="url(#poleclip)"><rect x="34" y="62" width="44" height="170" fill="#fff"/><g id="stripes"></g><rect x="34" y="62" width="44" height="170" fill="url(#shade)"/></g>
+      <rect x="28" y="48" width="56" height="18" rx="6" fill="#e0a82e"/><circle cx="56" cy="38" r="13" fill="#e0a82e"/><circle cx="52" cy="34" r="4" fill="#fff" opacity=".6"/>
+      <rect x="28" y="228" width="56" height="18" rx="6" fill="#e0a82e"/><rect x="44" y="246" width="24" height="12" fill="#b9861c"/>
+    </svg>
+  </header>
+
+  <div class="band"><div id="band"></div></div>
+
+  <section id="services">
+    <div class="kicker rv">Services</div>
+    <h2 class="rv">Cuts &amp; shaves</h2>
+    <p class="lead rv">Clear prices. No surprises at the till.</p>
+    <div class="svc" id="svc"></div>
+  </section>
+
+  <section id="barbers">
+    <div class="kicker rv">The team</div>
+    <h2 class="rv">Meet the barbers</h2>
+    <div class="crew" id="crew"></div>
+  </section>
+
+  <div class="book rv" id="book">
+    <h2>Book a <em>chair</em></h2>
+    <div class="step">1 &middot; Pick a barber</div>
+    <div class="chips" id="chips"></div>
+    <div class="step">2 &middot; Pick a time today</div>
+    <div class="slots" id="slots"></div>
+    <button id="confirm">Book a chair</button>
+    <div id="note">Free to cancel up to an hour before.</div>
+  </div>
+
+  <section id="reviews">
+    <div class="kicker rv">Reviews</div>
+    <h2 class="rv">Regulars say</h2>
+    <div class="rev rv"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>In the chair two minutes after I walked in. Best fade in town.</p><small>Teodor, Fennick Cove</small></div>
+    <div class="rev rv"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>Booked on my phone at lunch. Zero waiting.</p><small>Amadi, Larkspur Lane</small></div>
+    <div class="rev rv"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>The hot towel shave is worth every dollar.</p><small>Pascal, Quillby Road</small></div>
+  </section>
+
+  <section id="visit">
+    <div class="kicker rv">Visit</div>
+    <h2 class="rv">22 Larkspur Lane</h2>
+    <div class="visit">
+      <div class="map rv">
+        <svg viewBox="0 0 496 230"><rect width="496" height="230" fill="#e6e2d3"/>
+          <rect x="300" y="126" width="196" height="104" fill="#bfe0c2"/><circle cx="350" cy="176" r="16" fill="#8fc79a"/><circle cx="420" cy="196" r="20" fill="#8fc79a"/><circle cx="452" cy="156" r="13" fill="#8fc79a"/>
+          <g stroke="#fff" stroke-width="18" fill="none"><path d="M-10 104 H506"/><path d="M150 -10 V240"/><path d="M286 -10 V240"/></g>
+          <g fill="#d3cdb8"><rect x="18" y="16" width="112" height="66" rx="8"/><rect x="170" y="16" width="96" height="66" rx="8"/><rect x="306" y="16" width="172" height="66" rx="8"/><rect x="18" y="126" width="112" height="86" rx="8"/><rect x="170" y="126" width="96" height="86" rx="8"/></g>
+          <text x="328" y="110" font-family="Inter, sans-serif" font-weight="700" font-size="13" fill="#8b8672">LARKSPUR LANE</text>
+          <g id="pin" transform="translate(218 104)"><ellipse cx="0" cy="2" rx="13" ry="5" fill="#000" opacity=".2"/><path d="M0 0 C-32 -36 -24 -72 0 -72 C24 -72 32 -36 0 0Z" fill="#d7263d" stroke="#fff" stroke-width="3"/><circle cy="-47" r="10" fill="#fff"/></g>
+          <rect x="120" y="140" width="196" height="34" rx="8" fill="#14213d"/><text x="218" y="163" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="16" fill="#fff">Kettleworth Barbers</text>
+        </svg>
+      </div>
+      <div class="hours rv">
+        <div><b>Mon to Fri</b><span>9 am to 7 pm</span></div>
+        <div><b>Saturday</b><span>8 am to 5 pm</span></div>
+        <div><b>Sunday</b><span>Closed</span></div>
+        <div><b>Call</b><span>555 0117</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="logo"><i></i>Kettleworth</div>Kettleworth Barbers is a made-up shop.<br>This demo site was built by AI.</footer>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  if (FILM) document.body.className = 'film';
+  var $ = function (s) { return document.querySelector(s); };
+  var all = function (s) { return [].slice.call(document.querySelectorAll(s)); };
+  var clamp = function (x) { return Math.max(0, Math.min(1, x)); };
+  var ease = function (x) { x = clamp(x); return x * x * (3 - 2 * x); };
+  var back = function (x) { x = clamp(x); var c = 2.2; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+
+  // ---- drawn faces for the three barbers ----
+  function face(kind, size) {
+    var bg = ['#d7263d', '#2f6fd0', '#e0a82e'][kind], skin = ['#f0c6a0', '#8d5a3b', '#f6d7b8'][kind], hair = ['#2a1d16', '#111319', '#b5532a'][kind];
+    var s = '<svg viewBox="0 0 120 120"' + (size ? ' width="' + size + '" height="' + size + '"' : '') + '><circle cx="60" cy="60" r="58" fill="' + bg + '"/><clipPath id="fc' + kind + size + '"><circle cx="60" cy="60" r="58"/></clipPath><g clip-path="url(#fc' + kind + size + ')">';
+    s += '<path d="M18 124 Q20 92 60 90 Q100 92 102 124Z" fill="#14213d"/><path d="M48 92 L60 106 L72 92Z" fill="#fff"/>';
+    s += '<rect x="50" y="74" width="20" height="20" rx="8" fill="' + skin + '"/><ellipse cx="60" cy="56" rx="25" ry="29" fill="' + skin + '"/>';
+    if (kind === 0) s += '<path d="M34 52 Q32 22 60 22 Q90 22 86 54 Q82 36 62 36 Q44 36 34 52Z" fill="' + hair + '"/><path d="M40 66 Q60 96 80 66 Q80 88 60 90 Q40 88 40 66Z" fill="' + hair + '"/>';
+    if (kind === 1) s += '<path d="M33 50 Q30 18 60 20 Q90 18 87 50 Q84 34 60 34 Q36 34 33 50Z" fill="' + hair + '"/><path d="M48 70 Q60 76 72 70" stroke="' + hair + '" stroke-width="5" fill="none" stroke-linecap="round"/>';
+    if (kind === 2) s += '<path d="M32 56 Q26 16 64 20 Q94 22 88 56 Q84 40 70 34 Q50 44 32 56Z" fill="' + hair + '"/><circle cx="60" cy="16" r="10" fill="' + hair + '"/>';
+    s += '<circle cx="50" cy="56" r="3.2" fill="#17203a"/><circle cx="70" cy="56" r="3.2" fill="#17203a"/>';
+    if (kind !== 1) s += '<path d="M52 68 Q60 74 68 68" stroke="#17203a" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+    return s + '</g></svg>';
+  }
+  var CREW = [['Dario', 'Fades and beard work'], ['Wren', 'Classic scissor cuts'], ['Ossie', 'Hot towel shaves']];
+  var ICON = {
+    cut: '<svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><circle cx="8" cy="22" r="4"/><circle cx="22" cy="22" r="4"/><path d="M10.5 19 L22 4"/><path d="M19.5 19 L8 4"/></svg>',
+    fade: '<svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="10" y="12" width="10" height="15" rx="3"/><path d="M9 12 H21 M11 8 V12 M15 6 V12 M19 8 V12"/></svg>',
+    beard: '<svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M6 8 Q6 26 15 26 Q24 26 24 8 Q20 14 15 14 Q10 14 6 8Z" fill="#e0a82e" stroke="#e0a82e"/></svg>',
+    shave: '<svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><rect x="5" y="5" width="20" height="8" rx="2"/><path d="M15 13 V26"/><path d="M8 9 H22" stroke="#e0a82e"/></svg>',
+    kid: '<svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><circle cx="15" cy="16" r="9"/><path d="M8 11 Q15 2 22 11" stroke="#e0a82e"/><path d="M11.5 19 Q15 22 18.5 19"/></svg>'
+  };
+  var SVC = [['cut', 'Classic cut', 'Scissors or clippers', 28, 30], ['fade', 'Skin fade', 'Tight sides, sharp line', 34, 40], ['beard', 'Beard trim', 'Shape, line and oil', 16, 15], ['shave', 'Hot towel shave', 'Straight razor finish', 30, 30], ['kid', 'Kids cut', 'Twelve and under', 20, 20]];
+  $('#svc').innerHTML = SVC.map(function (s) { return '<div class="it"><div class="ic">' + ICON[s[0]] + '</div><div class="mid"><h3>' + s[1] + '</h3><small>' + s[2] + '</small></div><div><span class="price">$' + s[3] + '</span><span class="min">' + s[4] + ' min</span></div></div>'; }).join('');
+  $('#crew').innerHTML = CREW.map(function (c, i) { return '<div class="who">' + face(i, 0) + '<b>' + c[0] + '</b><small>' + c[1] + '</small></div>'; }).join('');
+  $('#chips').innerHTML = CREW.map(function (c, i) { return '<button class="chip" data-i="' + i + '">' + face(i, 56) + c[0] + '</button>'; }).join('');
+  var TIMES = ['1:00', '1:30', '2:00', '2:30', '3:00', '3:30'], FULL = { 0: 1, 2: 1 };
+  $('#slots').innerHTML = TIMES.map(function (s, i) { return '<button class="slot' + (FULL[i] ? ' full' : '') + '" data-i="' + i + '">' + s + '</button>'; }).join('');
+  var txt = ''; for (var b = 0; b < 6; b++) txt += 'Walk-ins welcome &nbsp;✂&nbsp; Hot towel shaves &nbsp;✂&nbsp; Open six days &nbsp;✂&nbsp; ';
+  $('#band').innerHTML = txt;
+  var st = ''; for (var k = -8; k < 16; k++) st += '<path d="M20 ' + (k * 48) + ' L92 ' + (k * 48 - 40) + ' V' + (k * 48 - 28) + ' L20 ' + (k * 48 + 12) + 'Z" fill="#d7263d"/><path d="M20 ' + (k * 48 + 24) + ' L92 ' + (k * 48 - 16) + ' V' + (k * 48 - 4) + ' L20 ' + (k * 48 + 36) + 'Z" fill="#2f6fd0"/>';
+  $('#stripes').innerHTML = st;
+
+  // ---- booking: a real little form ----
+  var state = { who: -1, slot: -1, done: false };
+  var chips = all('.chip'), slots = all('.slot'), confirm = $('#confirm'), note = $('#note'), goBtn = $('.top a.go');
+  function paint() {
+    chips.forEach(function (c, i) { c.className = 'chip' + (state.who === i ? ' on' : ''); });
+    slots.forEach(function (s, i) { s.className = 'slot' + (FULL[i] ? ' full' : '') + (state.slot === i ? ' on' : ''); });
+    var w = state.who >= 0 ? CREW[state.who][0] : '', s = state.slot >= 0 ? TIMES[state.slot] : '';
+    confirm.className = state.done ? 'done' : '';
+    confirm.textContent = state.done ? 'Booked for ' + s + ' ✓' : (w && s ? 'Book ' + w + ' at ' + s : w ? 'Now pick a time' : 'Book a chair');
+    note.textContent = state.done ? 'See you today at ' + s + ' with ' + w + '.' : 'Free to cancel up to an hour before.';
+    goBtn.textContent = state.done ? s + ' ✓' : 'Book';
+  }
+  chips.forEach(function (c, i) { c.addEventListener('click', function () { if (!state.done) { state.who = i; paint(); } }); });
+  slots.forEach(function (s, i) { s.addEventListener('click', function () { if (!state.done && !FULL[i]) { state.slot = i; paint(); } }); });
+  confirm.addEventListener('click', function () { if (state.done) state = { who: -1, slot: -1, done: false }; else if (state.who >= 0 && state.slot >= 0) state.done = true; paint(); });
+
+  // ---- the build-in: skeleton boxes that the real parts replace ----
+  var hero = $('#hero'), top = $('#top'), cover = $('#cover'), navcover = $('#navcover');
+  function sk(parent, x, y, w, h) { var d = document.createElement('div'); d.className = 'sk'; d.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px'; parent.appendChild(d); return d; }
+  function rel(el, parent) { var a = el.getBoundingClientRect(), p = parent.getBoundingClientRect(); return { x: a.left - p.left, y: a.top - p.top, w: a.width, h: a.height }; }
+  var h1 = $('#h1'), hp = $('#hp'), hb = $('#hb'), shop = $('#shop');
+  var r1 = rel(h1, hero), r2 = rel(hp, hero), r3 = rel(hb, hero), r4 = rel(shop, hero);
+  var skH = [sk(hero, r1.x, r1.y + 6, 330, 54), sk(hero, r1.x, r1.y + 73, 290, 54)];
+  var skP = [sk(hero, r2.x, r2.y + 4, 410, 18), sk(hero, r2.x, r2.y + 31, 330, 18), sk(hero, r3.x, r3.y, 170, r3.h), sk(hero, r3.x + 182, r3.y, 140, r3.h)];
+  var skS = [sk(hero, r4.x, r4.y + 20, r4.w, r4.h - 20)];
+  var skN = [sk(top, 16, 13, 150, 26), sk(top, 290, 18, 70, 16), sk(top, 376, 18, 62, 16), sk(top, 456, 10, 66, 32)];
+  var T_NAV = -1, T_BG = 0.07, T_H1 = 0.3, T_PIC = 0.56, T_BTN = 0.82;
+  function pop(el, t, t0, sks) {
+    var a = clamp((t - t0) / 0.07), s = 0.86 + 0.14 * back((t - t0) / 0.26);
+    el.style.opacity = a.toFixed(2); el.style.transform = t - t0 < 0.3 ? 'scale(' + s.toFixed(3) + ')' : '';
+    for (var i = 0; i < sks.length; i++) sks[i].style.opacity = (1 - a).toFixed(2);
+  }
+  function build(t) {
+    var sh = 0.72 + 0.28 * Math.sin(t * 9);
+    var n = clamp((t - T_NAV) / 0.07); navcover.style.opacity = (1 - n).toFixed(2); for (var i = 0; i < skN.length; i++) { skN[i].style.opacity = ((1 - n) * sh).toFixed(2); }
+    navcover.style.display = n >= 1 ? 'none' : 'block';
+    var w = ease((t - T_BG) / 0.22); cover.style.clipPath = 'inset(' + (w * 100).toFixed(1) + '% 0 0 0)'; cover.style.display = w >= 1 ? 'none' : 'block';
+    pop(h1, t, T_H1, skH); pop(shop, t, T_PIC, skS);
+    var a = clamp((t - T_BTN) / 0.07), s = 0.86 + 0.14 * back((t - T_BTN) / 0.26);
+    hp.style.opacity = a.toFixed(2); hb.style.opacity = a.toFixed(2); hb.style.transform = t - T_BTN < 0.3 ? 'scale(' + s.toFixed(3) + ')' : '';
+    for (i = 0; i < skP.length; i++) skP[i].style.opacity = (1 - a).toFixed(2);
+    if (t < T_BTN) { var al = [].concat(skH, skP, skS); for (i = 0; i < al.length; i++) if (+al[i].style.opacity > 0) al[i].style.opacity = (al[i].style.opacity * sh).toFixed(2); }
+  }
+
+  // ---- everything else is a pure function of scroll position and time ----
+  var page = $('#page'), rv = all('.rv'), its = all('.svc .it'), whos = all('.who'), tops = [], itTop = [], whoTop = 0;
+  var stripes = $('#stripes'), band = $('#band'), glint = $('#glint'), pin = $('#pin'), sign = $('#sign'), awn = $('#awn');
+  function topOf(el) { var y = 0, e = el; while (e && e !== document.body) { y += e.offsetTop; e = e.offsetParent; } return y; }
+  var pinTop = 0;
+  function measure() { tops = rv.map(topOf); itTop = its.map(topOf); whoTop = topOf(whos[0]); pinTop = topOf($('.map')); }
+  function render(y, t) {
+    var vh = innerHeight, i, k;
+    stripes.setAttribute('transform', 'translate(0 ' + (-((t * 62) % 48)).toFixed(2) + ')');
+    glint.setAttribute('transform', 'translate(' + (((t * 0.5) % 1) * 150 - 20).toFixed(1) + ' 0)'); glint.setAttribute('opacity', (0.5 * Math.sin(Math.PI * ((t * 0.5) % 1))).toFixed(2));
+    sign.setAttribute('transform', 'rotate(' + (Math.sin(t * 3.1) * 5).toFixed(2) + ' 398 172)');
+    band.style.transform = 'translateX(' + (-(y * 0.45 + t * 26) % 590).toFixed(1) + 'px)';
+    for (i = 0; i < rv.length; i++) { k = ease((y + vh * 0.84 - tops[i]) / 150); rv[i].style.opacity = k.toFixed(3); rv[i].style.transform = 'translateY(' + ((1 - k) * 34).toFixed(1) + 'px)'; }
+    for (i = 0; i < its.length; i++) { k = ease((y + vh * 0.8 - itTop[i]) / 130); its[i].style.opacity = k.toFixed(3); its[i].style.transform = 'translateX(' + ((1 - k) * -60).toFixed(1) + 'px)'; }
+    for (i = 0; i < whos.length; i++) { k = ease((y + vh * 0.8 - whoTop - i * 46) / 150); whos[i].style.opacity = k.toFixed(3); whos[i].style.transform = 'translateY(' + ((1 - k) * 60).toFixed(1) + 'px) rotate(' + ((1 - k) * (i - 1) * 9).toFixed(2) + 'deg)'; }
+    k = ease((y + vh * 0.62 - pinTop) / 130); pin.setAttribute('transform', 'translate(218 ' + (104 - (1 - k) * 90).toFixed(1) + ')'); pin.setAttribute('opacity', k.toFixed(2));
+  }
+  measure(); addEventListener('resize', measure); paint();
+  if (!FILM) { var t0 = performance.now(); (function loop() { var t = (performance.now() - t0) / 1000; build(t); render(scrollY, t); requestAnimationFrame(loop); })(); return; }
+
+  // ---------- filming ----------
+  var CAPS = [
+    [0.0, 2.7, '<em>AI</em> built this website for a <em>barber shop</em>'],
+    [2.7, 3.9, 'It’s a real page. <em>Watch it scroll.</em>'],
+    [3.9, 5.3, 'Every service, <em>with prices</em>'],
+    [5.3, 6.9, 'Meet the barbers'],
+    [6.9, 10.4, 'Pick a barber. <em>Pick a time.</em>'],
+    [10.4, 11.9, 'The booking <em>really works</em>'],
+    [11.9, 13.6, 'Reviews, a map, opening hours'],
+    [13.6, 15.3, 'Built by <em>AI</em>. No code typed by hand.']
+  ];
+  var TAPS = [[8.8, function () { return chips[1]; }, 0.5], [9.7, function () { return slots[3]; }, 0.5], [10.6, function () { return confirm; }, 0.86]];
+  var Z0 = 15.3, Z1 = 16.1, DUR = 17.4;
+  var cap = $('#cap span'), sb = $('#sb i'), dot = $('#dot'), end = $('#end'), H = page.offsetHeight, MAX = H + 62 - innerHeight;
+  var bookY = topOf($('#book')) - 205;      // booking card sits under the caption
+  var f0 = (bookY - 40) / MAX, f1 = (bookY + 30) / MAX;
+  window.__film = { duration: DUR, keys: [[0, 0], [1.3, 0], [8.3, f0], [11.0, f1], [15.2, 1], [DUR, 1]] };
+  window.__frame = function (t, y) {
+    var z = ease((t - Z0) / (Z1 - Z0));                 // zoom out to show the whole page at the end
+    var S = 1 - (1 - 630 / H) * z, ys = y * (1 - z);
+    page.style.transform = z > 0 ? 'translate(' + (z * 64).toFixed(1) + 'px,' + (z * 116).toFixed(1) + 'px) scale(' + S.toFixed(4) + ')' : 'none';
+    window.scrollTo(0, ys);
+    state = { who: t >= TAPS[0][0] ? 1 : -1, slot: t >= TAPS[1][0] ? 3 : -1, done: t >= TAPS[2][0] }; paint();
+    build(t); render(z > 0 ? 1e6 : ys, t);
+    // caption
+    var txt = ''; for (var i = 0; i < CAPS.length; i++) if (t >= CAPS[i][0] && t < CAPS[i][1]) { txt = CAPS[i][2]; var a = Math.min(i === 0 ? 1 : clamp((t - CAPS[i][0]) / 0.16), i === CAPS.length - 1 ? clamp((CAPS[i][1] - t) / 0.2) : 1); cap.style.opacity = a.toFixed(2); cap.style.transform = 'translateY(' + ((1 - a) * 10).toFixed(1) + 'px)'; }
+    if (cap.innerHTML !== txt) cap.innerHTML = txt; cap.parentNode.style.visibility = txt ? 'visible' : 'hidden';
+    // scrollbar thumb
+    var th = 600 * innerHeight / (H + 62); sb.style.height = th.toFixed(1) + 'px'; sb.style.top = ((600 - th) * clamp(ys / MAX)).toFixed(1) + 'px'; sb.parentNode.style.opacity = (1 - z).toFixed(2);
+    // finger taps
+    var op = 0, px = 0, py = 0, sc = 1;
+    for (i = 0; i < TAPS.length; i++) {
+      var T = TAPS[i][0], d = t - (T - 0.55);
+      if (d > 0 && d < 0.85) { var r = TAPS[i][1]().getBoundingClientRect(), m = 1 - ease(d / 0.42); op = clamp(d / 0.15) * clamp((0.85 - d) / 0.18); px = r.left + r.width * TAPS[i][2] + m * 60; py = r.top + r.height / 2 + 8 + m * 90; sc = 1 - 0.28 * clamp(1 - Math.abs(t - T) / 0.14); }
+    }
+    dot.style.left = px.toFixed(1) + 'px'; dot.style.top = py.toFixed(1) + 'px'; dot.style.opacity = op.toFixed(2); dot.style.transform = 'scale(' + sc.toFixed(3) + ')';
+    // end card
+    var e = ease((t - Z1 + 0.25) / 0.45); end.style.opacity = e.toFixed(2); end.style.transform = 'translateX(' + ((1 - e) * 24).toFixed(1) + 'px)';
+  };
+})();
+</script>
+</body>
+</html>
