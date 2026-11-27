@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nightkettle Coffee | Roasted after dark</title>
+<style>
+  :root { --bg:#0d0907; --gold:#ffcf7a; --cream:#fff3dc; --mut:#b9a58a; --card:#1a1310; --green:#3fae6a; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--cream); font-family: "DM Sans", "Fira Sans", system-ui, sans-serif; overflow-x: hidden; }
+  h1, h2, .logo, .price { font-family: "Anton", Impact, "Archivo Black", sans-serif; font-weight: 400; letter-spacing: .5px; text-transform: uppercase; }
+  body.film { padding-top: 62px; }
+  body.film::-webkit-scrollbar { display: none; }
+  #bar, #cap, #sb, #dot, #pc, #chat { display: none; }
+  body.film #bar { display: flex; position: fixed; z-index: 90; top: 0; left: 0; right: 0; height: 62px; background: #e9e6e1; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid #c9c4bb; }
+  #bar .nav { display: flex; gap: 12px; color: #7d776d; font-size: 26px; line-height: 1; }
+  #bar .url { flex: 1; height: 40px; border-radius: 20px; background: #fff; display: flex; align-items: center; gap: 9px; padding: 0 16px; font-size: 19px; color: #2a2620; font-weight: 500; box-shadow: inset 0 0 0 1px #d8d3ca; }
+  #bar .lock { width: 13px; height: 11px; background: #5f594f; border-radius: 3px; position: relative; margin-top: 5px; }
+  #bar .lock::before { content: ""; position: absolute; left: 2px; top: -8px; width: 9px; height: 10px; border: 2.5px solid #5f594f; border-bottom: 0; border-radius: 6px 6px 0 0; box-sizing: border-box; }
+  #bar .dots { color: #7d776d; font-size: 26px; }
+  body.film #cap { display: block; position: fixed; z-index: 95; left: 0; right: 0; top: 122px; text-align: center; pointer-events: none; }
+  #cap span { display: inline-block; max-width: 452px; background: #fff; color: #17110c; font-family: "Archivo Black", sans-serif; font-size: 28px; line-height: 1.16; padding: 13px 22px 14px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.55); }
+  #cap em { font-style: normal; color: #c8641a; }
+  #cap small { display: block; font-family: "DM Sans", sans-serif; font-weight: 700; font-size: 18px; color: #5a5046; margin-top: 4px; }
+  body.film #sb { display: block; position: fixed; z-index: 85; right: 5px; top: 70px; width: 7px; height: 600px; border-radius: 4px; background: rgba(255,255,255,.1); }
+  #sb i { position: absolute; left: 0; width: 7px; border-radius: 4px; background: rgba(255,207,122,.7); }
+  body.film #dot { display: block; position: fixed; z-index: 99; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; background: rgba(255,255,255,.55); border: 3px solid #fff; box-shadow: 0 0 0 3px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.4); opacity: 0; pointer-events: none; }
+
+  /* film-only step screens */
+  body.film #pc, body.film #chat { display: block; position: fixed; z-index: 92; left: 0; right: 0; top: 0; bottom: 0; opacity: 0; visibility: hidden; }
+  #pc { background: #14100d; padding: 212px 26px 0; }
+  #pc .card { display: block; padding: 0; margin: 0; border: 0; background: #fff; color: #17110c; border-radius: 22px; height: 420px; overflow: hidden; position: relative; box-shadow: 0 16px 50px rgba(0,0,0,.6); }
+  #pc .hd { position: relative; z-index: 2; height: 50px; background: #f1ebe2; display: flex; align-items: center; padding: 0 18px; font-weight: 800; font-size: 15px; letter-spacing: 2px; color: #7a6a55; border-bottom: 1px solid #e2d9cb; }
+  #pc pre { position: absolute; left: 0; right: 0; top: 50px; padding: 16px 20px; font-family: "DejaVu Sans Mono", monospace; font-size: 15.5px; line-height: 1.5; white-space: pre-wrap; color: #2a221a; }
+  #pc .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 70px; background: linear-gradient(rgba(255,255,255,0), #fff); }
+  #copy { display: block; margin: 22px auto 0; width: 300px; height: 62px; border-radius: 18px; background: var(--gold); color: #17110c; font-family: "Archivo Black", sans-serif; font-size: 24px; text-align: center; line-height: 62px; }
+  #copy.on { background: var(--green); color: #fff; }
+  #chat { background: #f6f1ea; color: #17110c; padding: 212px 24px 0; }
+  #bubble { display: none; margin: 22px 0 0 70px; background: #e9dfd0; border-radius: 20px 20px 6px 20px; padding: 14px 16px; font-family: "DejaVu Sans Mono", monospace; font-size: 14.5px; line-height: 1.45; color: #2a221a; }
+  #chat .who { font-family: "Bitter", Georgia, serif; font-weight: 800; font-size: 34px; text-align: center; }
+  #chat .sub { text-align: center; color: #7a6a55; font-size: 19px; margin-top: 4px; font-weight: 600; }
+  #chat .box { margin-top: 26px; background: #fff; border-radius: 22px; box-shadow: 0 6px 24px rgba(60,40,20,.14); padding: 18px 18px 64px; position: relative; height: 250px; overflow: hidden; font-family: "DejaVu Sans Mono", monospace; font-size: 15px; line-height: 1.5; white-space: pre-wrap; color: #2a221a; }
+  #chat .ph { color: #a89a86; font-family: "DM Sans", sans-serif; font-size: 19px; }
+  #send { position: absolute; right: 14px; bottom: 12px; width: 46px; height: 46px; border-radius: 14px; background: #c8641a; }
+  #send::after { content: ""; position: absolute; left: 15px; top: 13px; width: 13px; height: 13px; border-left: 4px solid #fff; border-top: 4px solid #fff; transform: rotate(45deg) translate(3px,3px); }
+  #chat .work { margin-top: 26px; font-size: 22px; font-weight: 800; opacity: 0; }
+  #chat .track { margin-top: 12px; height: 12px; border-radius: 6px; background: #e4dccf; overflow: hidden; }
+  #chat .track i { display: block; height: 100%; width: 0; background: #c8641a; border-radius: 6px; }
+
+  /* the site */
+  #page { max-width: 540px; margin: 0 auto; position: relative; }
+  .top { position: sticky; top: 0; z-index: 30; height: 50px; background: rgba(13,9,7,.92); display: flex; align-items: center; padding: 0 18px; gap: 16px; border-bottom: 1px solid #2a1f18; }
+  body.film .top { top: 62px; }
+  .logo { font-size: 22px; color: var(--gold); margin-right: auto; }
+  .top a { color: var(--cream); text-decoration: none; font-size: 15.5px; font-weight: 600; }
+  .cart { background: var(--gold); color: #17110c !important; padding: 7px 13px; border-radius: 16px; font-weight: 800 !important; }
+  .stage { position: relative; height: 2150px; }
+  .pin { position: sticky; top: 50px; height: 760px; }
+  body.film .pin { top: 112px; }
+  #cv { display: block; width: 540px; height: 760px; }
+  .line { position: absolute; left: 0; right: 0; text-align: center; padding: 0 26px; }
+  .line h1, .line h2 { font-size: 52px; line-height: 1.02; color: #fff; text-shadow: 0 4px 30px rgba(0,0,0,.9); }
+  .line em { font-style: normal; color: var(--gold); }
+  .line p { margin-top: 10px; color: var(--mut); font-size: 18px; font-weight: 600; }
+  section { padding: 36px 22px 14px; position: relative; background: var(--bg); }
+  .kick { color: var(--gold); font-weight: 800; font-size: 14px; letter-spacing: 2.5px; text-transform: uppercase; }
+  section h2 { font-size: 42px; line-height: 1.05; margin-top: 4px; }
+  .card { background: var(--card); border: 1px solid #2c211a; border-radius: 20px; padding: 18px; margin-top: 14px; display: flex; gap: 16px; align-items: center; }
+  .bag { flex: 0 0 84px; height: 108px; border-radius: 10px 10px 14px 14px; position: relative; }
+  .bag::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 16px; background: rgba(0,0,0,.28); border-radius: 10px 10px 0 0; }
+  .bag::after { content: ""; position: absolute; left: 24px; top: 46px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.9); }
+  .card h3 { font-size: 21px; font-weight: 800; }
+  .card p { color: var(--mut); font-size: 15px; margin-top: 3px; line-height: 1.35; }
+  .row { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+  .price { font-size: 26px; color: var(--gold); }
+  .add { margin-left: auto; background: var(--gold); color: #17110c; font-weight: 800; font-size: 16px; padding: 10px 18px; border-radius: 12px; border: 0; font-family: inherit; cursor: pointer; }
+  .add.on { background: var(--green); color: #fff; }
+  .rev { background: var(--card); border-radius: 18px; padding: 16px 18px; margin-top: 12px; }
+  .stars { color: var(--gold); font-size: 19px; letter-spacing: 3px; }
+  .rev p { font-size: 17px; line-height: 1.4; margin-top: 4px; }
+  .rev small { display: block; margin-top: 6px; color: var(--mut); font-weight: 700; font-size: 14px; }
+  .info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .info div { background: var(--card); border-radius: 16px; padding: 14px 16px; font-size: 15.5px; line-height: 1.45; }
+  .info b { display: block; color: var(--gold); font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3px; }
+  footer { margin-top: 26px; padding: 26px 22px 40px; border-top: 1px solid #2a1f18; color: var(--mut); font-size: 14.5px; line-height: 1.6; background: var(--bg); position: relative; }
+</style>
+</head>
+<body>
+<script type="text/plain" id="prompt">Build a single-file website (one index.html, no libraries, no external images or fonts) for Nightkettle Coffee, a made-up small-batch roaster that roasts at night.
+
+Look: near-black espresso background (#0d0907), warm gold (#ffcf7a) and cream accents, bold condensed uppercase headings, generous spacing, mobile-first at 540px wide.
+
+Centrepiece: a canvas pinned behind the first three screens. Draw about 2,600 glowing gold particles in real 3D (your own rotate-and-project maths, no WebGL). They form a coffee cup on a saucer with a handle and rising steam, slowly rotating. As the visitor scrolls, the particles fly apart and re-form into a giant coffee bean, then spread into a slow spiral galaxy that fades into the page. Drive the shapes by scroll position so it plays forwards and backwards.
+
+Text over the canvas, one line per screen: "Coffee roasted after dark." / "Small batches. Roasted at midnight." / "At your door by morning."
+
+Then normal sections: a sticky top bar with logo, Roasts, Visit and a cart counter; "Tonight's roasts" with three cards (Midnight Oil, dark, $16; Slow Dawn, medium, $17; First Light, light, $18), each with tasting notes and an Add button that turns green, says Added and raises the cart count; two short customer reviews with stars; opening hours and a made-up address; a footer.
+
+Make elements fade and slide in as they scroll into view. No placeholder text anywhere.</script>
+
+<div id="bar"><div class="nav"><span>&#8249;</span><span>&#8250;</span></div><div class="url"><i class="lock"></i>nightkettlecoffee.example</div><div class="dots">&#8943;</div></div>
+<div id="cap"><span></span></div>
+<div id="sb"><i></i></div>
+<div id="dot"></div>
+<div id="pc"><div class="card"><div class="hd">THE PROMPT</div><pre id="pcText"></pre><div class="fade"></div></div><div id="copy">Copy prompt</div></div>
+<div id="chat"><div class="who">Claude</div><div class="sub">What should we build?</div><div id="bubble"></div><div class="box" id="box"><span id="chatText" class="ph">Ask anything</span><i id="send"></i></div><div class="work" id="work">Building your site...</div><div class="track"><i id="prog"></i></div></div>
+
+<div id="page">
+  <nav class="top"><div class="logo">Nightkettle</div><a href="#roasts">Roasts</a><a href="#visit">Visit</a><a href="#roasts" class="cart" id="cart">Cart 0</a></nav>
+  <div class="stage" id="stage">
+    <div class="pin"><canvas id="cv" width="1080" height="1520"></canvas></div>
+    <div class="line" style="top:560px"><h1>Coffee roasted <em>after dark.</em></h1><p>Small-batch beans from a made-up roastery.</p></div>
+    <div class="line" style="top:1270px"><h2>Small batches.<br><em>Roasted at midnight.</em></h2></div>
+    <div class="line" style="top:1900px"><h2>At your door <em>by morning.</em></h2></div>
+  </div>
+  <section id="roasts">
+    <div class="kick rv">Tonight's roasts</div><h2 class="rv">Pick your bag</h2>
+    <div id="cards"></div>
+  </section>
+  <section>
+    <div class="kick rv">Reviews</div><h2 class="rv">Night owls agree</h2>
+    <div class="rev rv"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>Ordered at ten, brewing by eight. Best dark roast I've had.</p><small>Ines, Lantern Quay</small></div>
+    <div class="rev rv"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>First Light tastes like peach tea. I'm on my fourth bag.</p><small>Teo, Harrow Lane</small></div>
+  </section>
+  <section id="visit">
+    <div class="kick rv">Visit</div><h2 class="rv">9 Ember Yard</h2>
+    <div class="info rv"><div><b>Roastery door</b>Thursday to Sunday<br>6 pm to midnight</div><div><b>Say hello</b>555 0127<br>Lantern Quay</div></div>
+  </section>
+  <footer>Nightkettle Coffee is a made-up roaster. This demo site was built by AI.</footer>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  if (FILM) document.body.className = 'film';
+  var $ = function (s) { return document.querySelector(s); };
+  var clamp = function (x) { return Math.max(0, Math.min(1, x)); };
+  var ease = function (x) { x = clamp(x); return x * x * (3 - 2 * x); };
+
+  // ---- roast cards with working Add buttons ----
+  var roasts = [['Midnight Oil', 'Dark roast. Cocoa, burnt sugar, smoke.', 16, '#3a221a'], ['Slow Dawn', 'Medium roast. Hazelnut, caramel, plum.', 17, '#8a4a22'], ['First Light', 'Light roast. Peach, jasmine, honey.', 18, '#d08a3a']];
+  var added = {}, cards = $('#cards');
+  roasts.forEach(function (r, i) {
+    var d = document.createElement('div'); d.className = 'card rv';
+    d.innerHTML = '<div class="bag" style="background:' + r[3] + '"></div><div style="flex:1"><h3>' + r[0] + '</h3><p>' + r[1] + '</p><div class="row"><span class="price">$' + r[2] + '</span><button class="add">Add</button></div></div>';
+    cards.appendChild(d);
+  });
+  var adds = [].slice.call(document.querySelectorAll('.add'));
+  function paintCart() { var n = 0; adds.forEach(function (b, i) { var on = !!added[i]; if (on) n++; b.className = 'add' + (on ? ' on' : ''); b.textContent = on ? 'Added ✓' : 'Add'; }); $('#cart').textContent = 'Cart ' + n; }
+  adds.forEach(function (b, i) { b.addEventListener('click', function () { added[i] = !added[i]; paintCart(); }); });
+
+  // ---- 3D particles: cup -> bean -> galaxy ----
+  var N = 2600, rnd = (function () { var s = 7; return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })();
+  var cup = [], bean = [], gal = [], kind = [], seed = [];
+  for (var i = 0; i < N; i++) {
+    var u = rnd(), v = rnd(), w = rnd(), th = u * 6.2832, p, k = 0;
+    if (i < 1050) { var y = v - 0.5, r = 0.56 + 0.16 * v; p = [r * Math.cos(th), y, r * Math.sin(th)]; }                 // cup wall
+    else if (i < 1250) { p = [0.72 * Math.cos(th), 0.5 + (v - .5) * 0.03, 0.72 * Math.sin(th)]; }                         // rim
+    else if (i < 1480) { var rr = 0.66 * Math.sqrt(v); p = [rr * Math.cos(th), 0.4, rr * Math.sin(th)]; k = 1; }          // coffee surface
+    else if (i < 1620) { var rb = 0.56 * Math.sqrt(v); p = [rb * Math.cos(th), -0.5, rb * Math.sin(th)]; }                 // base
+    else if (i < 1900) { var a = (v - .5) * 3.1416, tu = w * 6.2832, R = 0.3 + 0.06 * Math.cos(tu); p = [0.72 + R * Math.cos(a), 0.02 + R * Math.sin(a) * 1.05, 0.06 * Math.sin(tu)]; } // handle
+    else if (i < 2330) { var rs = 0.5 + 0.72 * Math.sqrt(v); p = [rs * Math.cos(th), -0.58 - 0.03 * Math.cos(rs * 5), rs * Math.sin(th)]; } // saucer
+    else { var c = i % 3, h = v; p = [(c - 1) * 0.3, 0.62 + h * 0.85, 0]; k = 2; }                                       // steam (animated)
+    cup.push(p); kind.push(k); seed.push([u, v, w]);
+    var bu = u * 6.2832, bv = Math.asin(2 * v - 1), bx = 1.05 * Math.cos(bv) * Math.cos(bu), by = 0.66 * Math.sin(bv), bz = 0.6 * Math.cos(bv) * Math.sin(bu);
+    if (bz > 0) { var g = Math.abs(by - 0.13 * Math.sin(bx * 3.2)); if (g < 0.1) bz *= 0.35 + 6.5 * g; }
+    bean.push([bx, by, bz]);
+    var gr = 0.25 + 1.9 * Math.pow(v, 0.7), ga = u * 6.2832 * 0.3 + gr * 2.6 + (i % 3) * 2.094; gal.push([gr * Math.cos(ga), (w - .5) * 0.22 / (0.6 + gr), gr * Math.sin(ga)]);
+  }
+  var cv = $('#cv'), ctx = cv.getContext('2d'), stage = $('#stage');
+  function drawScene(sp, t) {            // sp = scroll progress through the stage (0..1), t = seconds
+    var W = 1080, H = 1520; ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, H);
+    var m1 = ease((sp - 0.22) / 0.2), m2 = ease((sp - 0.62) / 0.22), fade = 1 - ease((sp - 0.86) / 0.14);
+    var burst = Math.sin(Math.PI * clamp((sp - 0.22) / 0.2)) * 0.9 + Math.sin(Math.PI * clamp((sp - 0.62) / 0.22)) * 0.5;
+    var ang = t * 0.55 + sp * 5.2, ca = Math.cos(ang), sa = Math.sin(ang), tilt = 0.42 - 0.2 * m2, ct = Math.cos(tilt), st = Math.sin(tilt);
+    var cx = W / 2, cy = 590 + 60 * m1, sc = 400 - 40 * m1 + 60 * m2;
+    var gl = ctx.createRadialGradient(cx, cy, 20, cx, cy, 620); gl.addColorStop(0, 'rgba(255,170,70,' + (0.2 * fade).toFixed(3) + ')'); gl.addColorStop(1, 'rgba(255,170,70,0)'); ctx.fillStyle = gl; ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < N; i++) {
+      var a = cup[i], b = bean[i], g = gal[i], s = seed[i], x = a[0], y = a[1], z = a[2];
+      if (kind[i] === 2) { var hh = (s[1] + t * 0.28 + s[0]) % 1; y = 0.6 + hh * 0.95; x = ((i % 3) - 1) * 0.3 + 0.1 * Math.sin(hh * 7 + t * 1.6 + (i % 3) * 2); z = 0.08 * Math.cos(hh * 6 + t); }
+      x += (b[0] - x) * m1; y += (b[1] - y) * m1; z += (b[2] - z) * m1;
+      x += (g[0] - x) * m2; y += (g[1] - y) * m2; z += (g[2] - z) * m2;
+      if (burst > 0.001) { x += (s[0] - .5) * 2.6 * burst; y += (s[1] - .5) * 2.6 * burst; z += (s[2] - .5) * 2.6 * burst; }
+      var X = x * ca + z * sa, Z = -x * sa + z * ca, Y = y * ct - Z * st, Z2 = y * st + Z * ct, pz = 3.4 / (3.4 - Z2);
+      var px = cx + X * sc * pz, py = cy - Y * sc * pz, sz = (kind[i] === 2 ? 3.2 : 4.2) * pz, al = (0.35 + 0.45 * clamp((Z2 + 1) / 2)) * fade;
+      if (kind[i] === 2) al *= (1 - m1) * Math.sin(Math.PI * ((s[1] + t * 0.28 + s[0]) % 1)) * 0.9;
+      if (al <= 0.01) continue;
+      ctx.fillStyle = kind[i] === 1 ? 'rgba(255,236,200,' + al.toFixed(3) + ')' : kind[i] === 2 ? 'rgba(255,255,255,' + al.toFixed(3) + ')' : 'rgba(255,196,104,' + al.toFixed(3) + ')';
+      ctx.fillRect(px - sz / 2, py - sz / 2, sz, sz);
+    }
+  }
+  var rv = [].slice.call(document.querySelectorAll('.rv')), tops = [], stageH = 0;
+  function topOf(el) { var y = 0; while (el && el !== document.body) { y += el.offsetTop; el = el.offsetParent; } return y; }
+  function measure() { tops = rv.map(topOf); stageH = stage.offsetHeight - 760; }
+  function render(y, t) {
+    drawScene(clamp(y / stageH), t);
+    for (var i = 0; i < rv.length; i++) { var k = ease((y + innerHeight * 0.88 - tops[i]) / 150); rv[i].style.opacity = k.toFixed(3); rv[i].style.transform = 'translateY(' + ((1 - k) * 30).toFixed(1) + 'px)'; }
+  }
+  measure(); addEventListener('resize', measure); paintCart();
+  if (!FILM) { (function loop() { render(scrollY, performance.now() / 1000); requestAnimationFrame(loop); })(); return; }
+
+  // ---------- filming: result, prompt, paste into Claude, finished site ----------
+  var PROMPT = $('#prompt').textContent.trim();
+  var CAPS = [
+    [0.0, 4.0, 'How to make a <em>3D website</em> like this with AI'],
+    [4.0, 7.5, '1. <em>Copy</em> this prompt'],
+    [7.5, 11.0, '2. <em>Paste</em> it into Claude'],
+    [11.0, 13.4, 'Done. <em>One prompt.</em>'],
+    [13.4, 15.9, 'A real page. <em>Buttons work.</em>'],
+    [15.9, 18.6, 'Full prompt in the <em>description</em><small>Follow for a new one daily</small>']
+  ];
+  var DUR = 18.6, T_COPY = 6.3, T_SEND = 9.3, T_ADD = 15.0;
+  var cap = $('#cap span'), sb = $('#sb i'), dot = $('#dot'), pc = $('#pc'), chat = $('#chat'), pcText = $('#pcText'), copyB = $('#copy'), chatText = $('#chatText'), work = $('#work'), prog = $('#prog');
+  pcText.textContent = PROMPT;
+  var H = $('#page').offsetHeight, MAX = H + 62 - innerHeight, yCards = topOf($('#roasts')) - 150;
+  window.__film = { duration: DUR, keys: [[0, 0], [4.0, 150 / MAX], [4.6, 150 / MAX], [4.7, 0], [11.0, 0], [14.3, yCards / MAX], [15.4, (yCards + 30) / MAX], [17.2, 1], [DUR, 1]] };
+  var first = true;
+  function tap(t, T, el, dx) { var d = t - (T - 0.55); if (d <= 0 || d >= 0.95) return 0; var r = el.getBoundingClientRect(), m = 1 - ease(d / 0.45), press = 1 - 0.28 * clamp(1 - Math.abs(t - T) / 0.14); dot.style.left = (r.left + r.width * (dx || 0.5) + m * 60).toFixed(1) + 'px'; dot.style.top = (r.top + r.height / 2 + 4 + m * 110).toFixed(1) + 'px'; dot.style.transform = 'scale(' + press.toFixed(3) + ')'; return clamp(d / 0.2) * clamp((0.95 - d) / 0.2); }
+  window.__frame = function (t, y) {
+    if (first) { measure(); first = false; }
+    window.scrollTo(0, y);
+    added = {}; if (t >= T_ADD) added[0] = true; paintCart();
+    render(y, t);
+    // step screens
+    var a1 = Math.min(ease((t - 4.0) / 0.3), 1 - ease((t - 7.45) / 0.25)), a2 = Math.min(ease((t - 7.5) / 0.3), 1 - ease((t - 10.95) / 0.3));
+    pc.style.opacity = a1.toFixed(3); pc.style.visibility = a1 > 0.001 ? 'visible' : 'hidden';
+    chat.style.opacity = a2.toFixed(3); chat.style.visibility = a2 > 0.001 ? 'visible' : 'hidden';
+    pcText.style.transform = 'translateY(' + (-ease((t - 4.4) / 1.7) * 330).toFixed(1) + 'px)';
+    copyB.className = t >= T_COPY ? 'on' : ''; copyB.textContent = t >= T_COPY ? 'Copied ✓' : 'Copy prompt';
+    var pasted = t >= 8.3, sent = t >= T_SEND;
+    chatText.className = pasted && !sent ? '' : 'ph'; chatText.textContent = pasted && !sent ? PROMPT.slice(0, 330) + '...' : (sent ? 'Reply to Claude' : 'Ask anything');
+    $('#bubble').style.display = sent ? 'block' : 'none'; $('#bubble').textContent = PROMPT.slice(0, 168) + '...'; $('#box').style.height = sent ? '74px' : '250px'; $('#box').style.marginTop = sent ? '18px' : '26px';
+    work.style.opacity = sent ? 1 : 0; work.textContent = 'Building your site' + '...'.slice(0, 1 + Math.floor(((t - T_SEND) * 3) % 3));
+    prog.style.width = (sent ? ease((t - T_SEND) / 1.5) * 100 : 0).toFixed(1) + '%';
+    // caption
+    var txt = ''; for (var i = 0; i < CAPS.length; i++) if (t >= CAPS[i][0] && t < CAPS[i][1]) { txt = CAPS[i][2]; var a = i === 0 ? 1 : clamp((t - CAPS[i][0]) / 0.16); cap.style.opacity = a.toFixed(2); cap.style.transform = 'translateY(' + ((1 - a) * 10).toFixed(1) + 'px)'; }
+    if (cap.innerHTML !== txt) cap.innerHTML = txt;
+    // scrollbar
+    var onSite = 1 - Math.max(a1, a2), th = 600 * innerHeight / (H + 62); sb.style.height = th.toFixed(1) + 'px'; sb.style.top = ((600 - th) * clamp(y / MAX)).toFixed(1) + 'px'; sb.parentNode.style.opacity = onSite.toFixed(2);
+    // taps
+    var op = Math.max(tap(t, T_COPY, copyB), tap(t, T_SEND, $('#send')), tap(t, T_ADD, adds[0], 0.6));
+    dot.style.opacity = op.toFixed(2);
+  };
+})();
+</script>
+</body>
+</html>

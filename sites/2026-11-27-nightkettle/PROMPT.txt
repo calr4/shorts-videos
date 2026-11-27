@@ -1,0 +1,11 @@
+Build a single-file website (one index.html, no libraries, no external images or fonts) for Nightkettle Coffee, a made-up small-batch roaster that roasts at night.
+
+Look: near-black espresso background (#0d0907), warm gold (#ffcf7a) and cream accents, bold condensed uppercase headings, generous spacing, mobile-first at 540px wide.
+
+Centrepiece: a canvas pinned behind the first three screens. Draw about 2,600 glowing gold particles in real 3D (your own rotate-and-project maths, no WebGL). They form a coffee cup on a saucer with a handle and rising steam, slowly rotating. As the visitor scrolls, the particles fly apart and re-form into a giant coffee bean, then spread into a slow spiral galaxy that fades into the page. Drive the shapes by scroll position so it plays forwards and backwards.
+
+Text over the canvas, one line per screen: "Coffee roasted after dark." / "Small batches. Roasted at midnight." / "At your door by morning."
+
+Then normal sections: a sticky top bar with logo, Roasts, Visit and a cart counter; "Tonight's roasts" with three cards (Midnight Oil, dark, $16; Slow Dawn, medium, $17; First Light, light, $18), each with tasting notes and an Add button that turns green, says Added and raises the cart count; two short customer reviews with stars; opening hours and a made-up address; a footer.
+
+Make elements fade and slide in as they scroll into view. No placeholder text anywhere.
