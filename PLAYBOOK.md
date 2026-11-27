@@ -3,26 +3,31 @@
 How each day's video for the "Build Your Site" YouTube channel is made. This repo is PUBLIC: it holds only the videos, the demo-site source, and the tools. Research notes, the video log and performance numbers are kept elsewhere, never here. Never commit names, emails, locations, client or business details, credentials, or anything else about the channel owner.
 
 ## The format
-A 15 to 20 second vertical video (1080x1920, 30 fps) that films a real, working website built that day for an invented brand. The site is a single `index.html` with no network requests; all visuals are drawn in code (canvas, CSS, SVG).
+A 17 to 20 second vertical video (1080x1920, 30 fps) that shows HOW to make a striking website with AI: the result first, then the prompt, then the prompt going into Claude, then the finished site. The site is real and is built that day, from that prompt, for an invented brand. It is a single `index.html` with no network requests; all visuals are drawn in code (canvas, CSS, SVG).
 
-The owner's two standing rules (given 2026-11-25 after watching the videos; they outrank the brief, the experiment and everything else in this file):
-1. A stranger must understand the video in the first second.
-2. It must look like a website, not an animation or a game.
+Why this format (owner's instruction, 2026-11-27: study the channels that are winning and use what works): a 2,000-subscriber channel in this exact niche gets 20,000 to 150,000 views per 18-second Short with this structure and the title "How to Make 3D Websites with Claude". Our own plain scrolling-page videos got about 35 views each; our flashy ones got 100 to 1,170. Borrow the structure only. Never copy another creator's footage, wording, site designs, prompts or brand names.
 
-Format checklist:
-- **It reads as a web page being used.** A slim browser bar stays at the top for the whole video (back arrow, a lock, an address pill with an invented address such as `thimbleandowl.example`). Under it is a normal page: a menu bar with a logo and links, a headline with a button, then ordinary sections (products or menu with prices, reviews, opening hours or contact, a footer).
-- **The page visibly scrolls.** For at least two thirds of the video the content moves up the screen as one long page, at a pace a person would scroll, with a scrollbar thumb moving down the right edge. Do not replace scrolling with scene changes, page flips, or a camera flying through a 3D scene.
-- **Effects live inside the page.** Things may animate, tilt, light up or assemble as they scroll into view, and one section may be a showpiece (3D product, a small game, particles). The showpiece takes at most a third of the video and the page must scroll into it and out of it, so it is clearly part of a page.
-- **The first second explains everything in plain words.** The first caption says what this is and who it is for, for example "AI built this website for a bookshop." No series numbers, no in-jokes, nothing that needs an earlier video. The page behind it already shows the browser bar, the menu and the headline.
-- **Captions say what the viewer is looking at.** One idea each, seven words or fewer, a new one every 2 to 3 seconds: "This is the real page", "Scroll down to the menu", "The buttons work", "Built by AI. No code typed by hand."
-- **Proof that it is interactive:** a visible tap (finger dot) on a real control such as a menu link, a button or a form, and the page responds.
-- **End on the whole page:** zoom out for the last 1.5 seconds so the full length of the page is visible top to bottom, with "Follow for a new AI-built site every day".
-- No voiceover. An upbeat beat that starts at 0s.
+The four beats (keep this order and these timings, within half a second):
+1. **Result first, 0 to 4 s.** The most striking part of the finished site, inside the browser frame (slim browser bar with an invented address), already moving in the first frame: a 3D object, particles, a scroll-driven animation. Caption from frame one: "How to make a 3D website like this with AI" (vary the wording daily; always "How to make ... like this").
+2. **The prompt, 4 to 7.5 s.** Caption "1. Copy this prompt". A clean card shows the real prompt text (the first lines readable, the rest scrolling past), with a Copy button that the finger dot taps and that changes to "Copied".
+3. **Into Claude, 7.5 to 11 s.** Caption "2. Paste it into Claude". A plain chat box drawn by you (the word "Claude" as text, no logo, no imitation of the real app's screen) with the prompt pasted in; the finger taps Send; a short "Building your site..." line.
+4. **Done, 11 to end.** Caption "Done. One prompt." then the finished site again in the browser frame, scrolled from top to bottom so it is plainly a real page with real sections and one tap on a working control. Last 2 seconds: "Full prompt in the description. Follow for a new one daily."
 
-Cold-viewer check (required before publishing): look at the frames at 0.5 s and 3 s and answer three questions as a stranger who has never seen the channel. Is this a website? Did AI make it? What business is it for? If any answer is not obvious, revise.
+Rules that still apply from the owner's earlier feedback:
+- A stranger must understand it in the first second: the caption says what this is in plain words, and the browser frame makes it obvious the thing on screen is a website.
+- Captions are one idea each, seven words or fewer.
+- No voiceover. An upbeat beat that starts at 0 s.
+
+Honesty rules for this format (no exceptions):
+- Write the prompt FIRST, as a complete prompt a viewer could paste into Claude. Then build the site by following that prompt and nothing else, so "this prompt made this site" is true. If you change the site afterwards, change the prompt to match.
+- The full prompt, word for word as shown, goes in the YouTube description (under 4,000 characters) so "Full prompt in the description" is true. Put a shortened pointer in the Instagram and TikTok captions ("Full prompt on our YouTube").
+- Do not say "comment for the prompt" or promise a message or a link: nothing sends them.
+- Say "results vary" once in the description: the same prompt gives a similar site, not an identical one.
+
+Cold-viewer check (required before publishing): look at the frames at 0.5 s and 3 s as a stranger. Is this a website? Is it obvious the video will show how to make it with AI? Would you stop scrolling for it? If any answer is no, revise.
 
 ## Build steps
-1. Start from `sites/2026-11-25-mooncrust/` (the reference for the browser bar, the real scrolling page, the scrollbar, captions, tap indicator and the zoomed-out ending), or a newer folder that follows the same format. Do not start from folders dated before it: they use the old look. Copy only the plumbing (`__film`, `__frame`, browser bar, captions, tap indicator). The concept, brand, palette, type, layout, and visual technique must be new.
+1. Take the plumbing (`__film`, `__frame`, browser bar, captions, scrollbar, tap indicator) from `sites/2026-11-25-mooncrust/` or a newer folder, and look at `sites/2026-11-23-solene/` and `sites/2026-11-24-glowtilt/` for how striking 3D and particle scenes were drawn. The prompt card and the chat box are overlays you add for beats 2 and 3. The concept, brand, palette, type, layout and visual technique must be new each day. The concept, brand, palette, type, layout, and visual technique must be new.
 2. Everything on screen must be a pure function of `(t, scrollY)`. No CSS transitions or timers. In normal browsing (no `?film=1`) the same render function runs from `requestAnimationFrame`, so the site is real.
 3. The browser bar sits in the top 7% of the height. Keep captions between 9% and 17% of the height as a pill over the page, and all important content above 78% of the height (the Shorts UI covers the bottom and the right edge). Draw a scrollbar thumb on the right edge in the upper two thirds of the frame, where the Shorts buttons do not cover it.
 4. `node tools/film.js sites/<folder> stills 0.5,2.5,5,8,11,14` and look at the frames. Fix what is weak: a frame that does not look like a web page, a first frame a stranger would not understand, a dim or empty first frame, text overlapping visuals, tiny type, low contrast, a scene that reads as noise. Repeat until every frame would stop a scroll (expect 1 to 3 rounds).
