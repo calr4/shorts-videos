@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Tool Drop: Gemini turns a photo of your handwritten notes into a study guide</title>
+<style>
+  :root { --bg: #ffe08a; --paper: #fffaf0; --ink: #14225a; --red: #e0392f; --soft: #5b6699; --hl: #ffc21a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--ink); font-family: "Inter Display", "Inter", system-ui, sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  /* notebook: ruled lines and a red margin line */
+  #stage { position: fixed; inset: 0; overflow: hidden; background:
+    linear-gradient(90deg, transparent 19px, rgba(224,57,47,.55) 19px, rgba(224,57,47,.55) 22px, transparent 22px),
+    repeating-linear-gradient(180deg, transparent 0, transparent 46px, rgba(20,34,90,.10) 46px, rgba(20,34,90,.10) 48px),
+    var(--bg); }
+  .hole { position: absolute; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: rgba(20,34,90,.22); }
+  .tag { position: absolute; left: 34px; top: 64px; font-weight: 900; font-size: 12px; letter-spacing: .22em; color: var(--paper); background: var(--ink); padding: 7px 12px 6px; border-radius: 6px; z-index: 9; }
+  .scene { position: absolute; inset: 0; will-change: opacity, transform; opacity: 0; }
+  .rd { color: var(--red); }
+  .mk { background: linear-gradient(180deg, transparent 56%, var(--hl) 56%, var(--hl) 94%, transparent 94%); }
+  .small { font-family: "Inter", sans-serif; font-weight: 700; font-size: 16px; color: var(--soft); }
+  .card { background: var(--paper); border: 3px solid var(--ink); border-radius: 18px; box-shadow: 7px 8px 0 var(--ink); }
+  .hand { font-family: "Comic Relief", "Comic Sans MS", cursive; }
+
+  /* A: headline + drawn before and after */
+  #a h1 { position: absolute; left: 34px; top: 96px; font-weight: 900; font-size: 49px; line-height: 1.07; white-space: nowrap; letter-spacing: -.04em; }
+  #notes { position: absolute; left: 34px; top: 398px; width: 178px; height: 262px; padding: 0; overflow: hidden; will-change: transform; transform-origin: 50% 60%; background:
+    repeating-linear-gradient(180deg, transparent 0, transparent 21px, rgba(20,34,90,.16) 21px, rgba(20,34,90,.16) 22px), var(--paper); }
+  #notes svg { position: absolute; inset: 0; }
+  #nlab, #glab { position: absolute; top: 672px; font-weight: 900; font-size: 13px; letter-spacing: .16em; }
+  #nlab { left: 34px; width: 178px; text-align: center; }
+  #glab { left: 256px; width: 218px; text-align: center; color: var(--red); }
+  #flow { position: absolute; left: 216px; top: 506px; width: 38px; height: 38px; border-radius: 19px; background: var(--red); border: 3px solid var(--ink); display: grid; place-items: center; z-index: 3; will-change: transform, opacity; }
+  #guide { position: absolute; left: 256px; top: 398px; width: 218px; height: 262px; padding: 14px 14px; will-change: transform, opacity; transform-origin: left center; }
+  #guide .hd { font-weight: 900; font-size: 21px; letter-spacing: -.02em; margin-bottom: 8px; }
+  .gl { display: flex; align-items: center; gap: 8px; height: 36px; font-weight: 800; font-size: 19px; letter-spacing: -.02em; will-change: transform, opacity; white-space: nowrap; }
+  .gl i { flex: none; width: 24px; height: 24px; border-radius: 8px; background: var(--ink); color: var(--paper); font-style: normal; font-weight: 900; font-size: 14px; display: grid; place-items: center; }
+  .gk { margin-top: 8px; height: 34px; border-radius: 9px; background: var(--hl); display: flex; align-items: center; padding: 0 10px; font-weight: 900; font-size: 15px; will-change: transform, opacity; transform-origin: left center; white-space: nowrap; }
+  #anote { position: absolute; left: 34px; top: 700px; }
+
+  /* B: steps 1 and 2 */
+  h2 { position: absolute; left: 34px; top: 108px; font-weight: 900; font-size: 60px; letter-spacing: -.045em; white-space: nowrap; }
+  .step { position: absolute; left: 34px; width: 440px; display: flex; gap: 14px; align-items: flex-start; will-change: transform, opacity; transform-origin: left center; }
+  .step em { font-style: normal; flex: none; width: 54px; height: 54px; border-radius: 16px; background: var(--red); color: var(--paper); display: grid; place-items: center; font-weight: 900; font-size: 32px; border: 3px solid var(--ink); }
+  .step p { font-weight: 900; font-size: 38px; line-height: 1.08; letter-spacing: -.035em; }
+  .pg { position: absolute; top: 352px; width: 104px; height: 136px; border-radius: 12px; border-width: 3px; box-shadow: 5px 6px 0 var(--ink); overflow: hidden; will-change: transform, opacity; }
+  .pg svg { position: absolute; inset: 0; }
+  .fl { position: absolute; inset: 0; background: #fff; }
+  .pn { position: absolute; right: 6px; bottom: 5px; font-weight: 900; font-size: 13px; color: var(--soft); }
+  #up { position: absolute; left: 388px; top: 386px; width: 68px; height: 68px; border-radius: 34px; background: var(--ink); display: grid; place-items: center; will-change: transform, opacity; }
+  #bnote { position: absolute; left: 34px; top: 700px; }
+
+  /* C: the prompt */
+  #box { position: absolute; left: 34px; top: 216px; width: 440px; height: 316px; padding: 22px 22px; border-radius: 26px; }
+  #typed { font-weight: 900; font-size: 39px; line-height: 1.13; letter-spacing: -.035em; }
+  #caret { display: inline-block; width: 5px; height: 38px; background: var(--red); vertical-align: -5px; margin-left: 3px; }
+  #att { position: absolute; left: 22px; bottom: 18px; display: flex; gap: 8px; align-items: center; font-weight: 800; font-size: 16px; color: var(--soft); }
+  #att b { width: 22px; height: 28px; border-radius: 5px; border: 2.5px solid var(--ink); background: var(--bg); }
+  #send { position: absolute; right: 18px; bottom: 14px; width: 52px; height: 52px; border-radius: 26px; background: var(--red); border: 3px solid var(--ink); display: grid; place-items: center; will-change: transform; }
+  #cline { position: absolute; left: 34px; top: 574px; font-weight: 900; font-size: 32px; letter-spacing: -.03em; will-change: transform, opacity; }
+  #cnote { position: absolute; left: 34px; top: 700px; }
+
+  /* D: also + check it */
+  #d h2 { font-size: 54px; }
+  .mini { position: absolute; top: 204px; width: 210px; height: 190px; padding: 14px; will-change: transform, opacity; }
+  .mini .ti { font-weight: 900; font-size: 27px; letter-spacing: -.03em; }
+  #fcard { left: 34px; } #qcard { left: 264px; }
+  #flip { position: absolute; left: 14px; right: 14px; top: 58px; height: 108px; border-radius: 12px; border: 3px solid var(--ink); display: grid; place-items: center; font-weight: 900; font-size: 19px; text-align: center; line-height: 1.15; will-change: transform; }
+  .op { position: absolute; left: 14px; right: 14px; height: 30px; border-radius: 9px; border: 2.5px solid var(--ink); display: flex; align-items: center; gap: 8px; padding: 0 8px; font-weight: 800; font-size: 15px; white-space: nowrap; }
+  .op svg { margin-left: auto; }
+  #warn { position: absolute; left: 34px; top: 440px; width: 440px; padding: 18px 20px 20px; background: var(--ink); color: var(--paper); border-radius: 22px; box-shadow: 7px 8px 0 var(--red); will-change: transform, opacity; transform-origin: left top; }
+  #warn p { font-weight: 900; font-size: 37px; line-height: 1.08; letter-spacing: -.035em; }
+  #warn p span { color: var(--hl); }
+  #dnote { position: absolute; left: 34px; top: 676px; line-height: 1.35; }
+
+  /* E: name + follow */
+  #e .pre { position: absolute; left: 34px; top: 118px; font-weight: 800; font-size: 30px; letter-spacing: -.02em; color: var(--soft); }
+  #ename { position: absolute; left: 30px; top: 152px; font-weight: 900; font-size: 132px; line-height: 1; letter-spacing: -.06em; color: var(--red); will-change: transform; transform-origin: left top; }
+  #eby { position: absolute; left: 34px; top: 296px; font-weight: 900; font-size: 40px; letter-spacing: -.035em; }
+  #eline { position: absolute; left: 34px; width: 440px; top: 380px; font-weight: 900; font-size: 42px; line-height: 1.1; letter-spacing: -.035em; }
+  #follow { position: absolute; left: 34px; top: 568px; font-weight: 900; font-size: 28px; letter-spacing: -.02em; color: var(--paper); background: var(--ink); padding: 17px 22px; border-radius: 18px; box-shadow: 7px 8px 0 var(--red); will-change: transform, opacity; transform-origin: left center; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="hole" style="top:150px"></div><div class="hole" style="top:480px"></div><div class="hole" style="top:810px"></div>
+  <div class="tag">AI TOOL DROP</div>
+
+  <section class="scene" id="a">
+    <h1>Google's <span class="rd">Gemini</span><br>turns a photo of<br>your handwritten<br>notes into a<br><span class="mk">study guide</span></h1>
+    <div id="notes" class="card">
+      <svg viewBox="0 0 178 262" class="hand">
+        <text x="14" y="30" font-size="19" font-weight="700" fill="#14225a" transform="rotate(-4 14 30)">water cycle ??</text>
+        <path d="M14 38c30 5 60-6 104 1" fill="none" stroke="#e0392f" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- doodle: sun, cloud, rain, arrows -->
+        <circle cx="140" cy="66" r="11" fill="none" stroke="#14225a" stroke-width="2.5"/>
+        <path d="M140 49v-6M154 55l5-4M157 68h6M126 55l-5-4" stroke="#14225a" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M30 86c-12 0-13-15-2-16 1-12 19-13 22-2 10-3 15 10 7 15z" fill="none" stroke="#14225a" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M32 96l-3 9M42 96l-3 9M52 96l-3 9" stroke="#14225a" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M74 80c18-14 34-14 48-8M116 64l7 8-10 3" fill="none" stroke="#e0392f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="70" y="104" font-size="13" fill="#14225a" transform="rotate(5 70 104)">evap. → up!</text>
+        <g fill="none" stroke="#14225a" stroke-width="2.3" stroke-linecap="round">
+          <path d="M14 128c8-6 12 6 20 0s12 6 20 0 12 6 20 0 12 5 20 0 12 5 20 0 14 4 22-1"/>
+          <path d="M14 148c10-5 14 5 24 0s14 6 22 0 16 5 24 0 10 4 18 1"/>
+          <path d="M22 168c8-6 14 6 22 0s12 5 20 0 14 6 22 0 12 4 20 0 12 4 18 0"/>
+          <path d="M14 208c8-5 14 5 22 0s12 6 20 0 14 5 22 0 14 5 22 0"/>
+          <path d="M14 228c10-6 14 6 24 0s14 5 22 0 12 4 20 0"/>
+          <path d="M22 248c8-5 12 5 20 0s14 5 22 0 12 5 20 0 14 4 24 0"/>
+        </g>
+        <path d="M60 143l52 10M60 153l52-10" stroke="#e0392f" stroke-width="2.3" stroke-linecap="round"/>
+        <text x="16" y="192" font-size="14" font-weight="700" fill="#e0392f" transform="rotate(-3 16 192)">ON THE EXAM !!</text>
+        <path d="M130 196c14 4 22 14 20 30M144 222l6 6 5-9" fill="none" stroke="#14225a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+        <ellipse cx="150" cy="150" rx="17" ry="15" fill="none" stroke="rgba(150,96,40,.4)" stroke-width="4"/>
+      </svg>
+    </div>
+    <div id="nlab">YOUR NOTES</div>
+    <div id="flow"><svg width="18" height="18" viewBox="0 0 16 16"><path d="M3 8h9M8 3l5 5-5 5" fill="none" stroke="#fffaf0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div id="guide" class="card">
+      <div class="hd">The Water Cycle</div>
+      <div class="gl"><i>1</i>Evaporation</div>
+      <div class="gl"><i>2</i>Condensation</div>
+      <div class="gl"><i>3</i>Precipitation</div>
+      <div class="gl"><i>4</i>Collection</div>
+      <div class="gk">Key terms to know</div>
+    </div>
+    <div id="glab">STUDY GUIDE</div>
+    <div id="anote" class="small">Illustration, not a real reply</div>
+  </section>
+
+  <section class="scene" id="b">
+    <h2>How to <span class="rd">do it</span></h2>
+    <div class="step" id="s1" style="top:212px"><em>1</em><p>Take a photo of each page of notes</p></div>
+    <div class="pg card" id="pg1" style="left:44px"><svg viewBox="0 0 104 136"><g fill="none" stroke="#14225a" stroke-width="2.4" stroke-linecap="round"><path d="M12 22c8-5 12 5 20 0s12 5 20 0 12 4 18 0"/><path d="M12 44c10-5 14 5 22 0s14 5 22 0 14 4 22 0"/><path d="M12 66c8-5 12 5 20 0s12 5 20 0"/><path d="M12 88c10-5 14 5 22 0s14 5 22 0 14 4 22 0"/><path d="M12 110c8-5 12 5 20 0s12 5 18 0"/></g></svg><div class="fl"></div><div class="pn">1</div></div>
+    <div class="pg card" id="pg2" style="left:160px"><svg viewBox="0 0 104 136"><g fill="none" stroke="#14225a" stroke-width="2.4" stroke-linecap="round"><path d="M12 22c10-5 14 5 22 0s14 5 22 0"/><circle cx="74" cy="56" r="14"/><path d="M12 48c8-5 12 5 20 0s10 4 16 0"/><path d="M12 70c8-5 12 5 20 0s10 4 16 0"/><path d="M12 92c10-5 14 5 22 0s14 5 22 0 14 4 22 0"/><path d="M12 114c8-5 12 5 20 0s12 5 20 0 10 4 16 0"/></g></svg><div class="fl"></div><div class="pn">2</div></div>
+    <div class="pg card" id="pg3" style="left:276px"><svg viewBox="0 0 104 136"><g fill="none" stroke="#14225a" stroke-width="2.4" stroke-linecap="round"><path d="M12 22c8-5 12 5 20 0s12 5 20 0 12 4 18 0"/><path d="M12 44c10-5 14 5 22 0s14 5 22 0"/><path d="M14 62h60v34h-60z"/><path d="M12 114c8-5 12 5 20 0s12 5 20 0 10 4 16 0"/></g><path d="M22 86l14-12 12 8 16-14" fill="none" stroke="#e0392f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="fl"></div><div class="pn">3</div></div>
+    <div id="up"><svg width="34" height="34" viewBox="0 0 34 34"><path d="M17 27V8M8 16l9-9 9 9" fill="none" stroke="#fffaf0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="step" id="s2" style="top:534px"><em>2</em><p>Upload the photos to <span class="rd">Gemini</span></p></div>
+    <div id="bnote" class="small">Steps from Google's own blog</div>
+  </section>
+
+  <section class="scene" id="c">
+    <h2><span class="rd">3.</span> Type this</h2>
+    <div id="box" class="card">
+      <div id="typed"></div>
+      <div id="att"><b></b><b></b><b></b>3 photos</div>
+      <div id="send"><svg width="24" height="24" viewBox="0 0 34 34"><path d="M17 27V8M8 16l9-9 9 9" fill="none" stroke="#fffaf0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div id="cline">Then you get a <span class="mk">study guide</span>.</div>
+    <div id="cnote" class="small">Prompt from Google's own blog. Illustration.</div>
+  </section>
+
+  <section class="scene" id="d">
+    <h2>It can also make</h2>
+    <div class="mini card" id="fcard"><div class="ti">Flashcards</div><div id="flip"></div></div>
+    <div class="mini card" id="qcard"><div class="ti">Quizzes</div>
+      <div class="op" style="top:58px">A. Melting</div>
+      <div class="op" id="opb" style="top:95px">B. Evaporation<svg width="18" height="18" viewBox="0 0 24 24"><path d="M5 12l5 5 10-12" fill="none" stroke="#14225a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
+      <div class="op" style="top:132px">C. Freezing</div>
+    </div>
+    <div id="warn"><p>It can make mistakes.<br><span>Check it against your notes.</span></p></div>
+    <div id="dnote" class="small">Illustration. Source: Google.<br>Details checked Nov 2026.</div>
+  </section>
+
+  <section class="scene" id="e">
+    <div class="pre">Try it before your next exam</div>
+    <div id="ename">Gemini</div>
+    <div id="eby">by Google</div>
+    <div id="eline">Photo of your notes <span class="rd">→</span><br><span class="mk">study guide</span></div>
+    <div id="follow">Follow for one AI tool a day</div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  var $ = function (id) { return document.getElementById(id); };
+  var all = function (q) { return [].slice.call(document.querySelectorAll(q)); };
+  var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+  var sm = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  var out = function (x) { x = clamp(x, 0, 1); return 1 - Math.pow(1 - x, 3); };
+  var back = function (x) { x = clamp(x, 0, 1); var c = 1.8; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  var mix = function (a, b, k) { return a + (b - a) * k; };
+  var pop = function (el, d, dur) { el.style.opacity = clamp(d / .08, 0, 1); el.style.transform = 'scale(' + mix(.7, 1, back(d / (dur || .3))).toFixed(3) + ')'; };
+
+  // 92 bpm: beat = 0.652 s. Six bars loop at 15.652 s. Scene cuts sit on beats.
+  var BT = 60 / 92, DUR = 16.0, LOOP = 24 * BT;
+  var SC = [['a', 0, 7 * BT], ['b', 7 * BT, 12 * BT], ['c', 12 * BT, 17 * BT], ['d', 17 * BT, 21 * BT], ['e', 21 * BT, LOOP]];
+  var gls = all('.gl'), PROMPT = 'Create a study guide based on my course materials for my exams.';
+
+  function sceneA(t) {
+    // the notes page is already sliding in on frame 0
+    var k = out((t + .36) / .8);
+    $('notes').style.transform = 'translateX(' + ((1 - k) * -230).toFixed(1) + 'px) rotate(' + (mix(-12, -4, k) + .9 * Math.sin(t * 2.1)).toFixed(2) + 'deg)';
+    $('nlab').style.opacity = sm((t - .1) / .2).toFixed(3);
+    pop($('flow'), t - .3, .26);
+    $('flow').style.transform += ' translateX(' + (3 * Math.sin(t * 7)).toFixed(1) + 'px)';
+    pop($('guide'), t - .42, .32);
+    $('glab').style.opacity = sm((t - .5) / .2).toFixed(3);
+    gls.forEach(function (el, i) {
+      var d = t - BT * (1 + i * .75);
+      el.style.opacity = clamp(d / .07, 0, 1);
+      el.style.transform = 'translateX(' + ((1 - out(d / .24)) * 30).toFixed(1) + 'px)';
+    });
+    pop(document.querySelector('.gk'), t - BT * 4.25, .3);
+    $('anote').style.opacity = sm((t - .6) / .3).toFixed(3);
+  }
+
+  function render(t) {
+    SC.forEach(function (s) {
+      var first = s[1] === 0;
+      var i = first ? 1 : sm((t - s[1]) / .18), o = sm((s[2] - t) / .16);
+      var el = $(s[0]); el.style.opacity = (i * o).toFixed(3);
+      el.style.transform = 'translateY(' + ((1 - i) * 46 - (1 - o) * 46).toFixed(1) + 'px)';
+    });
+    // loop: the last moments return to the exact first frame
+    if (t >= LOOP - .16) {
+      var k = sm((t - (LOOP - .1)) / .25);
+      $('a').style.opacity = k.toFixed(3); $('a').style.transform = 'translateY(' + ((1 - k) * 46).toFixed(1) + 'px)';
+      sceneA(0);
+    } else sceneA(t);
+
+    // B: three pages get photographed (flash), then upload
+    var tb = t - 7 * BT;
+    pop($('s1'), tb - .1, .3);
+    ['pg1', 'pg2', 'pg3'].forEach(function (id, i) {
+      var d = tb - BT * (1 + i * .5), el = $(id);
+      el.style.opacity = clamp(d / .06, 0, 1);
+      el.style.transform = 'translateY(' + ((1 - out(d / .22)) * 40).toFixed(1) + 'px) rotate(' + [-5, 3, -2][i] + 'deg) scale(' + (1 + .07 * Math.sin(clamp(d / .3, 0, 1) * Math.PI)).toFixed(3) + ')';
+      el.querySelector('.fl').style.opacity = (clamp(d / .04, 0, 1) * (1 - sm((d - .05) / .26))).toFixed(3);
+    });
+    pop($('s2'), tb - BT * 3, .3);
+    var du = tb - BT * 3.25; pop($('up'), du, .3);
+    $('up').style.transform += ' translateY(' + (-5 * Math.abs(Math.sin(clamp(du, 0, 9) * Math.PI / BT))).toFixed(1) + 'px)';
+    $('bnote').style.opacity = sm((tb - .8) / .3).toFixed(3);
+
+    // C: the prompt types out
+    var tc = t - 12 * BT, n = Math.floor(clamp((tc - .28) / (BT * 3.1), 0, 1) * PROMPT.length);
+    var blink = n < PROMPT.length || Math.floor(tc * 3.2) % 2 === 0;
+    $('typed').innerHTML = PROMPT.slice(0, n) + (blink ? '<span id="caret"></span>' : '');
+    var pr = tc - BT * 3.55, press = sm(pr / .1) * (1 - sm((pr - .12) / .14));
+    $('send').style.transform = 'scale(' + (1 - .16 * press + .1 * sm(pr / .1) * (1 - sm((pr - .2) / .3))).toFixed(3) + ')';
+    pop($('cline'), tc - BT * 3.9, .3); $('cline').style.transformOrigin = 'left center';
+    $('cnote').style.opacity = sm((tc - .6) / .3).toFixed(3);
+
+    // D: flashcards and quizzes, then the honest caveat
+    var td = t - 17 * BT;
+    pop($('fcard'), td - .08, .3); pop($('qcard'), td - .22, .3);
+    var fk = sm((td - BT * 1.1) / .34), sx = Math.cos(fk * Math.PI), front = sx > 0;
+    var fl = $('flip'); fl.style.transform = 'scaleX(' + Math.max(.02, Math.abs(sx)).toFixed(3) + ')';
+    fl.style.background = front ? '#ffe08a' : '#14225a'; fl.style.color = front ? '#14225a' : '#fffaf0';
+    fl.innerHTML = front ? 'Water turns<br>to vapor?' : 'Evaporation';
+    var qk = sm((td - BT * 1.6) / .2);
+    $('opb').style.background = qk > .5 ? '#ffc21a' : 'transparent';
+    $('opb').querySelector('path').style.strokeDashoffset = (1 - qk).toFixed(3);
+    pop($('warn'), td - BT * 2, .32);
+    $('dnote').style.opacity = sm((td - BT * 2.3) / .3).toFixed(3);
+
+    // E: name and follow
+    var te = t - 21 * BT;
+    $('ename').style.transform = 'scale(' + mix(.75, 1, back((te - .04) / .32)).toFixed(3) + ')';
+    $('eby').style.opacity = clamp((te - .3) / .1, 0, 1);
+    $('eline').style.opacity = clamp((te - .5) / .1, 0, 1);
+    $('eline').style.transform = 'translateY(' + ((1 - out((te - .5) / .25)) * 18).toFixed(1) + 'px)';
+    var d = te - BT * 1.25; $('follow').style.opacity = clamp(d / .08, 0, 1);
+    $('follow').style.transform = 'scale(' + (mix(.6, 1, back(d / .34)) * (1 + .02 * Math.sin(te * 6))).toFixed(3) + ') rotate(-1.5deg)';
+  }
+
+  if (!FILM) { var t0 = performance.now(); (function loop() { render(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); })(); }
+  window.__film = { duration: DUR, keys: [[0, 0], [DUR, 0]] };
+  window.__frame = function (t) { render(t); };
+})();
+</script>
+</body>
+</html>
