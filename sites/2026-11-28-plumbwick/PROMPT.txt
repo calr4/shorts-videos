@@ -1,0 +1,17 @@
+Build a single-file website (one index.html, no libraries, no external images or fonts) for Plumbwick Homes, a made-up small home builder.
+
+Look: pale sky-blue page (#cfeafb fading to white), brick terracotta (#c8553a), leaf green (#4f9d57), charcoal text (#26323a), white cards with soft shadows, bold rounded geometric headings, mobile-first at 540px wide.
+
+Centrepiece: a canvas pinned under the top bar for the first three screens of scrolling. Draw a solid, flat-shaded 3D house on a small square green plot, using your own rotate-and-project maths and a painter's sort (no WebGL). It turns slowly all the time. Scroll position builds it step by step, and scrolling back up takes it apart again:
+1) a grey foundation slab drops onto the plot,
+2) four cream walls drop in one after another,
+3) two terracotta roof panels land, then a brick chimney,
+4) a green front door appears and the windows light up warm yellow one by one,
+5) a stone path, a white picket fence, bushes and three trees pop up, and smoke puffs rise from the chimney.
+Each part lands with a small bounce. A few soft white clouds drift across the sky behind the house.
+
+Under the house, pinned with it, show one headline at a time that cross-fades as the build moves on: "Homes built to last." / "From empty plot to front door." / "Move in by spring." Below the headline put a row of five small step labels (Plot, Walls, Roof, Lights, Garden) that turn green as each step completes.
+
+Then normal sections: a sticky top bar with the logo, Homes, Process and a pill that counts booked visits ("Visits 0"); "Three homes" with three cards (The Wren, 2 bedrooms; The Alder, 3 bedrooms; The Heron, 4 bedrooms), each with a small drawn house in its own colours, one line of description and a Book a visit button that turns green, says Booked and raises the count in the top bar; a four-step process grid (Plot, Plan, Build, Keys) with a one-line note each; two short customer reviews with stars; a made-up address, phone number and opening hours; a footer saying the company is made up.
+
+No prices. Make sections fade and slide in as they scroll into view. No placeholder text anywhere.

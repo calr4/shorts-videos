@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plumbwick Homes | Homes built to last</title>
+<style>
+  :root { --sky:#cfeafb; --brick:#c8553a; --leaf:#4f9d57; --ink:#26323a; --mut:#5d6f7a; --line:#dbe8f0; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #f5fbff; color: var(--ink); font-family: "Inter", "DM Sans", system-ui, sans-serif; overflow-x: hidden; }
+  h1, h2, h3, .logo, .btn, .pill { font-family: "Montserrat", "Nunito", ui-rounded, system-ui, sans-serif; font-weight: 800; letter-spacing: -.4px; }
+  body.film { padding-top: 62px; }
+  body.film::-webkit-scrollbar { display: none; }
+  #bar, #cap, #sb, #dot, #sheet { display: none; }
+  body.film #bar { display: flex; position: fixed; z-index: 90; top: 0; left: 0; right: 0; height: 62px; background: #e9edf0; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid #c5ced4; }
+  #bar .nav { display: flex; gap: 12px; color: #77848c; font-size: 26px; line-height: 1; }
+  #bar .url { flex: 1; height: 40px; border-radius: 20px; background: #fff; display: flex; align-items: center; gap: 9px; padding: 0 16px; font-size: 19px; color: #1f2a30; font-weight: 500; box-shadow: inset 0 0 0 1px #d3dbe0; }
+  #bar .lock { width: 13px; height: 11px; background: #5c6970; border-radius: 3px; position: relative; margin-top: 5px; }
+  #bar .lock::before { content: ""; position: absolute; left: 2px; top: -8px; width: 9px; height: 10px; border: 2.5px solid #5c6970; border-bottom: 0; border-radius: 6px 6px 0 0; box-sizing: border-box; }
+  #bar .dots { color: #77848c; font-size: 26px; }
+  body.film #cap { display: block; position: fixed; z-index: 95; left: 0; right: 0; top: 122px; text-align: center; pointer-events: none; }
+  #cap span { display: inline-block; max-width: 452px; background: #1c262c; color: #fff; font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 27px; line-height: 1.18; padding: 13px 22px 14px; border-radius: 18px; box-shadow: 0 10px 28px rgba(20,40,55,.35); }
+  #cap em { font-style: normal; color: #ffcf5c; }
+  #cap small { display: block; font-family: "Inter", sans-serif; font-weight: 700; font-size: 18px; color: #c9d6de; margin-top: 4px; }
+  body.film #sb { display: block; position: fixed; z-index: 85; right: 5px; top: 70px; width: 7px; height: 600px; border-radius: 4px; background: rgba(38,50,58,.1); }
+  #sb i { position: absolute; left: 0; width: 7px; border-radius: 4px; background: rgba(38,50,58,.5); }
+  body.film #dot { display: block; position: fixed; z-index: 99; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; background: rgba(38,50,58,.3); border: 3px solid #fff; box-shadow: 0 0 0 3px rgba(38,50,58,.55), 0 6px 18px rgba(0,0,0,.3); opacity: 0; pointer-events: none; }
+
+  /* film-only step sheet (prompt card, then chat box) */
+  body.film #sheet { display: block; position: fixed; z-index: 92; left: 0; right: 0; top: 0; height: 960px; background: #fffaf2; border-radius: 28px 28px 0 0; box-shadow: 0 -12px 40px rgba(20,40,55,.28); }
+  #pc, #chat { position: absolute; left: 24px; right: 76px; top: 16px; }
+  #pc .hd { font-weight: 800; font-size: 13.5px; letter-spacing: 2.5px; color: #8a7a62; height: 26px; }
+  .pbox { position: relative; height: 172px; border-radius: 16px; background: #fff; border: 1.5px solid #eadfce; overflow: hidden; }
+  .pbox pre, #chatText { font-family: "DejaVu Sans Mono", monospace; font-size: 15px; line-height: 1.5; white-space: pre-wrap; color: #2a221a; }
+  .pbox pre { position: absolute; left: 0; right: 0; top: 0; padding: 12px 16px; }
+  .pbox .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 44px; background: linear-gradient(rgba(255,255,255,0), #fff); }
+  #copy { margin: 13px auto 0; width: 250px; height: 54px; border-radius: 16px; background: var(--brick); color: #fff; font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 21px; text-align: center; line-height: 54px; }
+  #copy.on { background: var(--leaf); }
+  #chat .who { height: 34px; display: flex; align-items: baseline; gap: 12px; }
+  #chat .who b { font-family: "Bitter", Georgia, serif; font-weight: 800; font-size: 26px; color: #2a221a; }
+  #chat .who span { color: #8a7a62; font-size: 16px; font-weight: 600; }
+  #box { position: relative; margin-top: 6px; height: 176px; border-radius: 18px; background: #fff; border: 1.5px solid #eadfce; padding: 12px 16px; overflow: hidden; box-shadow: 0 6px 18px rgba(80,60,30,.1); }
+  #chatText.ph { color: #a89a86; font-family: "Inter", sans-serif; font-size: 17px; }
+  #send { position: absolute; right: 12px; bottom: 12px; width: 46px; height: 46px; border-radius: 14px; background: #c8641a; box-shadow: 0 0 0 5px #fff; }
+  #send::after { content: ""; position: absolute; left: 15px; top: 13px; width: 13px; height: 13px; border-left: 4px solid #fff; border-top: 4px solid #fff; transform: rotate(45deg) translate(3px,3px); }
+  #bubble { display: none; margin: 8px 0 0 90px; background: #efe5d6; border-radius: 18px 18px 6px 18px; padding: 11px 14px; font-family: "DejaVu Sans Mono", monospace; font-size: 14.5px; line-height: 1.45; color: #2a221a; }
+  #work { display: none; margin-top: 20px; font-size: 21px; font-weight: 800; color: #2a221a; }
+  #track { display: none; margin-top: 10px; height: 12px; border-radius: 6px; background: #eadfce; overflow: hidden; }
+  #track i { display: block; height: 100%; width: 0; background: #c8641a; border-radius: 6px; }
+
+  /* the site */
+  #page { max-width: 540px; margin: 0 auto; position: relative; }
+  .top { position: sticky; top: 0; z-index: 30; height: 50px; background: rgba(255,255,255,.94); display: flex; align-items: center; padding: 0 16px; gap: 16px; border-bottom: 1px solid var(--line); }
+  body.film .top { top: 62px; }
+  .logo { font-size: 19px; margin-right: auto; display: flex; align-items: center; gap: 8px; }
+  .logo i { width: 22px; height: 20px; background: var(--brick); clip-path: polygon(50% 0, 100% 45%, 86% 45%, 86% 100%, 14% 100%, 14% 45%, 0 45%); }
+  .top a { color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 600; }
+  .pill { background: var(--ink); color: #fff !important; padding: 7px 13px; border-radius: 16px; font-size: 14px !important; font-weight: 800 !important; letter-spacing: 0; }
+  .pill.on { background: var(--leaf); }
+  .stage { position: relative; height: calc(100vh - 50px + 1250px); background: linear-gradient(var(--sky), #eef8ff 70%, #f5fbff); }
+  .pin { position: sticky; top: 50px; height: calc(100vh - 50px); overflow: hidden; }
+  body.film .stage { height: 2098px; }
+  body.film .pin { top: 112px; height: 848px; }
+  #cv { position: absolute; left: 0; top: 0; display: block; }
+  .hero { position: absolute; left: 0; right: 0; top: 492px; text-align: center; padding: 0 22px; }
+  .hero .hl { position: relative; height: 92px; }
+  .hero h1 { position: absolute; left: 0; right: 0; top: 0; font-size: 41px; line-height: 1.08; }
+  .hero h1 em { font-style: normal; color: var(--brick); }
+  .steps { display: flex; justify-content: center; gap: 7px; margin-top: 14px; }
+  .steps span { font-size: 13.5px; font-weight: 800; padding: 6px 11px; border-radius: 13px; background: #fff; color: #7f909a; box-shadow: inset 0 0 0 1.5px var(--line); }
+  .steps span.on { background: var(--leaf); color: #fff; box-shadow: none; }
+  .hint { margin-top: 12px; color: var(--mut); font-size: 15px; font-weight: 600; }
+  section { padding: 34px 22px 12px; position: relative; }
+  .kick { color: var(--brick); font-weight: 800; font-size: 13.5px; letter-spacing: 2.5px; text-transform: uppercase; }
+  section h2 { font-size: 36px; line-height: 1.08; margin-top: 4px; }
+  .card { background: #fff; border-radius: 22px; padding: 16px; margin-top: 14px; display: flex; gap: 16px; align-items: center; box-shadow: 0 8px 26px rgba(40,80,110,.12); }
+  .card svg { flex: 0 0 112px; height: 104px; border-radius: 16px; }
+  .card h3 { font-size: 22px; }
+  .card .beds { color: var(--brick); font-weight: 800; font-size: 14px; margin-top: 1px; }
+  .card p { color: var(--mut); font-size: 15px; margin-top: 4px; line-height: 1.35; }
+  .btn { margin-top: 10px; background: var(--brick); color: #fff; font-size: 15.5px; padding: 10px 18px; border-radius: 13px; border: 0; cursor: pointer; letter-spacing: 0; }
+  .btn.on { background: var(--leaf); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .grid div { background: #fff; border-radius: 18px; padding: 14px 16px; font-size: 15px; line-height: 1.4; color: var(--mut); box-shadow: 0 6px 20px rgba(40,80,110,.1); }
+  .grid b { display: flex; align-items: center; gap: 8px; color: var(--ink); font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 19px; margin-bottom: 4px; }
+  .grid b i { font-style: normal; width: 26px; height: 26px; border-radius: 50%; background: var(--sky); color: var(--ink); font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+  .rev { background: #fff; border-radius: 18px; padding: 16px 18px; margin-top: 12px; box-shadow: 0 6px 20px rgba(40,80,110,.1); }
+  .stars { color: #f0a92c; font-size: 19px; letter-spacing: 3px; }
+  .rev p { font-size: 17px; line-height: 1.4; margin-top: 4px; }
+  .rev small { display: block; margin-top: 6px; color: var(--mut); font-weight: 700; font-size: 14px; }
+  .grid.info b { font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--brick); font-family: inherit; }
+  .grid.info div { color: var(--ink); font-size: 15.5px; }
+  footer { margin-top: 26px; padding: 24px 22px 40px; background: var(--ink); color: #c5d3db; font-size: 14.5px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<script type="text/plain" id="prompt">Build a single-file website (one index.html, no libraries, no external images or fonts) for Plumbwick Homes, a made-up small home builder.
+
+Look: pale sky-blue page (#cfeafb fading to white), brick terracotta (#c8553a), leaf green (#4f9d57), charcoal text (#26323a), white cards with soft shadows, bold rounded geometric headings, mobile-first at 540px wide.
+
+Centrepiece: a canvas pinned under the top bar for the first three screens of scrolling. Draw a solid, flat-shaded 3D house on a small square green plot, using your own rotate-and-project maths and a painter's sort (no WebGL). It turns slowly all the time. Scroll position builds it step by step, and scrolling back up takes it apart again:
+1) a grey foundation slab drops onto the plot,
+2) four cream walls drop in one after another,
+3) two terracotta roof panels land, then a brick chimney,
+4) a green front door appears and the windows light up warm yellow one by one,
+5) a stone path, a white picket fence, bushes and three trees pop up, and smoke puffs rise from the chimney.
+Each part lands with a small bounce. A few soft white clouds drift across the sky behind the house.
+
+Under the house, pinned with it, show one headline at a time that cross-fades as the build moves on: "Homes built to last." / "From empty plot to front door." / "Move in by spring." Below the headline put a row of five small step labels (Plot, Walls, Roof, Lights, Garden) that turn green as each step completes.
+
+Then normal sections: a sticky top bar with the logo, Homes, Process and a pill that counts booked visits ("Visits 0"); "Three homes" with three cards (The Wren, 2 bedrooms; The Alder, 3 bedrooms; The Heron, 4 bedrooms), each with a small drawn house in its own colours, one line of description and a Book a visit button that turns green, says Booked and raises the count in the top bar; a four-step process grid (Plot, Plan, Build, Keys) with a one-line note each; two short customer reviews with stars; a made-up address, phone number and opening hours; a footer saying the company is made up.
+
+No prices. Make sections fade and slide in as they scroll into view. No placeholder text anywhere.</script>
+
+<div id="bar"><div class="nav"><span>&#8249;</span><span>&#8250;</span></div><div class="url"><i class="lock"></i>plumbwickhomes.example</div><div class="dots">&#8943;</div></div>
+<div id="cap"><span></span></div>
+<div id="sb"><i></i></div>
+<div id="dot"></div>
+<div id="sheet">
+  <div id="pc"><div class="hd">THE PROMPT</div><div class="pbox"><pre id="pcText"></pre><div class="fade"></div></div><div id="copy">Copy prompt</div></div>
+  <div id="chat"><div class="who"><b>Claude</b><span>What should we build?</span></div><div id="box"><span id="chatText" class="ph"></span><i id="send"></i></div><div id="bubble"></div><div id="work"></div><div id="track"><i id="prog"></i></div></div>
+</div>
+
+<div id="page">
+  <nav class="top"><div class="logo"><i></i>Plumbwick</div><a href="#homes">Homes</a><a href="#process">Process</a><a href="#homes" class="pill" id="visits">Visits 0</a></nav>
+  <div class="stage" id="stage">
+    <div class="pin" id="pin">
+      <canvas id="cv"></canvas>
+      <div class="hero">
+        <div class="hl">
+          <h1 id="h0">Homes built <em>to last.</em></h1>
+          <h1 id="h1">From empty plot <em>to front door.</em></h1>
+          <h1 id="h2">Move in <em>by spring.</em></h1>
+        </div>
+        <div class="steps" id="steps"><span>Plot</span><span>Walls</span><span>Roof</span><span>Lights</span><span>Garden</span></div>
+        <div class="hint">Scroll to build the house</div>
+      </div>
+    </div>
+  </div>
+  <section id="homes">
+    <div class="kick rv">Three homes</div><h2 class="rv">Pick your floor plan</h2>
+    <div id="cards"></div>
+  </section>
+  <section id="process">
+    <div class="kick rv">Process</div><h2 class="rv">Four steps to your keys</h2>
+    <div class="grid rv">
+      <div><b><i>1</i>Plot</b>We help you find and check the land.</div>
+      <div><b><i>2</i>Plan</b>Pick a home and make it yours.</div>
+      <div><b><i>3</i>Build</b>One crew, weekly photo updates.</div>
+      <div><b><i>4</i>Keys</b>A full walk-through, then move in.</div>
+    </div>
+  </section>
+  <section>
+    <div class="kick rv">Reviews</div><h2 class="rv">Happy at home</h2>
+    <div class="rev rv"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>They finished a week early and the photo updates kept us calm.</p><small>Odile, The Alder</small></div>
+    <div class="rev rv"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>Our Wren is warm, quiet and exactly what the plan showed.</p><small>Kasper, The Wren</small></div>
+  </section>
+  <section id="visit">
+    <div class="kick rv">Visit</div><h2 class="rv">See the show home</h2>
+    <div class="grid info rv"><div><b>Show home</b>14 Larkspur Row<br>Fennimoor Green</div><div><b>Open</b>Tuesday to Saturday<br>10 am to 5 pm<br>555 0142</div></div>
+  </section>
+  <footer>Plumbwick Homes is a made-up home builder. This demo site was built by AI.</footer>
+</div>
+
+<script>
+(function () {
+  var FILM = /[?&]film=1/.test(location.search);
+  if (FILM) document.body.className = 'film';
+  var $ = function (s) { return document.querySelector(s); };
+  var clamp = function (x) { return Math.max(0, Math.min(1, x)); };
+  var ease = function (x) { x = clamp(x); return x * x * (3 - 2 * x); };
+  var st = function (p, a, b) { return clamp((p - a) / (b - a)); };
+  var land = function (x) { x = clamp(x); return x < 0.7 ? (x / 0.7) * (x / 0.7) : 1 - 0.07 * Math.sin(Math.PI * (x - 0.7) / 0.3); };   // fall, then a small bounce
+  var pop = function (x) { x = clamp(x); var u = x - 1; return 1 + 2.70158 * u * u * u + 1.70158 * u * u; };                         // grow with overshoot
+
+  // ---- home cards with working Book a visit buttons ----
+  var homes = [['The Wren', '2 bedrooms', 'A snug single-storey starter home.', '#fff4e2', '#c8553a', '#4f9d57'], ['The Alder', '3 bedrooms', 'Room to grow, with a garden office.', '#e8f1f6', '#3d5a6c', '#c8553a'], ['The Heron', '4 bedrooms', 'Two storeys and a double-height hall.', '#fdeedd', '#7a4a34', '#3d5a6c']];
+  var booked = {}, cards = $('#cards');
+  homes.forEach(function (h, i) {
+    var d = document.createElement('div'); d.className = 'card rv';
+    var tall = i === 2 ? 14 : 0, wide = i === 1 ? 10 : 0;
+    d.innerHTML = '<svg viewBox="0 0 112 104"><rect width="112" height="104" fill="#dff1fb"/><rect y="84" width="112" height="20" fill="#8fcf7c"/>' +
+      '<rect x="' + (26 - wide) + '" y="' + (50 - tall) + '" width="' + (60 + 2 * wide) + '" height="' + (36 + tall) + '" fill="' + h[3] + '"/>' +
+      '<polygon points="' + (18 - wide) + ',' + (52 - tall) + ' 56,' + (22 - tall) + ' ' + (94 + wide) + ',' + (52 - tall) + '" fill="' + h[4] + '"/>' +
+      '<rect x="49" y="62" width="14" height="24" rx="2" fill="' + h[5] + '"/><rect x="' + (31 - wide) + '" y="60" width="12" height="12" fill="#ffd766"/><rect x="' + (69 + wide) + '" y="60" width="12" height="12" fill="#ffd766"/>' +
+      (tall ? '<rect x="31" y="42" width="12" height="10" fill="#ffd766"/><rect x="69" y="42" width="12" height="10" fill="#ffd766"/>' : '') + '</svg>' +
+      '<div style="flex:1"><h3>' + h[0] + '</h3><div class="beds">' + h[1] + '</div><p>' + h[2] + '</p><button class="btn">Book a visit</button></div>';
+    cards.appendChild(d);
+  });
+  var btns = [].slice.call(document.querySelectorAll('.btn'));
+  function paintBooked() { var n = 0; btns.forEach(function (b, i) { var on = !!booked[i]; if (on) n++; b.className = 'btn' + (on ? ' on' : ''); b.textContent = on ? 'Booked ✓' : 'Book a visit'; }); var v = $('#visits'); v.textContent = 'Visits ' + n; v.className = 'pill' + (n ? ' on' : ''); }
+  btns.forEach(function (b, i) { b.addEventListener('click', function () { booked[i] = !booked[i]; paintBooked(); }); });
+
+  // ---- flat-shaded 3D house: own rotate-and-project maths, painter's sort ----
+  var cv = $('#cv'), ctx = cv.getContext('2d'), pin = $('#pin'), CW = 540, CH = 848, DPR = 2;
+  var view = { cy: 310, s: 172 };                       // where the plot sits in the canvas and how big it is
+  var CAMD = 7, TILT = 0.5, ct = Math.cos(TILT), sn = Math.sin(TILT), ca = 1, sa = 0;
+  var LIGHT = (function () { var v = [-0.5, 0.72, 0.48], l = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]); return [v[0] / l, v[1] / l, v[2] / l]; })();
+  function rot(p) { var X = p[0] * ca + p[2] * sa, Z = -p[0] * sa + p[2] * ca; return [X, p[1] * ct - Z * sn, p[1] * sn + Z * ct]; }
+  function proj(v) { var k = CAMD / (CAMD - v[2]); return [CW / 2 + v[0] * view.s * k, view.cy - v[1] * view.s * k]; }
+  var scene = [];
+  function obj(o) { o.f = o.f || []; o.layer = o.layer === undefined ? 2 : o.layer; o.sub = o.sub || 0; o.a = o.a === undefined ? 1 : o.a; scene.push(o); return o; }
+  // extrude a flat profile (array of 3D points) along a vector: a convex solid
+  function extrude(o, prof, vec, col) {
+    var far = prof.map(function (q) { return [q[0] + vec[0], q[1] + vec[1], q[2] + vec[2]]; }), n = prof.length;
+    o.f.push({ p: prof, c: col }, { p: far, c: col });
+    for (var i = 0; i < n; i++) { var j = (i + 1) % n; o.f.push({ p: [prof[i], prof[j], far[j], far[i]], c: col }); }
+    return o;
+  }
+  function box(o, x0, x1, y0, y1, z0, z1, col) { return extrude(o, [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0]], [0, 0, z1 - z0], col); }
+  // spin a profile of [radius, height] pairs around a vertical axis: cones, domes
+  function lathe(o, cx, cz, prof, n, col, sc) {
+    sc = sc === undefined ? 1 : sc;
+    var ring = function (r, y) { var a = []; for (var i = 0; i < n; i++) { var th = i / n * 6.2832 + 0.3; a.push([cx + r * sc * Math.cos(th), y * sc, cz + r * sc * Math.sin(th)]); } return a; };
+    o.f.push({ p: ring(prof[0][0], prof[0][1]), c: col });
+    for (var k = 0; k < prof.length - 1; k++) {
+      var A = ring(prof[k][0], prof[k][1]), B = ring(prof[k + 1][0], prof[k + 1][1]);
+      for (var i = 0; i < n; i++) { var j = (i + 1) % n; o.f.push(prof[k + 1][0] === 0 ? { p: [A[i], A[j], B[0]], c: col } : { p: [A[i], A[j], B[j], B[i]], c: col }); }
+    }
+    return o;
+  }
+  function shade(c, k) { return 'rgb(' + Math.round(Math.min(255, c[0] * k)) + ',' + Math.round(Math.min(255, c[1] * k)) + ',' + Math.round(Math.min(255, c[2] * k)) + ')'; }
+  function centre(pts) { var c = [0, 0, 0]; pts.forEach(function (q) { c[0] += q[0]; c[1] += q[1]; c[2] += q[2]; }); return [c[0] / pts.length, c[1] / pts.length, c[2] / pts.length]; }
+  function paintFace(f, oc, dy) {
+    var v = f.p.map(function (q) { return rot([q[0], q[1] + dy, q[2]]); }), fc = centre(v);
+    var a = [v[1][0] - v[0][0], v[1][1] - v[0][1], v[1][2] - v[0][2]], b = [v[2][0] - v[0][0], v[2][1] - v[0][1], v[2][2] - v[0][2]];
+    var n = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], l = Math.sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]) || 1; n = [n[0] / l, n[1] / l, n[2] / l];
+    if (f.n) { var rn = rot(f.n), o0 = rot([0, 0, 0]); n = [rn[0] - o0[0], rn[1] - o0[1], rn[2] - o0[2]]; }
+    else if (n[0] * (fc[0] - oc[0]) + n[1] * (fc[1] - oc[1]) + n[2] * (fc[2] - oc[2]) < 0) n = [-n[0], -n[1], -n[2]];   // point away from the solid's centre
+    if (n[0] * -fc[0] + n[1] * -fc[1] + n[2] * (CAMD - fc[2]) <= 0) return;                                           // facing away from the camera
+    var k = 0.74 + 0.33 * Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
+    ctx.beginPath(); v.forEach(function (q, i) { var s = proj(q); if (i) ctx.lineTo(s[0], s[1]); else ctx.moveTo(s[0], s[1]); }); ctx.closePath();
+    var col = f.flat ? shade(f.c, 1) : shade(f.c, k);
+    if (f.glow) { ctx.shadowColor = 'rgba(255,196,70,' + (0.95 * f.glow).toFixed(2) + ')'; ctx.shadowBlur = 20 * f.glow * view.s / 172; }
+    ctx.fillStyle = col; ctx.fill(); ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = col; ctx.lineWidth = 0.7; ctx.stroke();
+  }
+  var W = 1.24, D = 0.92, Y0 = 0.06, Y1 = 0.66, YR = 1.08, TH = 0.05, SL = (YR - Y1) / (D / 2);
+  var CREAM = [255, 240, 214], BRICK = [206, 88, 60], GLASS = [120, 150, 168], LIT = [255, 214, 96], WHITE = [255, 255, 255], GREEN = [70, 150, 88];
+  function windowOn(o, axis, sign, u, lit) {            // a framed window on a wall face; axis 'z' = front/back, 'x' = sides
+    var e = 0.006, y0 = 0.27, y1 = 0.5, hw = 0.1, fr = 0.022, d = sign * ((axis === 'z' ? D : W) / 2 + e);
+    var quad = function (a, b, c, dd, off) { return axis === 'z' ? [[a, c, d + sign * off], [b, c, d + sign * off], [b, dd, d + sign * off], [a, dd, d + sign * off]] : [[d + sign * off, c, a], [d + sign * off, c, b], [d + sign * off, dd, b], [d + sign * off, dd, a]]; };
+    var nrm = axis === 'z' ? [0, 0, sign] : [sign, 0, 0];
+    var gl = [GLASS[0] + (LIT[0] - GLASS[0]) * lit, GLASS[1] + (LIT[1] - GLASS[1]) * lit, GLASS[2] + (LIT[2] - GLASS[2]) * lit];
+    o.f.push({ p: quad(u - hw - fr, u + hw + fr, y0 - fr, y1 + fr, 0), c: WHITE, n: nrm });
+    o.f.push({ p: quad(u - hw, u + hw, y0, y1, 0.002), c: gl, n: nrm, flat: lit > 0.5, glow: lit });
+    o.f.push({ p: quad(u - 0.008, u + 0.008, y0, y1, 0.004), c: WHITE, n: nrm }, { p: quad(u - hw, u + hw, (y0 + y1) / 2 - 0.008, (y0 + y1) / 2 + 0.008, 0.004), c: WHITE, n: nrm });
+  }
+  function buildScene(p, t) {
+    scene = [];
+    // plot
+    box(obj({ layer: 0, sub: 0 }), -1.06, 1.06, -0.17, -0.03, -1.06, 1.06, [150, 104, 72]);
+    box(obj({ layer: 0, sub: 1 }), -1.06, 1.06, -0.03, 0, -1.06, 1.06, [124, 200, 108]);
+    // 1) foundation
+    var k = st(p, 0.03, 0.10);
+    if (k > 0) box(obj({ layer: 1, sub: 0, dy: (1 - land(k)) * 1.5, a: clamp(k * 5) }), -W / 2 - 0.06, W / 2 + 0.06, 0, Y0, -D / 2 - 0.06, D / 2 + 0.06, [196, 202, 208]);
+    // 2) walls: back, left, right, front
+    var lit = function (i) { return ease(st(p, 0.58 + i * 0.016, 0.60 + i * 0.016)); }, H = { g: [0, 0, 0] };
+    var wall = function (a, b, sortPt) { var kk = st(p, a, b); if (kk <= 0) return null; return obj({ g: H.g, sub: 0, sp: sortPt, dy: (1 - land(kk)) * 1.5, a: clamp(kk * 5) }); };
+    var o = wall(0.12, 0.175, [0, 0, -D / 2]);
+    if (o) { box(o, -W / 2 + TH, W / 2 - TH, Y0, Y1, -D / 2, -D / 2 + TH, CREAM); windowOn(o, 'z', -1, -0.3, lit(4)); windowOn(o, 'z', -1, 0.3, lit(5)); }
+    var gable = function (x0, x1) { return [[x0, Y0, -D / 2], [x0, Y0, D / 2], [x0, Y1, D / 2], [x0, YR, 0], [x0, Y1, -D / 2]]; };
+    o = wall(0.175, 0.23, [-W / 2, 0, 0]);
+    if (o) { extrude(o, gable(-W / 2), [TH, 0, 0], CREAM); windowOn(o, 'x', -1, 0, lit(3)); }
+    o = wall(0.23, 0.285, [W / 2, 0, 0]);
+    if (o) { extrude(o, gable(W / 2 - TH), [TH, 0, 0], CREAM); windowOn(o, 'x', 1, 0, lit(2)); }
+    o = wall(0.285, 0.34, [0, 0, D / 2]);
+    if (o) {
+      box(o, -W / 2 + TH, W / 2 - TH, Y0, Y1, D / 2 - TH, D / 2, CREAM); windowOn(o, 'z', 1, -0.38, lit(0)); windowOn(o, 'z', 1, 0.38, lit(1));
+      var kd = pop(st(p, 0.54, 0.58));
+      if (st(p, 0.54, 0.58) > 0) { var z = D / 2 + 0.006, top = Y0 + 0.38 * kd; o.f.push({ p: [[-0.115, Y0, z], [0.115, Y0, z], [0.115, top + 0.02, z], [-0.115, top + 0.02, z]], c: WHITE, n: [0, 0, 1] }, { p: [[-0.095, Y0, z + 0.002], [0.095, Y0, z + 0.002], [0.095, top, z + 0.002], [-0.095, top, z + 0.002]], c: GREEN, n: [0, 0, 1] }, { p: [[0.05, Y0 + 0.17 * kd, z + 0.004], [0.075, Y0 + 0.17 * kd, z + 0.004], [0.075, Y0 + 0.195 * kd, z + 0.004], [0.05, Y0 + 0.195 * kd, z + 0.004]], c: LIT, n: [0, 0, 1], flat: true }); }
+    }
+    // 3) roof panels, then the chimney
+    var panel = function (sg, a, b) {
+      var kk = st(p, a, b); if (kk <= 0) return;
+      var ez = sg * (D / 2 + 0.13), ey = Y1 - 0.13 * SL, tk = 0.055, x0 = -W / 2 - 0.1;
+      extrude(obj({ g: H.g, sub: 1, sp: [0, 0, sg * 0.3], dy: (1 - land(kk)) * 1.5, a: clamp(kk * 5) }), [[x0, ey, ez], [x0, YR, 0], [x0, YR + tk, 0], [x0, ey + tk, ez]], [W + 0.2, 0, 0], BRICK);
+    };
+    panel(-1, 0.36, 0.42); panel(1, 0.42, 0.48);
+    k = st(p, 0.48, 0.52);
+    if (k > 0) {
+      var dy = (1 - land(k)) * 1.2, al = clamp(k * 5);
+      box(obj({ g: H.g, sub: 2, dy: dy, a: al }), 0.24, 0.42, YR + 0.055 - 0.09 * SL, YR + 0.27, -0.09, 0.09, [176, 74, 52]);
+      box(obj({ g: H.g, sub: 3, dy: dy, a: al }), 0.22, 0.44, YR + 0.27, YR + 0.31, -0.11, 0.11, [160, 166, 172]);
+    }
+    // 5) garden: path, fence, bushes, trees
+    for (var i = 0; i < 4; i++) { k = st(p, 0.70 + i * 0.008, 0.716 + i * 0.008); if (k > 0) { var zc = 0.6 + i * 0.125, sc = pop(k) * 0.5; box(obj({ layer: 1, sub: 1 }), -0.17 * sc * 2, 0.17 * sc * 2, 0, 0.015, zc - 0.09 * sc, zc + 0.09 * sc, [214, 208, 196]); } }
+    var E = 0.97, NP = 13, idx = 0;
+    var picket = function (x, z, alongX, gap) {
+      var kk = st(p, 0.74 + idx * 0.001, 0.755 + idx * 0.001); idx++;
+      if (kk <= 0 || gap) return; var h = 0.19 * pop(kk), w = 0.022;
+      box(obj({ sp: [x, 0, z] }), x - (alongX ? w : 0.012), x + (alongX ? w : 0.012), 0, h, z - (alongX ? 0.012 : w), z + (alongX ? 0.012 : w), WHITE);
+      var half = E / (NP - 1), rl = half * clamp(kk * 1.5);
+      if (alongX) box(obj({ sp: [x, 0, z] }), x - rl, x + rl, h * 0.55, h * 0.55 + 0.028, z - 0.008, z + 0.008, [240, 244, 247]);
+      else box(obj({ sp: [x, 0, z] }), x - 0.008, x + 0.008, h * 0.55, h * 0.55 + 0.028, z - rl, z + rl, [240, 244, 247]);
+    };
+    for (i = 0; i < NP; i++) { var u = -E + 2 * E * i / (NP - 1); picket(u, E, true, Math.abs(u) < 0.2); }
+    for (i = 1; i < NP; i++) { u = E - 2 * E * i / (NP - 1); picket(E, u, false); }
+    for (i = 1; i < NP; i++) { u = E - 2 * E * i / (NP - 1); picket(u, -E, true); }
+    for (i = 1; i < NP - 1; i++) { u = -E + 2 * E * i / (NP - 1); picket(-E, u, false); }
+    [[-0.44, 0.62, 0.9], [0.44, 0.62, 1], [-0.8, 0.05, 1.1], [0.8, -0.2, 0.9]].forEach(function (b, i) {
+      k = st(p, 0.79 + i * 0.01, 0.81 + i * 0.01); if (k > 0) lathe(obj({ sp: [b[0], 0, b[1]] }), b[0], b[1], [[0.13, 0], [0.15, 0.07], [0.1, 0.15], [0, 0.19]], 7, [62, 148, 84], pop(k) * b[2]);
+    });
+    [[-0.72, -0.7, 1.1, 0], [0.72, -0.72, 0.92, 0], [-0.74, 0.66, 0.85, 1]].forEach(function (tr, i) {
+      k = st(p, 0.84 + i * 0.035, 0.875 + i * 0.035); if (k <= 0) return;
+      var sc = pop(k) * tr[2], g = [tr[0], 0, tr[1]], x = tr[0], z = tr[1];
+      box(obj({ g: g, sub: 0 }), x - 0.035 * sc, x + 0.035 * sc, 0, 0.2 * sc, z - 0.035 * sc, z + 0.035 * sc, [140, 94, 62]);
+      if (tr[3]) lathe(obj({ g: g, sub: 1 }), x, z, [[0.13, 0.17], [0.23, 0.3], [0.23, 0.44], [0.14, 0.58], [0, 0.63]], 8, [86, 176, 98], sc);
+      else { lathe(obj({ g: g, sub: 1 }), x, z, [[0.26, 0.15], [0, 0.56]], 8, [52, 140, 84], sc); lathe(obj({ g: g, sub: 2 }), x, z, [[0.2, 0.4], [0, 0.82]], 8, [66, 158, 94], sc); }
+    });
+    // smoke puffs
+    k = ease(st(p, 0.94, 0.985));
+    if (k > 0) obj({ g: H.g, sub: 4, draw: function () {
+      for (var i = 0; i < 5; i++) { var ph = (t * 0.33 + i / 5) % 1, s = proj(rot([0.33 + 0.07 * Math.sin(ph * 5 + i), YR + 0.33 + ph * 0.62, 0.05 * Math.cos(ph * 4 + i * 2)])); ctx.globalAlpha = k * 0.85 * Math.sin(Math.PI * Math.min(1, ph * 1.15)); ctx.fillStyle = '#fff'; ctx.strokeStyle = 'rgba(110,135,150,.35)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(s[0], s[1], (0.045 + 0.075 * ph) * view.s, 0, 6.2832); ctx.fill(); ctx.stroke(); }
+      ctx.globalAlpha = 1;
+    } });
+  }
+  var CLOUDS = [[60, 0.16, 9, 1.0], [330, 0.34, 6, 0.75], [520, 0.07, 12, 0.8], [200, 0.52, 5, 0.6]];
+  function drawScene(p, t) {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, CW, CH);
+    CLOUDS.forEach(function (c) {            // soft clouds drifting behind the house
+      var x = ((c[0] + t * c[2]) % (CW + 240)) - 120, y = 110 + c[1] * 420, s = c[3];
+      ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.beginPath();
+      ctx.arc(x, y, 26 * s, 0, 6.2832); ctx.arc(x + 30 * s, y - 14 * s, 32 * s, 0, 6.2832); ctx.arc(x + 66 * s, y - 2 * s, 28 * s, 0, 6.2832); ctx.arc(x + 34 * s, y + 8 * s, 30 * s, 0, 6.2832); ctx.fill();
+    });
+    var ang = t * 0.45 + p * 2.2 + 3.35; ca = Math.cos(ang); sa = Math.sin(ang);
+    var g = proj(rot([0, -0.17, 0]));        // soft shadow under the plot
+    ctx.save(); ctx.translate(g[0], g[1] + 0.1 * view.s); ctx.scale(1, 0.42); var sh = ctx.createRadialGradient(0, 0, view.s * 0.5, 0, 0, view.s * 1.75); sh.addColorStop(0, 'rgba(40,80,110,.3)'); sh.addColorStop(1, 'rgba(40,80,110,0)'); ctx.fillStyle = sh; ctx.beginPath(); ctx.arc(0, 0, view.s * 1.75, 0, 6.2832); ctx.fill(); ctx.restore();
+    buildScene(p, t);
+    scene.forEach(function (o) {
+      var pts = []; o.f.forEach(function (f) { if (!f.n) f.p.forEach(function (q) { pts.push(q); }); });
+      o.c = pts.length ? centre(pts) : [0, 0, 0]; o.dy = o.dy || 0;
+      o.dg = rot(o.g || o.sp || [o.c[0], 0, o.c[2]])[2]; o.ds = rot(o.sp || [o.c[0], 0, o.c[2]])[2];
+    });
+    scene.sort(function (a, b) { return a.layer - b.layer || a.dg - b.dg || a.sub - b.sub || a.ds - b.ds; });
+    scene.forEach(function (o) {
+      ctx.globalAlpha = o.a; if (o.draw) { o.draw(); return; }
+      var oc = rot([o.c[0], o.c[1] + o.dy, o.c[2]]); o.f.forEach(function (f) { paintFace(f, oc, o.dy); });
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  var rv = [].slice.call(document.querySelectorAll('.rv')), tops = [], SCROLL = 1250, heads = [$('#h0'), $('#h1'), $('#h2')], stepEls = [].slice.call(document.querySelectorAll('#steps span')), DONE = [0.10, 0.34, 0.52, 0.68, 0.945];
+  function topOf(el) { var y = 0; while (el && el !== document.body) { y += el.offsetTop; el = el.offsetParent; } return y; }
+  function measure() { tops = rv.map(topOf); CH = pin.offsetHeight; DPR = Math.min(2, window.devicePixelRatio || 1) < 2 && !FILM ? 1.5 : 2; cv.width = CW * DPR; cv.height = CH * DPR; cv.style.width = CW + 'px'; cv.style.height = CH + 'px'; }
+  function render(y, t) {
+    var p = clamp(y / SCROLL);
+    drawScene(p, t);
+    var a = ease(st(p, 0.29, 0.35)), b = ease(st(p, 0.62, 0.68)), ops = [1 - a, a * (1 - b), b];
+    heads.forEach(function (h, i) { h.style.opacity = ops[i].toFixed(3); h.style.transform = 'translateY(' + ((1 - ops[i]) * (i === 0 ? -14 : 14)).toFixed(1) + 'px)'; });
+    stepEls.forEach(function (s, i) { s.className = p >= DONE[i] ? 'on' : ''; });
+    for (var i = 0; i < rv.length; i++) { var k = ease((y + innerHeight * 0.9 - tops[i]) / 150); rv[i].style.opacity = k.toFixed(3); rv[i].style.transform = 'translateY(' + ((1 - k) * 30).toFixed(1) + 'px)'; }
+  }
+  measure(); addEventListener('resize', measure); paintBooked();
+  if (!FILM) { (function loop() { render(scrollY, performance.now() / 1000); requestAnimationFrame(loop); })(); return; }
+
+  // ---------- filming: result, prompt, paste into Claude, finished site ----------
+  var PROMPT = $('#prompt').textContent.trim();
+  var CAPS = [
+    [0.0, 4.0, 'How to make a <em>3D site</em> like this with AI'],
+    [4.0, 7.5, '1. <em>Copy</em> this prompt'],
+    [7.5, 11.0, '2. <em>Paste</em> it into Claude'],
+    [11.0, 12.3, 'Done. <em>One prompt.</em>'],
+    [12.3, 14.6, 'Scroll it. <em>The house builds.</em>'],
+    [14.6, 16.9, 'Real page. <em>Real buttons.</em>'],
+    [16.9, 19.0, 'Full prompt in the <em>description</em><small>Follow for a new one daily</small>']
+  ];
+  var DUR = 19.0, T_COPY = 6.3, T_SEND = 9.0, T_ADD = 15.6, SHEET_Y = 462;
+  var cap = $('#cap span'), sb = $('#sb i'), dot = $('#dot'), sheet = $('#sheet'), pc = $('#pc'), chat = $('#chat'), pcText = $('#pcText'), copyB = $('#copy'), chatText = $('#chatText'), work = $('#work'), prog = $('#prog');
+  pcText.textContent = PROMPT;
+  var H = $('#page').offsetHeight, MAX = H + 62 - innerHeight, yCards = topOf($('#homes')) - 222, P = function (p) { return p * SCROLL / MAX; };
+  window.__film = { duration: DUR, keys: [[-0.7, P(0.30)], [1.0, P(0.53)], [2.2, P(0.72)], [3.5, P(0.975)], [10.6, P(0.975)], [10.62, 0], [10.64, 0], [12.3, P(0.55)], [13.8, P(1.03)], [15.0, yCards / MAX], [16.0, (yCards + 24) / MAX], [17.6, 1], [DUR, 1]] };
+  var first = true;
+  function tap(t, T, el, dx) { var d = t - (T - 0.55); if (d <= 0 || d >= 0.95) return 0; var r = el.getBoundingClientRect(), m = 1 - ease(d / 0.45), press = 1 - 0.28 * clamp(1 - Math.abs(t - T) / 0.14); dot.style.left = (r.left + r.width * (dx || 0.5) + m * 60).toFixed(1) + 'px'; dot.style.top = (r.top + r.height / 2 + 4 + m * 110).toFixed(1) + 'px'; dot.style.transform = 'scale(' + press.toFixed(3) + ')'; return clamp(d / 0.2) * clamp((0.95 - d) / 0.2); }
+  window.__frame = function (t, y) {
+    if (first) { measure(); first = false; }
+    window.scrollTo(0, y);
+    booked = {}; if (t >= T_ADD) booked[0] = true; paintBooked();
+    // the sheet rises over the lower half; the house stays on screen above it, a little smaller
+    var up = ease((t - 4.0) / 0.4) * (1 - ease((t - 10.75) / 0.3)), full = ease((t - 10.3) / 0.3), sy = t < 10.75 ? 960 + (SHEET_Y - 960) * up + (62 - SHEET_Y) * full : 62 + 898 * ease((t - 10.75) / 0.3);
+    sheet.style.transform = 'translateY(' + sy.toFixed(1) + 'px)';
+    var camK = ease((t - 4.0) / 0.5) * (t < 10.61 ? 1 : 0); view.cy = 310 - 52 * camK; view.s = 172 - 52 * camK;
+    render(y, t);
+    var a1 = 1 - ease((t - 7.4) / 0.2), a2 = ease((t - 7.5) / 0.2) * (1 - ease((t - 10.3) / 0.2));
+    pc.style.opacity = a1.toFixed(3); pc.style.visibility = a1 > 0.001 ? 'visible' : 'hidden';
+    chat.style.opacity = a2.toFixed(3); chat.style.visibility = a2 > 0.001 ? 'visible' : 'hidden';
+    pcText.style.transform = 'translateY(' + (-ease((t - 4.5) / 1.6) * 250).toFixed(1) + 'px)';
+    copyB.className = t >= T_COPY ? 'on' : ''; copyB.textContent = t >= T_COPY ? 'Copied ✓' : 'Copy prompt';
+    var pasted = t >= 8.2, sent = t >= T_SEND;
+    chatText.className = pasted ? '' : 'ph'; chatText.textContent = pasted ? PROMPT.slice(0, 260) + '...' : 'Paste your prompt here';
+    $('#box').style.display = sent ? 'none' : 'block'; $('#bubble').style.display = sent ? 'block' : 'none'; $('#bubble').textContent = PROMPT.slice(0, 118) + '...';
+    work.style.display = $('#track').style.display = sent ? 'block' : 'none'; work.textContent = 'Building your site' + '...'.slice(0, 1 + Math.floor(((t - T_SEND) * 3) % 3));
+    prog.style.width = (sent ? ease((t - T_SEND) / 1.3) * 100 : 0).toFixed(1) + '%';
+    // caption
+    var txt = ''; for (var i = 0; i < CAPS.length; i++) if (t >= CAPS[i][0] && t < CAPS[i][1]) { txt = CAPS[i][2]; var a = i === 0 ? 1 : clamp((t - CAPS[i][0]) / 0.16); cap.style.opacity = a.toFixed(2); cap.style.transform = 'translateY(' + ((1 - a) * 10).toFixed(1) + 'px)'; }
+    if (cap.innerHTML !== txt) cap.innerHTML = txt;
+    // scrollbar
+    var th = 600 * innerHeight / (H + 62); sb.style.height = th.toFixed(1) + 'px'; sb.style.top = ((600 - th) * clamp(y / MAX)).toFixed(1) + 'px';
+    // taps
+    var op = Math.max(tap(t, T_COPY, copyB), tap(t, T_SEND, $('#send')), tap(t, T_ADD, btns[0], 0.5));
+    dot.style.opacity = op.toFixed(2);
+  };
+})();
+</script>
+</body>
+</html>
